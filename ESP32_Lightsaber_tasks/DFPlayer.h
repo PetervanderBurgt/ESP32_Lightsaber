@@ -15,4 +15,6 @@ uint16_t fontAndEnumtoTrack(lightsaber_sounds sound, uint8_t soundFont);
 uint16_t getGlobalTrackFromFolderandTrack(uint8_t folderInt, uint8_t trackInt);
 lightsaber_sounds getEnumFromGlobalTrack(uint16_t globalTrackInt);
 
+extern bool dfplayer_ready;
+
 #endif

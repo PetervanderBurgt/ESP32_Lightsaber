@@ -24,7 +24,7 @@ TaskHandle_t LEDTask;
 uint16_t globalTrackInt = 0;
 uint8_t soundFont = 1;
 global_states global_state = lightsaber_idle;
-lightsaber_on_states lightsaber_on_state = lightsaber_on_idle;
+lightsaber_on_states lightsaber_on_state = lightsaber_on_boot;
 
 extern uint16_t fontAndEnumtoTrack(lightsaber_sounds sound, uint8_t soundFont);
 extern uint16_t getGlobalTrackFromFolderandTrack(uint8_t folderInt, uint8_t trackInt);

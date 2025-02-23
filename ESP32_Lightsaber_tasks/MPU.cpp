@@ -3,8 +3,10 @@
 #include "pinConfig.h"
 #include "globalVariables.h"
 
-void MPUCode(void* pvParameters) {
+bool mpu_ready = false;
 
+void MPUCode(void* pvParameters) {
+  mpu_ready = true;
   for (;;) {
 
     // Runs task every 25 MS

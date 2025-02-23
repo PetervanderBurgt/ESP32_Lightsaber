@@ -16,7 +16,8 @@ enum lightsaber_on_states {
   lightsaber_on_blasterdeflect,
   lightsaber_on_clash,
   lightsaber_on_swing,
-  lightsaber_on_idle
+  lightsaber_on_idle,
+  lightsaber_on_boot
 };
 
 enum lightsaber_sounds {

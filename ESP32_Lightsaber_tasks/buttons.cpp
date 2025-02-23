@@ -8,6 +8,8 @@ OneButton main_button(MAIN_BUTTON, true, true);
 OneButton second_button(SECOND_BUTTON, true, true);
 extern lightsaber_on_states lightsaber_on_state;
 
+bool buttons_ready = false;
+
 void ButtonsCode(void* pvParameters) {
   OneButton main_button = OneButton(MAIN_BUTTON, true, true);
   main_button.setClickMs(CLICK);
@@ -30,6 +32,7 @@ void ButtonsCode(void* pvParameters) {
   second_button.attachLongPressStop(secondary_button_longPressStop);
   second_button.attachDuringLongPress(secondary_button_longPress);
 
+  buttons_ready = true;
   for (;;) {
     main_button.tick();
     second_button.tick();

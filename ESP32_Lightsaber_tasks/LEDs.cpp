@@ -1,9 +1,10 @@
 #include <Esp.h>
 #include <FastLED.h>
-#include "buttons.h"
+#include "LEDs.h"
 #include "pinConfig.h"
 #include "globalVariables.h"
 
+bool leds_ready = false;
 extern lightsaber_on_states lightsaber_on_state;
 
 void LEDCode(void* pvParameters) {
@@ -11,6 +12,7 @@ void LEDCode(void* pvParameters) {
   FastLED.addLeds<WS2811, LED_OUTPUT, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);  // Set brightness level (0-255)
 
+  leds_ready = true;
   for (;;) {
     // Serial.print("lightsaber_on_state: ");
     // Serial.println(lightsaber_on_state);
@@ -40,7 +42,7 @@ void LEDCode(void* pvParameters) {
 
       default:
         fill_solid(leds, NUM_LEDS, CRGB::Black);  // Hex value 0xFF5733
-        FastLED.show();                                 // Update the LEDs to reflect changes
+        FastLED.show();                           // Update the LEDs to reflect changes
         break;
     }
     // Runs task every 25 MS

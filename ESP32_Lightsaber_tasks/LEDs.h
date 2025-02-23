@@ -3,4 +3,7 @@
 
 void LEDCode(void* pvParameters);
 
+extern bool leds_ready;
+
+
 #endif

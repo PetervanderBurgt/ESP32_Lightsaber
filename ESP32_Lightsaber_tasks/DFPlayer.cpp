@@ -4,10 +4,18 @@
 #include "pinConfig.h"
 #include "globalVariables.h"
 
+bool dfplayer_ready = false;
+extern bool leds_ready;
+extern bool mpu_ready;
+extern bool buttons_ready;
+
 extern lightsaber_on_states lightsaber_on_state;
 extern uint16_t globalTrackInt;
 extern uint8_t soundFont;
 lightsaber_sounds current_sound = sound_unknown;
+
+int firstBootTimer = -1;
+int bootPlayTimeMS = 2000;
 
 // instance a DfMp3 object,
 DfMp3 dfmp3(Serial1);
@@ -44,7 +52,11 @@ void DFPlayerCode(void* pvParameters) {
   Serial.println(mode);
 
   Serial.println("starting...");
+  dfplayer_ready = true;
+
+
   for (;;) {
+
     if (globalTrackInt != 0) {
       Serial.print("globalTrackInt DF: ");
       Serial.println(globalTrackInt);
@@ -54,8 +66,10 @@ void DFPlayerCode(void* pvParameters) {
       globalTrackInt = 0;
     }
 
-    Serial.print("Current playing track= ");
-    Serial.println(current_sound);
+    // Serial.print("Current playing track= ");
+    // Serial.println(current_sound);
+
+    Serial.println(lightsaber_on_state);
 
     switch (lightsaber_on_state) {
       case lightsaber_on_ignition:
@@ -66,16 +80,31 @@ void DFPlayerCode(void* pvParameters) {
         break;
 
       case lightsaber_on_retraction:
-          current_sound = getEnumFromGlobalTrack(dfmp3.getCurrentTrack());
+        current_sound = getEnumFromGlobalTrack(dfmp3.getCurrentTrack());
         if (current_sound != sound_poweroff) {
           dfmp3.playGlobalTrack(fontAndEnumtoTrack(sound_poweroff, soundFont));
         }
         break;
 
       case lightsaber_on_hum:
-          current_sound = getEnumFromGlobalTrack(dfmp3.getCurrentTrack());
+        current_sound = getEnumFromGlobalTrack(dfmp3.getCurrentTrack());
         if (current_sound != sound_hum) {
           dfmp3.loopGlobalTrack(fontAndEnumtoTrack(sound_hum, soundFont));
+        }
+        break;
+
+      case lightsaber_on_boot:
+        current_sound = getEnumFromGlobalTrack(dfmp3.getCurrentTrack());
+        if (current_sound != sound_boot) {
+          dfmp3.playGlobalTrack(fontAndEnumtoTrack(sound_boot, soundFont));
+        }
+        if (firstBootTimer == -1) {
+          Serial.println("Playing boot sound");
+          firstBootTimer = millis();
+        } else {
+          if (millis() - firstBootTimer > bootPlayTimeMS) {
+            lightsaber_on_state = lightsaber_on_idle;
+          }
         }
         break;
 

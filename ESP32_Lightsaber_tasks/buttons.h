@@ -18,4 +18,7 @@ void secondary_button_longPressStart();
 void secondary_button_longPress();
 void secondary_button_longPressStop();
 
+extern bool buttons_ready;
+
+
 #endif
