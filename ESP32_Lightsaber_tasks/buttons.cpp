@@ -41,9 +41,11 @@ void ButtonsCode(void* pvParameters) {
 // ----- Main Button callback functions
 // This function will be called when the button1 was pressed 1 time (and no 2. button press followed).
 void main_button_click() {
-  lightsaber_on_state = lightsaber_on_ignition;
-  Serial.print("lightsaber_on_state: ");
-  Serial.println(lightsaber_on_state);
+  if (lightsaber_on_state == lightsaber_on_idle) {
+    lightsaber_on_state = lightsaber_on_ignition;
+    Serial.print("lightsaber_on_state: ");
+    Serial.println(lightsaber_on_state);
+  }
 }
 // This function will be called when the button1 was pressed 2 times in a short timeframe.
 void main_button_doubleclick() {
@@ -64,9 +66,11 @@ void main_button_longPressStop() {
 
 // ... and the same for Secondary Button:
 void secondary_button_click() {
-  lightsaber_on_state = lightsaber_on_retraction;
-  Serial.print("lightsaber_on_state: ");
-  Serial.println(lightsaber_on_state);
+  if (lightsaber_on_state == lightsaber_on_hum) {
+    lightsaber_on_state = lightsaber_on_retraction;
+    Serial.print("lightsaber_on_state: ");
+    Serial.println(lightsaber_on_state);
+  }
 }  // click2
 void secondary_button_doubleclick() {
   Serial.println("Secondary Button doubleclick.");

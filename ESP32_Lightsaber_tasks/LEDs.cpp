@@ -12,8 +12,8 @@ void LEDCode(void* pvParameters) {
   FastLED.setBrightness(BRIGHTNESS);  // Set brightness level (0-255)
 
   for (;;) {
-    Serial.print("lightsaber_on_state: ");
-    Serial.println(lightsaber_on_state);
+    // Serial.print("lightsaber_on_state: ");
+    // Serial.println(lightsaber_on_state);
     switch (lightsaber_on_state) {
       case lightsaber_on_ignition:
         for (int i = 0; i < NUM_LEDS; i++) {

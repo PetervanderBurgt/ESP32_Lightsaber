@@ -22,12 +22,15 @@ enum lightsaber_on_states {
 enum lightsaber_sounds {
   sound_boot,
   sound_poweron,
+  sound_poweroff,
   sound_swing,
   sound_clash,
   sound_lockup,
   sound_blaster,
   sound_font,
-  sound_hum
+  sound_hum,
+  sound_config,
+  sound_unknown
 };
 
 enum sound_play {

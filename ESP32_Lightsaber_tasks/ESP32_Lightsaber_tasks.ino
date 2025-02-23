@@ -26,6 +26,9 @@ uint8_t soundFont = 1;
 global_states global_state = lightsaber_idle;
 lightsaber_on_states lightsaber_on_state = lightsaber_on_idle;
 
+extern uint16_t fontAndEnumtoTrack(lightsaber_sounds sound, uint8_t soundFont);
+extern uint16_t getGlobalTrackFromFolderandTrack(uint8_t folderInt, uint8_t trackInt);
+
 void setup() {
   Serial.begin(115200);
 
@@ -82,47 +85,6 @@ void setup() {
 }
 
 void loop() {
-}
-
-uint16_t fontAndEnumtoTrack(lightsaber_sounds sound, uint8_t soundFont) {
-  uint8_t track = 0;
-  switch (sound) {
-    case sound_boot:
-      track = 1;
-      break;
-    case sound_poweron:
-      track = random(2, 5 + 1);
-      break;
-    case sound_swing:
-      track = random(6, 7 + 1);
-      break;
-    case sound_clash:
-      track = random(8, 15 + 1);
-      break;
-    case sound_lockup:
-      track = random(16, 24 + 1);
-      break;
-    case sound_blaster:
-      track = random(25, 28 + 1);
-      break;
-    case sound_font:
-      track = 29;
-      break;
-    default:
-    case sound_hum:
-      track = 30;
-      break;
-  }
-  return getGlobalTrackFromFolderandTrack(soundFont + 1, track);
-}
-
-uint16_t getGlobalTrackFromFolderandTrack(uint8_t folderInt, uint8_t trackInt) {
-  if (folderInt == 1) {
-    return trackInt;
-  } else {
-    return (folderInt - 2) * 30 + 29 + trackInt;
-  }
-  return 0;
 }
 
 void SerialReadingCode(void* pvParameters) {
