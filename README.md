@@ -2,7 +2,9 @@
 
 This project is a project I am working on for a long time and currently putting more effort in the code base.
 I am happily inspired by the great work done by everyone at [FX SaberOS](https://github.com/Protonerd/FX-SaberOS/tree/master), but would like to create my own ESP32 based version.
+As you will notice, the sounds are also from there, big thanks to them.
 This was mainly due to the fact I wanted some more coding under my belt, and would like to know how tasks can be used.
+Furthermore, I would like to see if I can incorporate some kind of nice BT Config menu or a webpage.
 
 **Please do note that this is an ongoing project and not finished.**
 
@@ -11,29 +13,29 @@ This was mainly due to the fact I wanted some more coding under my belt, and wou
 Before all this happened I set out a couple of things that I would like to attain:
 
 **Must haves:**
-* Light up all 100 LEDS
-* Two buttons to use
-* Sound to play:
-    * Boot sound
-    * Saber on
-    * Saber off 
-    * Humm sounds
-    * Swing sounds
-    * clash sounds
-* Config should be possible
-* Keep settings on power on off
-* Switch color / rainbow
+- [x] Light up all 100 LEDS
+- [ ] Two buttons to use
+- [ ]  Sound to play:
+    - [ ]  Boot sound
+    - [x]  Saber on
+    - [x]  Saber off 
+    - [x]  Hum sounds
+    - [ ]  Swing sounds
+    - [ ]  Clash sounds
+- [ ]  Config should be possible
+- [ ]  Keep settings on power on off
+- [ ]  Switch color / rainbow
 
 **Could haves:**
-* flicker in leds
-* random places for blaster
-* tip melt
-* pulsating
-* Webpage for settings
-* Sounds
-    * Config sounds
-    * Blaster
-    * lockup
+- [ ]  Flicker in leds
+- [ ]  Random places for blaster
+- [ ]  Tip melt
+- [ ]  Pulsating
+- [ ]  Webpage for settings
+- [ ]  Sounds
+    - [ ]  Config sounds
+    - [ ]  Blaster
+    - [ ]  Lockup
 
 ## Hardware gathering
 All links given are based on availability in the Netherlands
