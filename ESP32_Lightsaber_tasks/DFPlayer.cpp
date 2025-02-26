@@ -17,10 +17,27 @@ lightsaber_sounds current_sound = sound_unknown;
 int firstBootTimer = -1;
 int bootPlayTimeMS = 2000;
 
-// instance a DfMp3 object,
-DfMp3 dfmp3(Serial1);
+DFPlayer::DFPlayer(HardwareSerial& serialPort)
+  : dfmp3(serialPort) {
+  // Any other initialization you need for MyPlayer
+}
 
-void DFPlayerCode(void* pvParameters) {
+// Start the task by creating a FreeRTOS task
+void DFPlayer::startTask() {
+  // Create the task, passing `this` (the instance of the class) as the parameter
+  xTaskCreatePinnedToCore(runTask, "DFPlayerTask", 2048, this, 1, NULL, 0);
+}
+
+// Static task function called by FreeRTOS
+void DFPlayer::runTask(void* pvParameters) {
+  // Cast the parameter to a pointer to the MyTaskClass instance
+  DFPlayer* instance = static_cast<DFPlayer*>(pvParameters);
+
+  // Call the instance's non-static method (the actual task)
+  instance->DFPlayerCode();
+}
+
+void DFPlayer::DFPlayerCode() {
   Serial.print("DFPlayerTask running on core ");
   Serial.println(xPortGetCoreID());
   dfmp3.begin(/*rx =*/RX_DFPLAYER, /*tx =*/TX_DFPLAYER);
@@ -56,21 +73,6 @@ void DFPlayerCode(void* pvParameters) {
 
 
   for (;;) {
-
-    if (globalTrackInt != 0) {
-      Serial.print("globalTrackInt DF: ");
-      Serial.println(globalTrackInt);
-
-      // dfmp3.playGlobalTrack(globalTrackInt);
-      dfmp3.loopGlobalTrack(globalTrackInt);
-      globalTrackInt = 0;
-    }
-
-    // Serial.print("Current playing track= ");
-    // Serial.println(current_sound);
-
-    Serial.println(lightsaber_on_state);
-
     switch (lightsaber_on_state) {
       case lightsaber_on_ignition:
         current_sound = getEnumFromGlobalTrack(dfmp3.getCurrentTrack());
@@ -102,7 +104,8 @@ void DFPlayerCode(void* pvParameters) {
           Serial.println("Playing boot sound");
           firstBootTimer = millis();
         } else {
-          if (millis() - firstBootTimer > bootPlayTimeMS) {
+          //Done playing boot sound
+          if (dfmp3.getStatus().state == DfMp3_StatusState_Idle) {
             lightsaber_on_state = lightsaber_on_idle;
           }
         }
@@ -115,12 +118,12 @@ void DFPlayerCode(void* pvParameters) {
     }
 
     dfmp3.loop();
-    // Runs task every 25 MS
+    // Runs task every 50 MS
     vTaskDelay(20 / portTICK_PERIOD_MS);
   }
 }
 
-uint16_t fontAndEnumtoTrack(lightsaber_sounds sound, uint8_t soundFont) {
+uint16_t DFPlayer::fontAndEnumtoTrack(lightsaber_sounds sound, uint8_t soundFont) {
   uint8_t track = 0;
   switch (sound) {
     case sound_boot:
@@ -155,7 +158,7 @@ uint16_t fontAndEnumtoTrack(lightsaber_sounds sound, uint8_t soundFont) {
   return getGlobalTrackFromFolderandTrack(soundFont + 1, track);
 }
 
-uint16_t getGlobalTrackFromFolderandTrack(uint8_t folderInt, uint8_t trackInt) {
+uint16_t DFPlayer::getGlobalTrackFromFolderandTrack(uint8_t folderInt, uint8_t trackInt) {
   if (folderInt == 1) {
     return trackInt;
   } else {
@@ -164,7 +167,7 @@ uint16_t getGlobalTrackFromFolderandTrack(uint8_t folderInt, uint8_t trackInt) {
   return 0;
 }
 
-lightsaber_sounds getEnumFromGlobalTrack(uint16_t globalTrackInt) {
+lightsaber_sounds DFPlayer::getEnumFromGlobalTrack(uint16_t globalTrackInt) {
   if (globalTrackInt < 29) {
     return sound_config;
   } else {
@@ -183,7 +186,7 @@ lightsaber_sounds getEnumFromGlobalTrack(uint16_t globalTrackInt) {
   return sound_unknown;
 }
 
-class Mp3Notify {
+class DFPlayer::Mp3Notify {
 public:
   static void PrintlnSourceAction(DfMp3_PlaySources source, const char* action) {
     if (source & DfMp3_PlaySources_Sd) {
