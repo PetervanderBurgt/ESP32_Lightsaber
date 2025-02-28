@@ -5,7 +5,14 @@
 
 extern config_states config_state;
 
-ConfigMenu::ConfigMenu(){
+ConfigMenu::ConfigMenu() {
+  preferences.begin("Lightsaber", false);       // Lightsaber namespace, and false to be able to read/write
+  preferences.getUChar("SoundFont", 1);         // between 1 and 18
+  preferences.getUChar("Volume", 30);           // between 0 and 30
+  preferences.getUChar("SwingSensitivity", 1);  // between 0 and 255
+  preferences.getUInt("MainColor", 0x6464C8);   // Should be a hex color
+  preferences.getUInt("ClashColor", 0xFF0505);  // Should be a hex color
+  preferences.getUInt("BlastColor", 0xFF0505);  // Should be a hex color
 }
 
 void ConfigMenu::runConfigMenu() {
