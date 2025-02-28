@@ -10,6 +10,10 @@
 #define LED_OUTPUT 5
 #define NUM_LEDS 100
 #define BRIGHTNESS 100
+
 #define FPS_LEDS 120
+#define FPS_Buttons 60
+#define FPS_MPU 60
+#define FPS_DFPlayer 120
 
 #endif
