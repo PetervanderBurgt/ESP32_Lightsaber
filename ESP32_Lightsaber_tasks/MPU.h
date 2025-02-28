@@ -3,4 +3,6 @@
 
 void MPUCode(void* pvParameters);
 
+extern bool mpu_ready;
+
 #endif

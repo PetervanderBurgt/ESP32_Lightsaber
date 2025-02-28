@@ -16,7 +16,7 @@ Before all this happened I set out a couple of things that I would like to attai
 - [x] Light up all 100 LEDS
 - [ ] Two buttons to use
 - [ ]  Sound to play:
-    - [ ]  Boot sound
+    - [x]  Boot sound
     - [x]  Saber on
     - [x]  Saber off 
     - [x]  Hum sounds
