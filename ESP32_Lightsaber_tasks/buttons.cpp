@@ -79,13 +79,15 @@ void Buttons::ButtonsCode() {
 // This function will be called when the button1 was pressed 1 time (and no 2. button press followed).
 void Buttons::main_button_click() {
   Serial.println("Main Button click.");
-  if (global_state == lightsaber_idle && lightsaber_on_state == lightsaber_on_idle) {
-    global_state = lightsaber_on;
-    Serial.print("global_state: ");
-    Serial.println(global_state);
-    lightsaber_on_state = lightsaber_on_ignition;
-    Serial.print("lightsaber_on_state: ");
-    Serial.println(lightsaber_on_state);
+  if (global_state == lightsaber_idle) {
+    if (lightsaber_on_state == lightsaber_on_idle) {
+      global_state = lightsaber_on;
+      Serial.print("global_state: ");
+      Serial.println(global_state);
+      lightsaber_on_state = lightsaber_on_ignition;
+      Serial.print("lightsaber_on_state: ");
+      Serial.println(lightsaber_on_state);
+    }
   }
 }
 // This function will be called when the button1 was pressed 2 times in a short timeframe.
@@ -95,13 +97,15 @@ void Buttons::main_button_doubleclick() {
 // This function will be called once, when the button1 is pressed for a long time.
 void Buttons::main_button_longPressStart() {
   Serial.println("Secondary Button longPress start");
-  if (global_state == lightsaber_on && lightsaber_on_state == lightsaber_on_hum) {
-    Serial.print("global_state: ");
-    Serial.println(global_state);
-    lightsaber_on_state = lightsaber_on_retraction;
-    Serial.print("lightsaber_on_state: ");
-    Serial.println(lightsaber_on_state);
-  }else if (global_state == lightsaber_config) {
+  if (global_state == lightsaber_on) {
+    if (lightsaber_on_state == lightsaber_on_hum) {
+      Serial.print("global_state: ");
+      Serial.println(global_state);
+      lightsaber_on_state = lightsaber_on_retraction;
+      Serial.print("lightsaber_on_state: ");
+      Serial.println(lightsaber_on_state);
+    }
+  } else if (global_state == lightsaber_config) {
     menu.nextConfigMenu();
   }
 }  // longPressStart1
