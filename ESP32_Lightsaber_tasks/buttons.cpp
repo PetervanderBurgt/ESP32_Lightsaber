@@ -3,11 +3,16 @@
 #include "buttons.h"
 #include "pinConfig.h"
 #include "globalVariables.h"
+#include "configMenu.h"
 
 extern global_states global_state;
 extern lightsaber_on_states lightsaber_on_state;
+extern config_states config_state;
+extern bool configStart;
 
 bool buttons_ready = false;
+
+ConfigMenu menu;
 
 Buttons::Buttons(button_types button_type)
   : current_button_type(button_type) {
@@ -40,6 +45,7 @@ void Buttons::runTask(void* pvParameters) {
 
 void Buttons::ButtonsCode() {
   OneButton button;
+  menu = ConfigMenu();
   if (current_button_type == button_double_main) {
     button.setup(MAIN_BUTTON, INPUT_PULLUP, true);
     button.setClickMs(CLICK);
@@ -95,6 +101,8 @@ void Buttons::main_button_longPressStart() {
     lightsaber_on_state = lightsaber_on_retraction;
     Serial.print("lightsaber_on_state: ");
     Serial.println(lightsaber_on_state);
+  }else if (global_state == lightsaber_config) {
+    menu.nextConfigMenu();
   }
 }  // longPressStart1
 // This function will be called often, while the button1 is pressed for a long time.
@@ -109,20 +117,31 @@ void Buttons::main_button_longPressStop() {
 // ... and the same for Secondary Button:
 void Buttons::secondary_button_click() {
   Serial.println("Secondary Button click.");
-  if (global_state == lightsaber_idle) {
-    global_state = lightsaber_config;
-    Serial.print("global_state: ");
-    Serial.println(global_state);
-  }else if (global_state == lightsaber_config) {
-    global_state = lightsaber_idle;
-    Serial.print("global_state: ");
-    Serial.println(global_state);
-  }
 }  // click2
 void Buttons::secondary_button_doubleclick() {
   Serial.println("Secondary Button doubleclick.");
 }  // doubleclick2
 void Buttons::secondary_button_longPressStart() {
+  if (global_state == lightsaber_idle) {
+    global_state = lightsaber_config;
+    Serial.print("global_state: ");
+    Serial.println(global_state);
+    config_state = config_idle;
+    Serial.print("config_state: ");
+    Serial.println(config_state);
+    configStart = true;
+  } else if (global_state == lightsaber_config) {
+    global_state = lightsaber_idle;
+    Serial.print("global_state: ");
+    Serial.println(global_state);
+    lightsaber_on_state = lightsaber_on_boot;
+    Serial.print("lightsaber_on_state: ");
+    Serial.println(lightsaber_on_state);
+    config_state = config_idle;
+    Serial.print("config_state: ");
+    Serial.println(config_state);
+    configStart = true;
+  }
   Serial.println("Secondary Button longPress start");
 }  // longPressStart2
 void Buttons::secondary_button_longPress() {

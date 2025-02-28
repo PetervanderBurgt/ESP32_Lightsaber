@@ -20,42 +20,19 @@ Buttons secondaryButton(button_double_secondary);
 uint8_t soundFont = 1;
 global_states global_state = lightsaber_idle;
 lightsaber_on_states lightsaber_on_state = lightsaber_on_boot;
+config_states config_state = config_idle;
 
 void setup() {
   Serial.begin(115200);
 
-mainButton.startTask();
-secondaryButton.startTask();
-  // xTaskCreatePinnedToCore(
-  //   ButtonsCode,   /* Task function. */
-  //   "ButtonsTask", /* name of task. */
-  //   2048,          /* Stack size of task */
-  //   NULL,          /* parameter of the task */
-  //   1,             /* priority of the task */
-  //   &ButtonsTask,  /* Task handle to keep track of created task */
-  //   1);            /* pin task to core 1 */
+  mainButton.startTask();
+  secondaryButton.startTask();
   vTaskDelay(100);
 
-mpu.startTask();
-  // xTaskCreatePinnedToCore(
-  //   MPUCode,   /* Task function. */
-  //   "MPUTask", /* name of task. */
-  //   2048,      /* Stack size of task */
-  //   NULL,      /* parameter of the task */
-  //   1,         /* priority of the task */
-  //   &MPUTask,  /* Task handle to keep track of created task */
-  //   1);        /* pin task to core 1 */
+  mpu.startTask();
   vTaskDelay(100);
 
-leds.startTask();
-  // xTaskCreatePinnedToCore(
-  //   LEDCode,   /* Task function. */
-  //   "LEDTask", /* name of task. */
-  //   2048,      /* Stack size of task */
-  //   NULL,      /* parameter of the task */
-  //   1,         /* priority of the task */
-  //   &LEDTask,  /* Task handle to keep track of created task */
-  //   1);        /* pin task to core 1 */
+  leds.startTask();
   vTaskDelay(100);
 
   audio.startTask();

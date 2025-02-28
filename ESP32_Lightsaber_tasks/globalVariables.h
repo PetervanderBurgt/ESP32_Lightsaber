@@ -20,6 +20,18 @@ enum lightsaber_on_states {
   lightsaber_on_boot
 };
 
+enum config_states {
+  config_idle,
+  config_soundfont,
+  config_volume,
+  config_swingsensitivity,
+  config_maincolor,
+  config_clashcolor,
+  config_blastcolor,
+  config_batteryLevel,
+  config_lastMember
+};
+
 //Colors from https://www.reddit.com/r/lightsabers/comments/w5m02g/xenopixel_rgb_color_codes/
 enum lightsaberColor {
   Silver_blue = 0x6464C8,

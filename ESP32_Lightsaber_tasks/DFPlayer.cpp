@@ -4,6 +4,7 @@
 #include "pinConfig.h"
 #include "globalVariables.h"
 
+
 bool dfplayer_ready = false;
 extern bool leds_ready;
 extern bool mpu_ready;
@@ -11,11 +12,14 @@ extern bool buttons_ready;
 
 extern global_states global_state;
 extern lightsaber_on_states lightsaber_on_state;
+extern config_states config_state;
 extern uint8_t soundFont;
 
 lightsaber_sounds current_sound = sound_unknown;
+config_sounds current_config_sound = config_sound_unknown;
 
 bool firstBoot = true;
+bool configStart = true;
 
 DFPlayer::DFPlayer(HardwareSerial& serialPort)
   : dfmp3(serialPort) {
@@ -106,6 +110,65 @@ void DFPlayer::DFPlayerCode() {
           break;
       }
     } else if (global_state == lightsaber_config) {
+      switch (config_state) {
+        case config_idle:
+          current_config_sound = getCurrentconfigTrack();
+          if (current_config_sound != config_sound_configmode) {
+            playconfigTrack(config_sound_configmode);
+          }
+          if (configStart) {
+            Serial.println("Playing config sound");
+            configStart = false;
+          } else {
+            //Done playing boot sound
+            if (dfmp3.getStatus().state == DfMp3_StatusState_Idle) {
+              config_state = config_soundfont;
+            }
+          }
+          break;
+        case config_soundfont:
+          current_config_sound = getCurrentconfigTrack();
+          if (current_config_sound != config_sound_Soundfont) {
+            playconfigTrack(config_sound_Soundfont);
+          }
+          break;
+        case config_volume:
+          current_config_sound = getCurrentconfigTrack();
+          if (current_config_sound != config_sound_Volume) {
+            playconfigTrack(config_sound_Volume);
+          }
+          break;
+        case config_swingsensitivity:
+          current_config_sound = getCurrentconfigTrack();
+          if (current_config_sound != config_sound_swingsensitivity) {
+            playconfigTrack(config_sound_swingsensitivity);
+          }
+          break;
+        case config_maincolor:
+          current_config_sound = getCurrentconfigTrack();
+          if (current_config_sound != config_sound_MainColor) {
+            playconfigTrack(config_sound_MainColor);
+          }
+          break;
+        case config_clashcolor:
+          current_config_sound = getCurrentconfigTrack();
+          if (current_config_sound != config_sound_ClashColor) {
+            playconfigTrack(config_sound_ClashColor);
+          }
+          break;
+        case config_blastcolor:
+          current_config_sound = getCurrentconfigTrack();
+          if (current_config_sound != config_sound_BlastColor) {
+            playconfigTrack(config_sound_BlastColor);
+          }
+          break;
+        case config_batteryLevel:
+          current_config_sound = getCurrentconfigTrack();
+          if (current_config_sound != config_sound_batterynominal) {
+            playconfigTrack(config_sound_batterynominal);
+          }
+          break;
+      }
     } else {
       //global state is lightsaber_idle
       if (lightsaber_on_state == lightsaber_on_boot) {
@@ -138,8 +201,20 @@ void DFPlayer::loopLightsaberTrack(lightsaber_sounds sound_to_play) {
   dfmp3.loopGlobalTrack(fontAndEnumtoTrack(sound_to_play, soundFont));
 }
 
-lightsaber_sounds DFPlayer::getCurrentLightsaberTrack(){
+lightsaber_sounds DFPlayer::getCurrentLightsaberTrack() {
   return getEnumFromGlobalTrack(dfmp3.getCurrentTrack());
+}
+
+void DFPlayer::playconfigTrack(config_sounds sound_to_play) {
+  dfmp3.playGlobalTrack(static_cast<int>(sound_to_play) + 1);
+}
+
+config_sounds DFPlayer::getCurrentconfigTrack() {
+  uint16_t current_track = dfmp3.getCurrentTrack() - 1;
+  if (current_track > static_cast<int>(config_sound_unknown)) {
+    return config_sound_unknown;
+  }
+  return static_cast<config_sounds>(current_track);
 }
 
 

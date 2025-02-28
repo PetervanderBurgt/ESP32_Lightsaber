@@ -18,6 +18,39 @@ enum lightsaber_sounds {
   sound_unknown
 };
 
+enum config_sounds {
+  config_sound_up,
+  config_sound_down,
+  config_sound_configmode,
+  config_sound_Volume,
+  config_sound_Soundfont,
+  config_sound_MainColor,
+  config_sound_ClashColor,
+  config_sound_BlastColor,
+  config_sound_max,
+  config_sound_min,
+  config_sound_diyinolighsaber_boot_t2s,
+  config_sound_yes,
+  config_sound_no,
+  config_sound_diyinojukebox_t2s,
+  config_sound_batterynominal,
+  config_sound_batterydiminished,
+  config_sound_batterylow,
+  config_sound_batterycritical,
+  config_sound_batteryfull,
+  config_sound_bladetype,
+  config_sound_ledstringblade,
+  config_sound_pixelblade,
+  config_sound_starledblade,
+  config_sound_ignitionstyle,
+  config_sound_flickerStyle,
+  config_sound_swingsensitivity,
+  config_sound_programmingMode,
+  config_sound_storageMediaAccess,
+  config_sound_sleepModeInit,
+  config_sound_unknown
+};
+
 class DFPlayer {
 private:
   // Code for sound creating objects
@@ -37,6 +70,9 @@ private:
   void playLightsaberTrack(lightsaber_sounds sound_to_play);
   void loopLightsaberTrack(lightsaber_sounds sound_to_play);
   lightsaber_sounds getCurrentLightsaberTrack();
+
+  void playconfigTrack(config_sounds sound_to_play);
+  config_sounds getCurrentconfigTrack();
 
 public:
   // Code for sound creating objects
