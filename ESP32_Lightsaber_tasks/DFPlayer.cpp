@@ -9,13 +9,13 @@ extern bool leds_ready;
 extern bool mpu_ready;
 extern bool buttons_ready;
 
+extern global_states global_state;
 extern lightsaber_on_states lightsaber_on_state;
-extern uint16_t globalTrackInt;
 extern uint8_t soundFont;
+
 lightsaber_sounds current_sound = sound_unknown;
 
-int firstBootTimer = -1;
-int bootPlayTimeMS = 2000;
+bool firstBoot = true;
 
 DFPlayer::DFPlayer(HardwareSerial& serialPort)
   : dfmp3(serialPort) {
@@ -25,7 +25,14 @@ DFPlayer::DFPlayer(HardwareSerial& serialPort)
 // Start the task by creating a FreeRTOS task
 void DFPlayer::startTask() {
   // Create the task, passing `this` (the instance of the class) as the parameter
-  xTaskCreatePinnedToCore(runTask, "DFPlayerTask", 2048, this, 1, NULL, 0);
+  xTaskCreatePinnedToCore(
+    runTask,        /* Task function. */
+    "DFPlayerTask", /* name of task. */
+    2048,           /* Stack size of task */
+    this,           /* parameter of the task */
+    1,              /* priority of the task */
+    NULL,           /* Task handle to keep track of created task */
+    1);             /* pin task to core 1 */
 }
 
 // Static task function called by FreeRTOS
@@ -71,57 +78,70 @@ void DFPlayer::DFPlayerCode() {
   Serial.println("starting...");
   dfplayer_ready = true;
 
-
   for (;;) {
-    switch (lightsaber_on_state) {
-      case lightsaber_on_ignition:
-        current_sound = getEnumFromGlobalTrack(dfmp3.getCurrentTrack());
-        if (current_sound != sound_poweron) {
-          dfmp3.playGlobalTrack(fontAndEnumtoTrack(sound_poweron, soundFont));
-        }
-        break;
+    if (global_state == lightsaber_on) {
+      switch (lightsaber_on_state) {
+        case lightsaber_on_ignition:
+          current_sound = getCurrentLightsaberTrack();
+          if (current_sound != sound_poweron) {
+            playLightsaberTrack(sound_poweron);
+          }
+          break;
 
-      case lightsaber_on_retraction:
-        current_sound = getEnumFromGlobalTrack(dfmp3.getCurrentTrack());
-        if (current_sound != sound_poweroff) {
-          dfmp3.playGlobalTrack(fontAndEnumtoTrack(sound_poweroff, soundFont));
-        }
-        break;
-
-      case lightsaber_on_hum:
-        current_sound = getEnumFromGlobalTrack(dfmp3.getCurrentTrack());
-        if (current_sound != sound_hum) {
-          dfmp3.loopGlobalTrack(fontAndEnumtoTrack(sound_hum, soundFont));
-        }
-        break;
-
-      case lightsaber_on_boot:
-        current_sound = getEnumFromGlobalTrack(dfmp3.getCurrentTrack());
+        case lightsaber_on_retraction:
+          current_sound = getCurrentLightsaberTrack();
+          if (current_sound != sound_poweroff) {
+            playLightsaberTrack(sound_poweroff);
+          }
+          break;
+        case lightsaber_on_hum:
+          current_sound = getCurrentLightsaberTrack();
+          if (current_sound != sound_hum) {
+            loopLightsaberTrack(sound_hum);
+          }
+          break;
+        default:
+          dfmp3.stop();
+          current_sound = sound_unknown;
+          break;
+      }
+    } else if (global_state == lightsaber_config) {
+    } else {
+      //global state is lightsaber_idle
+      if (lightsaber_on_state == lightsaber_on_boot) {
+        current_sound = getCurrentLightsaberTrack();
         if (current_sound != sound_boot) {
-          dfmp3.playGlobalTrack(fontAndEnumtoTrack(sound_boot, soundFont));
+          playLightsaberTrack(sound_boot);
         }
-        if (firstBootTimer == -1) {
+        if (firstBoot) {
           Serial.println("Playing boot sound");
-          firstBootTimer = millis();
+          firstBoot = false;
         } else {
           //Done playing boot sound
           if (dfmp3.getStatus().state == DfMp3_StatusState_Idle) {
             lightsaber_on_state = lightsaber_on_idle;
           }
         }
-        break;
-
-      default:
-        dfmp3.stop();
-        current_sound = sound_unknown;
-        break;
+      }
     }
-
     dfmp3.loop();
-    // Runs task every 50 MS
-    vTaskDelay(20 / portTICK_PERIOD_MS);
+    // Runs task every 20 MS
+    vTaskDelay((1000 / FPS_DFPlayer) / portTICK_PERIOD_MS);
   }
 }
+
+void DFPlayer::playLightsaberTrack(lightsaber_sounds sound_to_play) {
+  dfmp3.playGlobalTrack(fontAndEnumtoTrack(sound_to_play, soundFont));
+}
+
+void DFPlayer::loopLightsaberTrack(lightsaber_sounds sound_to_play) {
+  dfmp3.loopGlobalTrack(fontAndEnumtoTrack(sound_to_play, soundFont));
+}
+
+lightsaber_sounds DFPlayer::getCurrentLightsaberTrack(){
+  return getEnumFromGlobalTrack(dfmp3.getCurrentTrack());
+}
+
 
 uint16_t DFPlayer::fontAndEnumtoTrack(lightsaber_sounds sound, uint8_t soundFont) {
   uint8_t track = 0;

@@ -5,9 +5,39 @@
 #include "globalVariables.h"
 
 bool leds_ready = false;
+
+extern global_states global_state;
 extern lightsaber_on_states lightsaber_on_state;
 
-void LEDCode(void* pvParameters) {
+Blade::Blade() {
+  // Any other initialization you need for this class
+}
+
+// Start the task by creating a FreeRTOS task
+void Blade::startTask() {
+  // Create the task, passing `this` (the instance of the class) as the parameter
+  xTaskCreatePinnedToCore(
+    runTask,   /* Task function. */
+    "LEDTask", /* name of task. */
+    2048,      /* Stack size of task */
+    this,      /* parameter of the task */
+    1,         /* priority of the task */
+    NULL,      /* Task handle to keep track of created task */
+    1);        /* pin task to core 1 */
+}
+
+// Static task function called by FreeRTOS
+void Blade::runTask(void* pvParameters) {
+  // Cast the parameter to a pointer to the MyTaskClass instance
+  Blade* instance = static_cast<Blade*>(pvParameters);
+
+  // Call the instance's non-static method (the actual task)
+  instance->LEDCode();
+}
+
+void Blade::LEDCode() {
+  Serial.print("LEDTask running on core ");
+  Serial.println(xPortGetCoreID());
   CRGB leds[NUM_LEDS];
   FastLED.addLeds<WS2811, LED_OUTPUT, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);  // Set brightness level (0-255)
@@ -32,6 +62,7 @@ void LEDCode(void* pvParameters) {
           FastLED.show();
           vTaskDelay(10 / portTICK_PERIOD_MS);
         }
+        global_state = lightsaber_idle;
         lightsaber_on_state = lightsaber_on_idle;
         break;
 

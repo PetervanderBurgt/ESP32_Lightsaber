@@ -4,86 +4,130 @@
 #include "pinConfig.h"
 #include "globalVariables.h"
 
-OneButton main_button(MAIN_BUTTON, true, true);
-OneButton second_button(SECOND_BUTTON, true, true);
+extern global_states global_state;
 extern lightsaber_on_states lightsaber_on_state;
 
 bool buttons_ready = false;
 
-void ButtonsCode(void* pvParameters) {
-  OneButton main_button = OneButton(MAIN_BUTTON, true, true);
-  main_button.setClickMs(CLICK);
-  main_button.setPressMs(LONG_PRESS);
-  OneButton second_button = OneButton(SECOND_BUTTON, true, true);
-  second_button.setClickMs(CLICK);
-  second_button.setPressMs(LONG_PRESS);
-  // Handler function for a single click:
-  // link the Main Button functions.
-  main_button.attachClick(main_button_click);
-  main_button.attachDoubleClick(main_button_doubleclick);
-  main_button.attachLongPressStart(main_button_longPressStart);
-  main_button.attachLongPressStop(main_button_longPressStop);
-  main_button.attachDuringLongPress(main_button_longPress);
+Buttons::Buttons(button_types button_type)
+  : current_button_type(button_type) {
+}
 
-  // link the Secondary Button functions.
-  second_button.attachClick(secondary_button_click);
-  second_button.attachDoubleClick(secondary_button_doubleclick);
-  second_button.attachLongPressStart(secondary_button_longPressStart);
-  second_button.attachLongPressStop(secondary_button_longPressStop);
-  second_button.attachDuringLongPress(secondary_button_longPress);
+// Start the task by creating a FreeRTOS task
+void Buttons::startTask() {
+  // Create the task, passing `this` (the instance of the class) as the parameter
+
+  xTaskCreatePinnedToCore(
+    runTask,       /* Task function. */
+    "ButtonsTask", /* name of task. */
+    2048,          /* Stack size of task */
+    this,          /* parameter of the task */
+    1,             /* priority of the task */
+    NULL,          /* Task handle to keep track of created task */
+    1);            /* pin task to core 1 */
+}
+
+// Static task function called by FreeRTOS
+void Buttons::runTask(void* pvParameters) {
+  Serial.print("ButtonTask running on core ");
+  Serial.println(xPortGetCoreID());
+  // Cast the parameter to a pointer to the MyTaskClass instance
+  Buttons* instance = static_cast<Buttons*>(pvParameters);
+
+  // Call the instance's non-static method (the actual task)
+  instance->ButtonsCode();
+}
+
+void Buttons::ButtonsCode() {
+  OneButton button;
+  if (current_button_type == button_double_main) {
+    button.setup(MAIN_BUTTON, INPUT_PULLUP, true);
+    button.setClickMs(CLICK);
+    button.setPressMs(LONG_PRESS);
+    button.attachClick(main_button_click);
+    button.attachDoubleClick(main_button_doubleclick);
+    button.attachLongPressStart(main_button_longPressStart);
+    button.attachLongPressStop(main_button_longPressStop);
+    button.attachDuringLongPress(main_button_longPress);
+
+  } else if (current_button_type == button_double_secondary) {
+    button.setup(SECOND_BUTTON, INPUT_PULLUP, true);
+    button.setClickMs(CLICK);
+    button.setPressMs(LONG_PRESS);
+    button.attachClick(secondary_button_click);
+    button.attachDoubleClick(secondary_button_doubleclick);
+    button.attachLongPressStart(secondary_button_longPressStart);
+    button.attachLongPressStop(secondary_button_longPressStop);
+    button.attachDuringLongPress(secondary_button_longPress);
+  }
 
   buttons_ready = true;
   for (;;) {
-    main_button.tick();
-    second_button.tick();
-    // Runs task every 25 MS
-    vTaskDelay(15 / portTICK_PERIOD_MS);
+    button.tick();
+    // Runs task every 15 MS
+    vTaskDelay((1000 / FPS_Buttons) / portTICK_PERIOD_MS);
   }
 }
 
 // ----- Main Button callback functions
 // This function will be called when the button1 was pressed 1 time (and no 2. button press followed).
-void main_button_click() {
-  if (lightsaber_on_state == lightsaber_on_idle) {
+void Buttons::main_button_click() {
+  Serial.println("Main Button click.");
+  if (global_state == lightsaber_idle && lightsaber_on_state == lightsaber_on_idle) {
+    global_state = lightsaber_on;
+    Serial.print("global_state: ");
+    Serial.println(global_state);
     lightsaber_on_state = lightsaber_on_ignition;
     Serial.print("lightsaber_on_state: ");
     Serial.println(lightsaber_on_state);
   }
 }
 // This function will be called when the button1 was pressed 2 times in a short timeframe.
-void main_button_doubleclick() {
+void Buttons::main_button_doubleclick() {
   Serial.println("Main Button doubleclick.");
 }  // doubleclick1
 // This function will be called once, when the button1 is pressed for a long time.
-void main_button_longPressStart() {
-  Serial.println("Main Button longPress start");
-}  // longPressStart1
-// This function will be called often, while the button1 is pressed for a long time.
-void main_button_longPress() {
-  Serial.println("Main Button longPress...");
-}  // longPress1
-// This function will be called once, when the button1 is released after beeing pressed for a long time.
-void main_button_longPressStop() {
-  Serial.println("Main Button longPress stop");
-}  // longPressStop1
-
-// ... and the same for Secondary Button:
-void secondary_button_click() {
-  if (lightsaber_on_state == lightsaber_on_hum) {
+void Buttons::main_button_longPressStart() {
+  Serial.println("Secondary Button longPress start");
+  if (global_state == lightsaber_on && lightsaber_on_state == lightsaber_on_hum) {
+    Serial.print("global_state: ");
+    Serial.println(global_state);
     lightsaber_on_state = lightsaber_on_retraction;
     Serial.print("lightsaber_on_state: ");
     Serial.println(lightsaber_on_state);
   }
+}  // longPressStart1
+// This function will be called often, while the button1 is pressed for a long time.
+void Buttons::main_button_longPress() {
+  Serial.println("Main Button longPress...");
+}  // longPress1
+// This function will be called once, when the button1 is released after beeing pressed for a long time.
+void Buttons::main_button_longPressStop() {
+  Serial.println("Main Button longPress stop");
+}  // longPressStop1
+
+// ... and the same for Secondary Button:
+void Buttons::secondary_button_click() {
+  Serial.println("Secondary Button click.");
+  if (global_state == lightsaber_idle) {
+    global_state = lightsaber_config;
+    Serial.print("global_state: ");
+    Serial.println(global_state);
+  }else if (global_state == lightsaber_config) {
+    global_state = lightsaber_idle;
+    Serial.print("global_state: ");
+    Serial.println(global_state);
+  }
 }  // click2
-void secondary_button_doubleclick() {
+void Buttons::secondary_button_doubleclick() {
   Serial.println("Secondary Button doubleclick.");
 }  // doubleclick2
-void secondary_button_longPressStart() {
+void Buttons::secondary_button_longPressStart() {
   Serial.println("Secondary Button longPress start");
 }  // longPressStart2
-void secondary_button_longPress() {
+void Buttons::secondary_button_longPress() {
   Serial.println("Secondary Button longPress...");
 }  // longPress2
-void secondary_button_longPressStop() {
+void Buttons::secondary_button_longPressStop() {
   Serial.println("Secondary Button longPress stop");
 }  // longPressStop2

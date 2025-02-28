@@ -4,19 +4,43 @@
 #define CLICK 200       //200  // ms you need to press a button to be a click
 #define LONG_PRESS 400  //400  // ms you need to press a button to be a long press, in action mode
 
-void ButtonsCode(void* pvParameters);
+enum button_types {
+  button_single,
+  button_double_main,
+  button_double_secondary
+};
 
-void main_button_click();
-void main_button_doubleclick();
-void main_button_longPressStart();
-void main_button_longPress();
-void main_button_longPressStop();
+class Buttons {
+private:
+  // Code for button objects
+  button_types current_button_type;
+  // Code for task creation and running
+  static void runTask(void* pvParameters);
+  void ButtonsCode();
 
-void secondary_button_click();
-void secondary_button_doubleclick();
-void secondary_button_longPressStart();
-void secondary_button_longPress();
-void secondary_button_longPressStop();
+  static void main_button_click();
+  static void main_button_doubleclick();
+  static void main_button_longPressStart();
+  static void main_button_longPress();
+  static void main_button_longPressStop();
+
+  static void secondary_button_click();
+  static void secondary_button_doubleclick();
+  static void secondary_button_longPressStart();
+  static void secondary_button_longPress();
+  static void secondary_button_longPressStop();
+
+public:
+  // Code for button objects
+  Buttons(button_types button_type);
+  // Code for task creation and running
+  void startTask();
+
+  // Code for helper functions in tasks
+};
+
+
+
 
 extern bool buttons_ready;
 

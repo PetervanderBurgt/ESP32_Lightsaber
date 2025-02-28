@@ -20,25 +20,6 @@ enum lightsaber_on_states {
   lightsaber_on_boot
 };
 
-enum lightsaber_sounds {
-  sound_boot,
-  sound_poweron,
-  sound_poweroff,
-  sound_swing,
-  sound_clash,
-  sound_lockup,
-  sound_blaster,
-  sound_font,
-  sound_hum,
-  sound_config,
-  sound_unknown
-};
-
-enum sound_play {
-  sound_play_single,
-  sound_play_loop
-};
-
 //Colors from https://www.reddit.com/r/lightsabers/comments/w5m02g/xenopixel_rgb_color_codes/
 enum lightsaberColor {
   Silver_blue = 0x6464C8,
