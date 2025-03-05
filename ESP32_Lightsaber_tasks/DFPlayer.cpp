@@ -13,7 +13,7 @@ extern bool buttons_ready;
 extern global_states global_state;
 extern lightsaber_on_states lightsaber_on_state;
 extern config_states config_state;
-extern uint8_t soundFont;
+uint8_t soundFont = 1;
 
 lightsaber_sounds current_sound = sound_unknown;
 config_sounds current_config_sound = config_sound_unknown;

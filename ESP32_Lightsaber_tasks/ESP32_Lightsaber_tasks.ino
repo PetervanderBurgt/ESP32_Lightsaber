@@ -12,6 +12,7 @@
 #include "LEDs.h"
 #include "MPU.h"
 #include "DFPlayer.h"
+#include "configMenu.h"
 
 // FreeRTOS Configuration for Runtime Stats
 #define configGENERATE_RUN_TIME_STATS 1
@@ -23,8 +24,10 @@ MovementDetection mpu;
 Blade leds;
 Buttons mainButton(button_double_main);
 Buttons secondaryButton(button_double_secondary);
+ConfigMenu menu = ConfigMenu();
 
-uint8_t soundFont = 1;
+bool print_stats = false;
+
 global_states global_state = lightsaber_idle;
 lightsaber_on_states lightsaber_on_state = lightsaber_on_boot;
 config_states config_state = config_idle;
@@ -47,6 +50,7 @@ void printTaskStats() {
 
 void setup() {
   Serial.begin(115200);
+  menu.readConfig();
 
   mainButton.startTask();
   secondaryButton.startTask();
@@ -61,15 +65,17 @@ void setup() {
   audio.startTask();
   vTaskDelay(100);
 
-  // Create a task to print runtime stats every second
-  xTaskCreatePinnedToCore(
-    printTask,    /* Task function. */
-    "PrintStats", /* name of task. */
-    4096,         /* Stack size of task */
-    NULL,         /* parameter of the task */
-    1,            /* priority of the task */
-    NULL,         /* Task handle to keep track of created task */
-    1);           /* pin task to core 1 */
+  if (print_stats) {
+    // Create a task to print runtime stats every second
+    xTaskCreatePinnedToCore(
+      printTask,    /* Task function. */
+      "PrintStats", /* name of task. */
+      4096,         /* Stack size of task */
+      NULL,         /* parameter of the task */
+      1,            /* priority of the task */
+      NULL,         /* Task handle to keep track of created task */
+      1);           /* pin task to core 1 */
+  }
 }
 
 void loop() {

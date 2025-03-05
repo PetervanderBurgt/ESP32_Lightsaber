@@ -4,20 +4,37 @@
 #include "globalVariables.h"
 
 extern config_states config_state;
+extern uint8_t soundFont;
 
 ConfigMenu::ConfigMenu() {
-  preferences.begin("Lightsaber", false);       // Lightsaber namespace, and false to be able to read/write
-  preferences.getUChar("SoundFont", 1);         // between 1 and 18
-  preferences.getUChar("Volume", 30);           // between 0 and 30
-  preferences.getUChar("SwingSensitivity", 1);  // between 0 and 255
-  preferences.getUInt("MainColor", 0x6464C8);   // Should be a hex color
-  preferences.getUInt("ClashColor", 0xFF0505);  // Should be a hex color
-  preferences.getUInt("BlastColor", 0xFF0505);  // Should be a hex color
 }
 
-void ConfigMenu::runConfigMenu() {
+void ConfigMenu::readConfig() {
+  preferences.begin("Lightsaber", true);             // Lightsaber namespace, and false to be able to read/write
+  soundFont = preferences.getUChar("SoundFont", 1);  // between 1 and 18
+  Serial.print("Readback Soundfont ");
+  Serial.println(soundFont);
+  preferences.getUChar("Volume", 30);                // between 0 and 30
+  preferences.getUChar("SwingSensitivity", 1);       // between 0 and 255
+  preferences.getUInt("MainColor", 0x6464C8);        // Should be a hex color
+  preferences.getUInt("ClashColor", 0xFF0505);       // Should be a hex color
+  preferences.getUInt("BlastColor", 0xFF0505);       // Should be a hex color
+  preferences.end();
+}
+
+void ConfigMenu::runConfigMenu(bool mainButtonPressed, bool secondaryButtonPressed) {
   switch (config_state) {
     case (config_soundfont):
+      if (mainButtonPressed) {
+        soundFont = (soundFont == 18) ? 1 : soundFont + 1;
+        Serial.print("increasing soundFont to ");
+        Serial.println(soundFont);
+      }
+      if (secondaryButtonPressed) {
+        soundFont = (soundFont == 1) ? 18 : soundFont - 1;
+        Serial.print("decreasing soundFont to ");
+        Serial.println(soundFont);
+      }
       break;
     case (config_volume):
       break;
@@ -35,6 +52,19 @@ void ConfigMenu::runConfigMenu() {
       // config_idle:
       break;
   }
+}
+
+void ConfigMenu::saveConfigMenu() {
+  Serial.print("Saving new Config: ");
+  Serial.println(soundFont);
+  preferences.begin("Lightsaber", false);        // Lightsaber namespace, and false to be able to read/write
+  preferences.putUChar("SoundFont", soundFont);  // between 1 and 18
+  // preferences.putUChar("Volume", 30);                // between 0 and 30
+  // preferences.putUChar("SwingSensitivity", 1);       // between 0 and 255
+  // preferences.putUInt("MainColor", 0x6464C8);        // Should be a hex color
+  // preferences.putUInt("ClashColor", 0xFF0505);       // Should be a hex color
+  // preferences.putUInt("BlastColor", 0xFF0505);       // Should be a hex color
+  preferences.end();
 }
 
 void ConfigMenu::nextConfigMenu() {

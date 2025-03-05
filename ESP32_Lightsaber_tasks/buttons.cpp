@@ -9,10 +9,10 @@ extern global_states global_state;
 extern lightsaber_on_states lightsaber_on_state;
 extern config_states config_state;
 extern bool configStart;
+extern ConfigMenu menu;
 
 bool buttons_ready = false;
 
-ConfigMenu menu;
 
 Buttons::Buttons(button_types button_type)
   : current_button_type(button_type) {
@@ -51,7 +51,6 @@ void Buttons::ButtonsCode() {
   const TickType_t xFrequency = pdMS_TO_TICKS((1000 / BUTTONS_HZ));
 
   OneButton button;
-  menu = ConfigMenu();
   if (current_button_type == button_double_main) {
     button.setup(MAIN_BUTTON, INPUT_PULLUP, true);
     button.setClickMs(CLICK);
@@ -96,6 +95,8 @@ void Buttons::main_button_click() {
       Serial.print("lightsaber_on_state: ");
       Serial.println(lightsaber_on_state);
     }
+  } else if (global_state == lightsaber_config) {
+    menu.runConfigMenu(true, false);
   }
 }
 // This function will be called when the button1 was pressed 2 times in a short timeframe.
@@ -129,6 +130,9 @@ void Buttons::main_button_longPressStop() {
 // ... and the same for Secondary Button:
 void Buttons::secondary_button_click() {
   Serial.println("Secondary Button click.");
+  if (global_state == lightsaber_config) {
+    menu.runConfigMenu(false, true);
+  }
 }  // click2
 void Buttons::secondary_button_doubleclick() {
   Serial.println("Secondary Button doubleclick.");
@@ -143,6 +147,7 @@ void Buttons::secondary_button_longPressStart() {
     Serial.println(config_state);
     configStart = true;
   } else if (global_state == lightsaber_config) {
+    menu.saveConfigMenu();
     global_state = lightsaber_idle;
     Serial.print("global_state: ");
     Serial.println(global_state);

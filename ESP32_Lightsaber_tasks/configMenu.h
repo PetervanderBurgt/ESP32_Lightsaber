@@ -16,9 +16,11 @@ private:
 public:
   // Code for button objects
   ConfigMenu();
+  void readConfig();
   void nextConfigMenu();
   void prevConfigMenu();
-  void runConfigMenu();
+  void saveConfigMenu();
+  void runConfigMenu(bool mainButtonPressed, bool secondaryButtonPressed);
 
 
   // Code for helper functions in tasks
