@@ -51,6 +51,9 @@ void DFPlayer::runTask(void* pvParameters) {
 void DFPlayer::DFPlayerCode() {
   Serial.print("DFPlayerTask running on core ");
   Serial.println(xPortGetCoreID());
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = pdMS_TO_TICKS((1000 / DFPLAYER_HZ));
+
   dfmp3.begin(/*rx =*/RX_DFPLAYER, /*tx =*/TX_DFPLAYER);
   // for boards that support hardware arbitrary pins
   // dfmp3.begin(10, 11); // RX, TX
@@ -82,6 +85,7 @@ void DFPlayer::DFPlayerCode() {
   Serial.println("starting...");
   dfplayer_ready = true;
 
+  xLastWakeTime = xTaskGetTickCount();
   for (;;) {
     if (global_state == lightsaber_on) {
       switch (lightsaber_on_state) {
@@ -189,7 +193,7 @@ void DFPlayer::DFPlayerCode() {
     }
     dfmp3.loop();
     // Runs task every 20 MS
-    vTaskDelay((1000 / FPS_DFPlayer) / portTICK_PERIOD_MS);
+    vTaskDelayUntil(&xLastWakeTime, xFrequency);
   }
 }
 

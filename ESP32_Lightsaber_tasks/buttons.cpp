@@ -44,6 +44,12 @@ void Buttons::runTask(void* pvParameters) {
 }
 
 void Buttons::ButtonsCode() {
+
+  Serial.print("Button running on core ");
+  Serial.println(xPortGetCoreID());
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = pdMS_TO_TICKS((1000 / BUTTONS_HZ));
+
   OneButton button;
   menu = ConfigMenu();
   if (current_button_type == button_double_main) {
@@ -68,10 +74,12 @@ void Buttons::ButtonsCode() {
   }
 
   buttons_ready = true;
+
+  xLastWakeTime = xTaskGetTickCount();
   for (;;) {
     button.tick();
     // Runs task every 15 MS
-    vTaskDelay((1000 / FPS_Buttons) / portTICK_PERIOD_MS);
+    vTaskDelayUntil(&xLastWakeTime, xFrequency);
   }
 }
 

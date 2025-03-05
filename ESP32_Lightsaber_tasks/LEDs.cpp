@@ -38,11 +38,16 @@ void Blade::runTask(void* pvParameters) {
 void Blade::LEDCode() {
   Serial.print("LEDTask running on core ");
   Serial.println(xPortGetCoreID());
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = pdMS_TO_TICKS(LEDS_HZ);
+
   CRGB leds[NUM_LEDS];
   FastLED.addLeds<WS2811, LED_OUTPUT, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);  // Set brightness level (0-255)
 
   leds_ready = true;
+
+  xLastWakeTime = xTaskGetTickCount();
   for (;;) {
     // Serial.print("lightsaber_on_state: ");
     // Serial.println(lightsaber_on_state);
@@ -77,6 +82,6 @@ void Blade::LEDCode() {
         break;
     }
     // Runs task every 25 MS
-    vTaskDelay((1000 / FPS_LEDS) / portTICK_PERIOD_MS);
+    vTaskDelayUntil(&xLastWakeTime, xFrequency);
   }
 }

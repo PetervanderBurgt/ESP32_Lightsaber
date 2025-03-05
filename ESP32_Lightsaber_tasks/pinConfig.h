@@ -11,9 +11,9 @@
 #define NUM_LEDS 100
 #define BRIGHTNESS 100
 
-#define FPS_LEDS 120
-#define FPS_Buttons 60
-#define FPS_MPU 60
-#define FPS_DFPlayer 120
+#define LEDS_HZ 120
+#define BUTTONS_HZ 60
+#define MPU_HZ 60
+#define DFPLAYER_HZ 120
 
 #endif
