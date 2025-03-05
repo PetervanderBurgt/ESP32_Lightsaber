@@ -5,6 +5,8 @@
 
 extern config_states config_state;
 extern uint8_t soundFont;
+extern bool configChanged;
+extern bool soundFontChanged;
 
 ConfigMenu::ConfigMenu() {
 }
@@ -14,11 +16,11 @@ void ConfigMenu::readConfig() {
   soundFont = preferences.getUChar("SoundFont", 1);  // between 1 and 18
   Serial.print("Readback Soundfont ");
   Serial.println(soundFont);
-  preferences.getUChar("Volume", 30);                // between 0 and 30
-  preferences.getUChar("SwingSensitivity", 1);       // between 0 and 255
-  preferences.getUInt("MainColor", 0x6464C8);        // Should be a hex color
-  preferences.getUInt("ClashColor", 0xFF0505);       // Should be a hex color
-  preferences.getUInt("BlastColor", 0xFF0505);       // Should be a hex color
+  preferences.getUChar("Volume", 30);           // between 0 and 30
+  preferences.getUChar("SwingSensitivity", 1);  // between 0 and 255
+  preferences.getUInt("MainColor", 0x6464C8);   // Should be a hex color
+  preferences.getUInt("ClashColor", 0xFF0505);  // Should be a hex color
+  preferences.getUInt("BlastColor", 0xFF0505);  // Should be a hex color
   preferences.end();
 }
 
@@ -26,11 +28,13 @@ void ConfigMenu::runConfigMenu(bool mainButtonPressed, bool secondaryButtonPress
   switch (config_state) {
     case (config_soundfont):
       if (mainButtonPressed) {
+        soundFontChanged = true;
         soundFont = (soundFont == 18) ? 1 : soundFont + 1;
         Serial.print("increasing soundFont to ");
         Serial.println(soundFont);
       }
       if (secondaryButtonPressed) {
+        soundFontChanged = true;
         soundFont = (soundFont == 1) ? 18 : soundFont - 1;
         Serial.print("decreasing soundFont to ");
         Serial.println(soundFont);
@@ -68,6 +72,7 @@ void ConfigMenu::saveConfigMenu() {
 }
 
 void ConfigMenu::nextConfigMenu() {
+  configChanged = true;
   int state = static_cast<int>(config_state) + 1;
 
   if (state > static_cast<int>(config_lastMember) - 1) {
@@ -77,6 +82,7 @@ void ConfigMenu::nextConfigMenu() {
   }
 }
 void ConfigMenu::prevConfigMenu() {
+  configChanged = true;
   int state = static_cast<int>(config_state) - 1;
   if (state < 0) {
     config_state = static_cast<config_states>(static_cast<int>(config_lastMember) - 1);

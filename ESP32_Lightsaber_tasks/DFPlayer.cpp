@@ -15,6 +15,9 @@ extern lightsaber_on_states lightsaber_on_state;
 extern config_states config_state;
 uint8_t soundFont = 1;
 
+bool configChanged = false;
+bool soundFontChanged = false;
+
 lightsaber_sounds current_sound = sound_unknown;
 config_sounds current_config_sound = config_sound_unknown;
 
@@ -127,49 +130,61 @@ void DFPlayer::DFPlayerCode() {
             //Done playing boot sound
             if (dfmp3.getStatus().state == DfMp3_StatusState_Idle) {
               config_state = config_soundfont;
+              configChanged = true;
             }
           }
           break;
         case config_soundfont:
           current_config_sound = getCurrentconfigTrack();
-          if (current_config_sound != config_sound_Soundfont) {
+          if (current_config_sound != config_sound_Soundfont && configChanged) {
             playconfigTrack(config_sound_Soundfont);
+            configChanged = false;
+          }
+          if(soundFontChanged){
+            playLightsaberTrack(sound_font);
+            soundFontChanged = false;
           }
           break;
         case config_volume:
           current_config_sound = getCurrentconfigTrack();
-          if (current_config_sound != config_sound_Volume) {
+          if (current_config_sound != config_sound_Volume && configChanged) {
             playconfigTrack(config_sound_Volume);
+            configChanged = false;
           }
           break;
         case config_swingsensitivity:
           current_config_sound = getCurrentconfigTrack();
-          if (current_config_sound != config_sound_swingsensitivity) {
+          if (current_config_sound != config_sound_swingsensitivity && configChanged) {
             playconfigTrack(config_sound_swingsensitivity);
+            configChanged = false;
           }
           break;
         case config_maincolor:
           current_config_sound = getCurrentconfigTrack();
-          if (current_config_sound != config_sound_MainColor) {
+          if (current_config_sound != config_sound_MainColor && configChanged) {
             playconfigTrack(config_sound_MainColor);
+            configChanged = false;
           }
           break;
         case config_clashcolor:
           current_config_sound = getCurrentconfigTrack();
-          if (current_config_sound != config_sound_ClashColor) {
+          if (current_config_sound != config_sound_ClashColor && configChanged) {
             playconfigTrack(config_sound_ClashColor);
+            configChanged = false;
           }
           break;
         case config_blastcolor:
           current_config_sound = getCurrentconfigTrack();
-          if (current_config_sound != config_sound_BlastColor) {
+          if (current_config_sound != config_sound_BlastColor && configChanged) {
             playconfigTrack(config_sound_BlastColor);
+            configChanged = false;
           }
           break;
         case config_batteryLevel:
           current_config_sound = getCurrentconfigTrack();
-          if (current_config_sound != config_sound_batterynominal) {
+          if (current_config_sound != config_sound_batterynominal && configChanged) {
             playconfigTrack(config_sound_batterynominal);
+            configChanged = false;
           }
           break;
       }
@@ -179,6 +194,8 @@ void DFPlayer::DFPlayerCode() {
         current_sound = getCurrentLightsaberTrack();
         if (current_sound != sound_boot) {
           playLightsaberTrack(sound_boot);
+          // need small delay to allow for bootsound to start playing
+          vTaskDelay(pdMS_TO_TICKS(100));  // Convert milliseconds to FreeRTOS ticks
         }
         if (firstBoot) {
           Serial.println("Playing boot sound");
