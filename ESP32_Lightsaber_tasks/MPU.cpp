@@ -5,6 +5,8 @@
 
 bool mpu_ready = false;
 
+uint8_t swingSensitivity = 150;
+
 
 MovementDetection::MovementDetection() {
   // Any other initialization you need for this class

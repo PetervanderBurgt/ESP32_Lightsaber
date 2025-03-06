@@ -39,7 +39,6 @@ void printTask(void* pvParameters) {
   }
 }
 
-
 // Function to print FreeRTOS runtime stats
 void printTaskStats() {
   char buffer[512];

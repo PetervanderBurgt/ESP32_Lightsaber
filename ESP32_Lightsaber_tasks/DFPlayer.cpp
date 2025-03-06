@@ -13,10 +13,14 @@ extern bool buttons_ready;
 extern global_states global_state;
 extern lightsaber_on_states lightsaber_on_state;
 extern config_states config_state;
+
 uint8_t soundFont = 1;
+uint8_t dfplayer_volume = 1;
 
 bool configChanged = false;
 bool soundFontChanged = false;
+bool configChangedUp = false;
+bool configChangedDown = false;
 
 lightsaber_sounds current_sound = sound_unknown;
 config_sounds current_config_sound = config_sound_unknown;
@@ -75,7 +79,7 @@ void DFPlayer::DFPlayerCode() {
   uint16_t volume = dfmp3.getVolume();
   Serial.print("volume ");
   Serial.println(volume);
-  dfmp3.setVolume(30);
+  dfmp3.setVolume(dfplayer_volume);
 
   uint16_t count = dfmp3.getTotalTrackCount(DfMp3_PlaySource_Sd);
   Serial.print("files ");
@@ -117,10 +121,13 @@ void DFPlayer::DFPlayerCode() {
           break;
       }
     } else if (global_state == lightsaber_config) {
+      Serial.print("dfplayer current config_state ");
+      Serial.println(config_state);
       switch (config_state) {
         case config_idle:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_configmode) {
+            Serial.println("Play config_sound_configmode");
             playconfigTrack(config_sound_configmode);
           }
           if (configStart) {
@@ -137,10 +144,11 @@ void DFPlayer::DFPlayerCode() {
         case config_soundfont:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_Soundfont && configChanged) {
+            Serial.println("Play config_sound_Soundfont");
             playconfigTrack(config_sound_Soundfont);
             configChanged = false;
           }
-          if(soundFontChanged){
+          if (soundFontChanged) {
             playLightsaberTrack(sound_font);
             soundFontChanged = false;
           }
@@ -148,41 +156,87 @@ void DFPlayer::DFPlayerCode() {
         case config_volume:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_Volume && configChanged) {
+            Serial.println("Play config_sound_Volume");
             playconfigTrack(config_sound_Volume);
             configChanged = false;
+          }
+          if (configChangedUp) {
+            playconfigTrack(config_sound_up);
+            configChangedUp = false;
+          }
+          if (configChangedDown) {
+            playconfigTrack(config_sound_down);
+            configChangedDown = false;
           }
           break;
         case config_swingsensitivity:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_swingsensitivity && configChanged) {
+            Serial.println("Play config_sound_swingsensitivity");
             playconfigTrack(config_sound_swingsensitivity);
             configChanged = false;
+          }
+          if (configChangedUp) {
+            playconfigTrack(config_sound_up);
+            configChangedUp = false;
+          }
+          if (configChangedDown) {
+            playconfigTrack(config_sound_down);
+            configChangedDown = false;
           }
           break;
         case config_maincolor:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_MainColor && configChanged) {
+            Serial.println("Play config_sound_MainColor");
             playconfigTrack(config_sound_MainColor);
             configChanged = false;
+          }
+          if (configChangedUp) {
+            playconfigTrack(config_sound_up);
+            configChangedUp = false;
+          }
+          if (configChangedDown) {
+            playconfigTrack(config_sound_down);
+            configChangedDown = false;
           }
           break;
         case config_clashcolor:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_ClashColor && configChanged) {
+            Serial.println("Play config_sound_ClashColor");
             playconfigTrack(config_sound_ClashColor);
             configChanged = false;
+          }
+          if (configChangedUp) {
+            playconfigTrack(config_sound_up);
+            configChangedUp = false;
+          }
+          if (configChangedDown) {
+            playconfigTrack(config_sound_down);
+            configChangedDown = false;
           }
           break;
         case config_blastcolor:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_BlastColor && configChanged) {
+            Serial.println("Play config_sound_BlastColor");
             playconfigTrack(config_sound_BlastColor);
             configChanged = false;
+          }
+          if (configChangedUp) {
+            playconfigTrack(config_sound_up);
+            configChangedUp = false;
+          }
+          if (configChangedDown) {
+            playconfigTrack(config_sound_down);
+            configChangedDown = false;
           }
           break;
         case config_batteryLevel:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_batterynominal && configChanged) {
+            Serial.println("Play config_sound_batterynominal");
             playconfigTrack(config_sound_batterynominal);
             configChanged = false;
           }

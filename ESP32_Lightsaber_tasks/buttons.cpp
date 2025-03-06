@@ -85,7 +85,7 @@ void Buttons::ButtonsCode() {
 // ----- Main Button callback functions
 // This function will be called when the button1 was pressed 1 time (and no 2. button press followed).
 void Buttons::main_button_click() {
-  Serial.println("Main Button click.");
+  // Serial.println("Main Button click.");
   if (global_state == lightsaber_idle) {
     if (lightsaber_on_state == lightsaber_on_idle) {
       global_state = lightsaber_on;
@@ -101,11 +101,11 @@ void Buttons::main_button_click() {
 }
 // This function will be called when the button1 was pressed 2 times in a short timeframe.
 void Buttons::main_button_doubleclick() {
-  Serial.println("Main Button doubleclick.");
+  // Serial.println("Main Button doubleclick.");
 }  // doubleclick1
 // This function will be called once, when the button1 is pressed for a long time.
 void Buttons::main_button_longPressStart() {
-  Serial.println("Secondary Button longPress start");
+  // Serial.println("Secondary Button longPress start");
   if (global_state == lightsaber_on) {
     if (lightsaber_on_state == lightsaber_on_hum) {
       Serial.print("global_state: ");
@@ -120,22 +120,22 @@ void Buttons::main_button_longPressStart() {
 }  // longPressStart1
 // This function will be called often, while the button1 is pressed for a long time.
 void Buttons::main_button_longPress() {
-  Serial.println("Main Button longPress...");
+  // Serial.println("Main Button longPress...");
 }  // longPress1
 // This function will be called once, when the button1 is released after beeing pressed for a long time.
 void Buttons::main_button_longPressStop() {
-  Serial.println("Main Button longPress stop");
+  // Serial.println("Main Button longPress stop");
 }  // longPressStop1
 
 // ... and the same for Secondary Button:
 void Buttons::secondary_button_click() {
-  Serial.println("Secondary Button click.");
+  // Serial.println("Secondary Button click.");
   if (global_state == lightsaber_config) {
     menu.runConfigMenu(false, true);
   }
 }  // click2
 void Buttons::secondary_button_doubleclick() {
-  Serial.println("Secondary Button doubleclick.");
+  // Serial.println("Secondary Button doubleclick.");
 }  // doubleclick2
 void Buttons::secondary_button_longPressStart() {
   if (global_state == lightsaber_idle) {
@@ -159,11 +159,11 @@ void Buttons::secondary_button_longPressStart() {
     Serial.println(config_state);
     configStart = true;
   }
-  Serial.println("Secondary Button longPress start");
+  // Serial.println("Secondary Button longPress start");
 }  // longPressStart2
 void Buttons::secondary_button_longPress() {
-  Serial.println("Secondary Button longPress...");
+  // Serial.println("Secondary Button longPress...");
 }  // longPress2
 void Buttons::secondary_button_longPressStop() {
-  Serial.println("Secondary Button longPress stop");
+  // Serial.println("Secondary Button longPress stop");
 }  // longPressStop2
