@@ -14,7 +14,7 @@ Before all this happened I set out a couple of things that I would like to attai
 
 **Must haves:**
 - [x] Light up all 100 LEDS
-- [ ] Two buttons to use
+- [x] Two buttons to use
 - [ ]  Sound to play:
     - [x]  Boot sound
     - [x]  Saber on
@@ -22,9 +22,9 @@ Before all this happened I set out a couple of things that I would like to attai
     - [x]  Hum sounds
     - [ ]  Swing sounds
     - [ ]  Clash sounds
-- [ ]  Config should be possible
-- [ ]  Keep settings on power on off
-- [ ]  Switch color / rainbow
+- [x]  Config should be possible
+- [x]  Keep settings on power on off
+- [x]  Switch color / rainbow
 
 **Could haves:**
 - [ ]  Flicker in leds

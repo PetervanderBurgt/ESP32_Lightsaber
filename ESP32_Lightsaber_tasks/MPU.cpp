@@ -5,6 +5,8 @@
 
 bool mpu_ready = false;
 
+uint8_t swingSensitivity = 150;
+
 
 MovementDetection::MovementDetection() {
   // Any other initialization you need for this class
@@ -34,11 +36,16 @@ void MovementDetection::runTask(void* pvParameters) {
 }
 
 void MovementDetection::MPUCode() {
-  Serial.print("MPUTask running on core ");
-  Serial.println(xPortGetCoreID());
+  DEBUG_PRINT("MPUTask running on core ");
+  DEBUG_PRINTLN(xPortGetCoreID());
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = pdMS_TO_TICKS((1000 / MPU_HZ));
+
   mpu_ready = true;
+
+  xLastWakeTime = xTaskGetTickCount();
   for (;;) {
 
-    vTaskDelay((1000 / FPS_MPU) / portTICK_PERIOD_MS);
+    vTaskDelayUntil(&xLastWakeTime, xFrequency);
   }
 }

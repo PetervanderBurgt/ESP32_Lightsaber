@@ -1,30 +1,28 @@
 #ifndef CONFIGMENU_H
 #define CONFIGMENU_H
 
-enum config_states {
-  config_idle,
-  config_soundfont,
-  config_volume,
-  config_swingsensitivity,
-  config_maincolor,
-  config_clashcolor,
-  config_blastcolor,
-  config_batteryLevel,
-  config_lastMember
-};
+#include <Esp.h>
+#include <Preferences.h>
+#include "globalVariables.h"
+#include "pinConfig.h"
+
+
 
 class ConfigMenu {
 private:
   // Code for button objects
-  config_states current_config_state;
+  Preferences preferences;
 
 
 public:
   // Code for button objects
   ConfigMenu();
+  void readConfig();
   void nextConfigMenu();
   void prevConfigMenu();
-  void runConfigMenu();
+  void saveConfigMenu();
+  void runConfigMenu(bool mainButtonPressed, bool secondaryButtonPressed);
+
 
   // Code for helper functions in tasks
 };
