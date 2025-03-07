@@ -14,6 +14,8 @@ lightsaberColor MainColor = Silver_blue;
 lightsaberColor ClashColor = Pink_red;
 lightsaberColor BlastColor = Sky_Blue;
 
+uint8_t colorSeed = 0;  // Starting hue for the rainbow animation
+
 
 // This array order should match the one that is given in the enum above
 uint32_t lightsaberColorHex[] = {
@@ -87,7 +89,11 @@ void Blade::LEDCode() {
       switch (lightsaber_on_state) {
         case lightsaber_on_ignition:
           for (int i = 0; i < NUM_LEDS; i++) {
-            leds[i] = CRGB(lightsaberColorHex[MainColor]);  // You can change the color here (e.g., CRGB::Blue or CRGB::Red)
+            if (MainColor == Rainbow) {
+              leds[i] = CHSV((i * 255 / NUM_LEDS) + colorSeed, 255, 255);   // CHSV: Hue, Saturation, Value (Brightness), Shift the hue for different starting point 
+            } else {
+              leds[i] = CRGB(lightsaberColorHex[MainColor]);  // You can change the color here (e.g., CRGB::Blue or CRGB::Red)
+            }
             FastLED.show();
             vTaskDelay(10 / portTICK_PERIOD_MS);  // Delay to control the speed of the effect (adjust as needed)
           }
@@ -105,7 +111,12 @@ void Blade::LEDCode() {
           break;
 
         case lightsaber_on_hum:
-          fill_solid(leds, NUM_LEDS, CRGB(lightsaberColorHex[MainColor]));
+          if (MainColor == Rainbow) {
+            fill_rainbow(leds, NUM_LEDS, colorSeed, 255 / NUM_LEDS);
+            colorSeed = colorSeed + 5;
+          } else {
+            fill_solid(leds, NUM_LEDS, CRGB(lightsaberColorHex[MainColor]));
+          }
           FastLED.show();  // Update the LEDs to reflect changes
           break;
 
@@ -117,17 +128,30 @@ void Blade::LEDCode() {
     } else if (global_state == lightsaber_config) {
       switch (config_state) {
         case config_maincolor:
-          fill_solid(leds, NUM_LEDS, CRGB(lightsaberColorHex[MainColor]));
+          if (MainColor == Rainbow) {
+            fill_rainbow(leds, NUM_LEDS, 0, 255 / NUM_LEDS);
+          } else {
+            fill_solid(leds, NUM_LEDS, CRGB(lightsaberColorHex[MainColor]));
+          }
           FastLED.show();  // Update the LEDs to reflect changes
           break;
 
         case config_clashcolor:
-          fill_solid(leds, NUM_LEDS, CRGB(lightsaberColorHex[ClashColor]));
+          if (ClashColor == Rainbow) {
+            fill_rainbow(leds, NUM_LEDS, 0, 255 / NUM_LEDS);
+          } else {
+            fill_solid(leds, NUM_LEDS, CRGB(lightsaberColorHex[ClashColor]));
+          }
           FastLED.show();  // Update the LEDs to reflect changes
           break;
 
         case config_blastcolor:
-          fill_solid(leds, NUM_LEDS, CRGB(lightsaberColorHex[BlastColor]));
+          if (BlastColor == Rainbow) {
+            fill_rainbow(leds, NUM_LEDS, 0, 255 / NUM_LEDS);
+
+          } else {
+            fill_solid(leds, NUM_LEDS, CRGB(lightsaberColorHex[BlastColor]));
+          }
           FastLED.show();  // Update the LEDs to reflect changes
           break;
 
