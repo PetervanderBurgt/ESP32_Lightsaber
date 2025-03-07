@@ -14,6 +14,32 @@ lightsaberColor MainColor = Silver_blue;
 lightsaberColor ClashColor = Pink_red;
 lightsaberColor BlastColor = Sky_Blue;
 
+
+// This array order should match the one that is given in the enum above
+uint32_t lightsaberColorHex[] = {
+  0x6464C8,  // Silver_blue,
+  0x969696,  // White,     //(having the values at 150 instead of 255 saves some power and is still bright)
+  0xFF0505,  // Pink_red,  //(aiming for ANH Vader colour)
+  0xFF0000,  // Red,
+  0xFF0F00,  // Blood_Orange,
+  0xFF1E00,  // Orange,
+  0xFFB300,  // Gold,
+  0xFFFF00,  // Yellow,  //(can appear slightly green depending on setup - see more below)
+  0xB3FF00,  // Neon_Green,
+  0x46FF00,  // Lime,
+  0x00FF00,  // Green,
+  0x00FF3C,  // Mint_Green,
+  0x00FF8C,  // Cyan,
+  0x008CFF,  // Sky_Blue,
+  0x0000FF,  // Blue,
+  0x7300FF,  // Purple,
+  0xDC00FF,  // Magenta,
+  0xABCDEF,  // Rainbow
+  0xC0FF00,  // UserColor1,
+  0x809BCE,  // UserColor2,
+  0xF19953   // UserColor3
+};
+
 Blade::Blade() {
   // Any other initialization you need for this class
 }
@@ -61,7 +87,7 @@ void Blade::LEDCode() {
       switch (lightsaber_on_state) {
         case lightsaber_on_ignition:
           for (int i = 0; i < NUM_LEDS; i++) {
-            leds[i] = CRGB(MainColor);  // You can change the color here (e.g., CRGB::Blue or CRGB::Red)
+            leds[i] = CRGB(lightsaberColorHex[MainColor]);  // You can change the color here (e.g., CRGB::Blue or CRGB::Red)
             FastLED.show();
             vTaskDelay(10 / portTICK_PERIOD_MS);  // Delay to control the speed of the effect (adjust as needed)
           }
@@ -79,7 +105,7 @@ void Blade::LEDCode() {
           break;
 
         case lightsaber_on_hum:
-          fill_solid(leds, NUM_LEDS, CRGB(MainColor));
+          fill_solid(leds, NUM_LEDS, CRGB(lightsaberColorHex[MainColor]));
           FastLED.show();  // Update the LEDs to reflect changes
           break;
 
@@ -91,17 +117,17 @@ void Blade::LEDCode() {
     } else if (global_state == lightsaber_config) {
       switch (config_state) {
         case config_maincolor:
-          fill_solid(leds, NUM_LEDS, CRGB(MainColor));
+          fill_solid(leds, NUM_LEDS, CRGB(lightsaberColorHex[MainColor]));
           FastLED.show();  // Update the LEDs to reflect changes
           break;
 
         case config_clashcolor:
-          fill_solid(leds, NUM_LEDS, CRGB(ClashColor));
+          fill_solid(leds, NUM_LEDS, CRGB(lightsaberColorHex[ClashColor]));
           FastLED.show();  // Update the LEDs to reflect changes
           break;
 
         case config_blastcolor:
-          fill_solid(leds, NUM_LEDS, CRGB(BlastColor));
+          fill_solid(leds, NUM_LEDS, CRGB(lightsaberColorHex[BlastColor]));
           FastLED.show();  // Update the LEDs to reflect changes
           break;
 

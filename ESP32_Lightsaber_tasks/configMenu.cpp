@@ -30,11 +30,11 @@ void ConfigMenu::readConfig() {
   soundFont = preferences.getUChar("SoundFont", 1);  // between 1 and 18
   DEBUG_PRINT("Readback Soundfont ");
   DEBUG_PRINTLN(soundFont);
-  dfplayer_volume = preferences.getUChar("Volume", 30);              // between 0 and 30
-  swingSensitivity = preferences.getUChar("SwingSensitivity", 150);  // between 0 and 255
-  preferences.getUInt("MainColor", 0x6464C8);                        // Should be a hex color
-  preferences.getUInt("ClashColor", 0xFF0505);                       // Should be a hex color
-  preferences.getUInt("BlastColor", 0xFF0505);                       // Should be a hex color
+  dfplayer_volume = preferences.getUChar("Volume", 30);                              // between 0 and 30
+  swingSensitivity = preferences.getUChar("SwingSensitivity", 150);                  // between 0 and 255
+  MainColor = static_cast<lightsaberColor>(preferences.getUChar("MainColor", 0));     // Should be a enum number (0-20)
+  ClashColor = static_cast<lightsaberColor>(preferences.getUChar("ClashColor", 3));   // Should be a enum number (0-20)
+  BlastColor = static_cast<lightsaberColor>(preferences.getUChar("BlastColor", 13));  // Should be a enum number (0-20)
   preferences.end();
 }
 
@@ -150,12 +150,13 @@ void ConfigMenu::saveConfigMenu() {
   preferences.begin("Lightsaber", false);           // Lightsaber namespace, and false to be able to read/write
   preferences.putUChar("SoundFont", soundFont);     // between 1 and 18
   preferences.putUChar("Volume", dfplayer_volume);  // between 0 and 30
-  audio.setVolume();                                // set the new volume on dfplayer
-  // preferences.putUChar("SwingSensitivity", 1);       // between 0 and 255
-  // preferences.putUInt("MainColor", 0x6464C8);        // Should be a hex color
-  // preferences.putUInt("ClashColor", 0xFF0505);       // Should be a hex color
-  // preferences.putUInt("BlastColor", 0xFF0505);       // Should be a hex color
+  preferences.putUChar("SwingSensitivity", swingSensitivity);       // between 0 and 255
+  preferences.putUChar("MainColor",static_cast<uint8_t>(MainColor));     // Should be a enum number (0-20)
+  preferences.putUChar("ClashColor", static_cast<uint8_t>(ClashColor));   // Should be a enum number (0-20)
+  preferences.putUChar("BlastColor",static_cast<uint8_t>(BlastColor));  // Should be a enum number (0-20)
   preferences.end();
+  
+  audio.setVolume();                                // set the new volume on dfplayer
 }
 
 void ConfigMenu::nextConfigMenu() {
