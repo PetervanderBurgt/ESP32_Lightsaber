@@ -16,6 +16,8 @@ extern bool soundFontChanged;
 extern bool configChangedUp;
 extern bool configChangedDown;
 
+extern SemaphoreHandle_t config_mutex;
+
 ConfigMenu::ConfigMenu() {
 }
 
@@ -152,18 +154,23 @@ void ConfigMenu::saveConfigMenu() {
 }
 
 void ConfigMenu::nextConfigMenu() {
+  xSemaphoreTake(config_mutex, portMAX_DELAY);
+
   configChanged = true;
   uint8_t state = static_cast<uint8_t>(config_state);
   state = (state == (config_lastMember - 1)) ? 1 : state + 1;
   config_state = static_cast<config_states>(state);
   Serial.print("set config_state ");
   Serial.println(config_state);
+  xSemaphoreGive(config_mutex);
 }
 void ConfigMenu::prevConfigMenu() {
+  xSemaphoreTake(config_mutex, portMAX_DELAY);
   configChanged = true;
   uint8_t state = static_cast<uint8_t>(config_state);
   state = (state == 1) ? (config_lastMember - 1) : state - 1;
   config_state = static_cast<config_states>(state);
   Serial.print("set config_state ");
   Serial.println(config_state);
+  xSemaphoreGive(config_mutex);
 }

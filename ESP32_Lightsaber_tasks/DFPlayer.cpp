@@ -25,6 +25,9 @@ bool configChangedDown = false;
 lightsaber_sounds current_sound = sound_unknown;
 config_sounds current_config_sound = config_sound_unknown;
 
+SemaphoreHandle_t config_mutex;
+
+
 bool firstBoot = true;
 bool configStart = true;
 
@@ -60,6 +63,8 @@ void DFPlayer::DFPlayerCode() {
   Serial.println(xPortGetCoreID());
   TickType_t xLastWakeTime;
   const TickType_t xFrequency = pdMS_TO_TICKS((1000 / DFPLAYER_HZ));
+
+  config_mutex = xSemaphoreCreateMutex();
 
   dfmp3.begin(/*rx =*/RX_DFPLAYER, /*tx =*/TX_DFPLAYER);
   // for boards that support hardware arbitrary pins
@@ -121,6 +126,7 @@ void DFPlayer::DFPlayerCode() {
           break;
       }
     } else if (global_state == lightsaber_config) {
+      xSemaphoreTake(config_mutex, portMAX_DELAY);
       Serial.print("dfplayer current config_state ");
       Serial.println(config_state);
       switch (config_state) {
@@ -242,6 +248,7 @@ void DFPlayer::DFPlayerCode() {
           }
           break;
       }
+      xSemaphoreGive(config_mutex);
     } else {
       //global state is lightsaber_idle
       if (lightsaber_on_state == lightsaber_on_boot) {
