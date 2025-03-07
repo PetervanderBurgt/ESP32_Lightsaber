@@ -43,8 +43,8 @@ void printTask(void* pvParameters) {
 void printTaskStats() {
   char buffer[512];
   vTaskGetRunTimeStats(buffer);  // Get task runtime stats into the buffer
-  Serial.println("\nFreeRTOS Task Run Time Stats:");
-  Serial.println(buffer);  // Print the stats to the Serial Monitor
+  DEBUG_PRINTLN("\nFreeRTOS Task Run Time Stats:");
+  DEBUG_PRINTLN(buffer);  // Print the stats to the Serial Monitor
 }
 
 void setup() {

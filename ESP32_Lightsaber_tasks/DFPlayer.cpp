@@ -27,6 +27,8 @@ config_sounds current_config_sound = config_sound_unknown;
 
 SemaphoreHandle_t config_mutex;
 
+TaskHandle_t dfTaskHandle = NULL;  // Declare a global task handle
+
 
 bool firstBoot = true;
 bool configStart = true;
@@ -45,8 +47,15 @@ void DFPlayer::startTask() {
     2048,           /* Stack size of task */
     this,           /* parameter of the task */
     1,              /* priority of the task */
-    NULL,           /* Task handle to keep track of created task */
+    &dfTaskHandle,  /* Task handle to keep track of created task */
     1);             /* pin task to core 1 */
+}
+
+void DFPlayer::setVolume() {
+  dfmp3.setVolume(dfplayer_volume);
+  uint16_t volume = dfmp3.getVolume();
+  DEBUG_PRINT("volume ");
+  DEBUG_PRINTLN(volume);
 }
 
 // Static task function called by FreeRTOS
@@ -59,8 +68,8 @@ void DFPlayer::runTask(void* pvParameters) {
 }
 
 void DFPlayer::DFPlayerCode() {
-  Serial.print("DFPlayerTask running on core ");
-  Serial.println(xPortGetCoreID());
+  DEBUG_PRINT("DFPlayerTask running on core ");
+  DEBUG_PRINTLN(xPortGetCoreID());
   TickType_t xLastWakeTime;
   const TickType_t xFrequency = pdMS_TO_TICKS((1000 / DFPLAYER_HZ));
 
@@ -77,24 +86,24 @@ void DFPlayer::DFPlayerCode() {
   dfmp3.reset();
 
   uint16_t version = dfmp3.getSoftwareVersion();
-  Serial.print("version ");
-  Serial.println(version);
+  DEBUG_PRINT("version ");
+  DEBUG_PRINTLN(version);
 
   // show some properties and set the volume
-  uint16_t volume = dfmp3.getVolume();
-  Serial.print("volume ");
-  Serial.println(volume);
   dfmp3.setVolume(dfplayer_volume);
+  uint16_t volume = dfmp3.getVolume();
+  DEBUG_PRINT("volume ");
+  DEBUG_PRINTLN(volume);
 
   uint16_t count = dfmp3.getTotalTrackCount(DfMp3_PlaySource_Sd);
-  Serial.print("files ");
-  Serial.println(count);
+  DEBUG_PRINT("files ");
+  DEBUG_PRINTLN(count);
 
   uint16_t mode = dfmp3.getPlaybackMode();
-  Serial.print("playback mode ");
-  Serial.println(mode);
+  DEBUG_PRINT("playback mode ");
+  DEBUG_PRINTLN(mode);
 
-  Serial.println("starting...");
+  DEBUG_PRINTLN("starting...");
   dfplayer_ready = true;
 
   xLastWakeTime = xTaskGetTickCount();
@@ -127,17 +136,15 @@ void DFPlayer::DFPlayerCode() {
       }
     } else if (global_state == lightsaber_config) {
       xSemaphoreTake(config_mutex, portMAX_DELAY);
-      Serial.print("dfplayer current config_state ");
-      Serial.println(config_state);
       switch (config_state) {
         case config_idle:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_configmode) {
-            Serial.println("Play config_sound_configmode");
+            DEBUG_PRINTLN("Play config_sound_configmode");
             playconfigTrack(config_sound_configmode);
           }
           if (configStart) {
-            Serial.println("Playing config sound");
+            DEBUG_PRINTLN("Playing config sound");
             configStart = false;
           } else {
             //Done playing boot sound
@@ -150,7 +157,7 @@ void DFPlayer::DFPlayerCode() {
         case config_soundfont:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_Soundfont && configChanged) {
-            Serial.println("Play config_sound_Soundfont");
+            DEBUG_PRINTLN("Play config_sound_Soundfont");
             playconfigTrack(config_sound_Soundfont);
             configChanged = false;
           }
@@ -162,7 +169,7 @@ void DFPlayer::DFPlayerCode() {
         case config_volume:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_Volume && configChanged) {
-            Serial.println("Play config_sound_Volume");
+            DEBUG_PRINTLN("Play config_sound_Volume");
             playconfigTrack(config_sound_Volume);
             configChanged = false;
           }
@@ -178,7 +185,7 @@ void DFPlayer::DFPlayerCode() {
         case config_swingsensitivity:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_swingsensitivity && configChanged) {
-            Serial.println("Play config_sound_swingsensitivity");
+            DEBUG_PRINTLN("Play config_sound_swingsensitivity");
             playconfigTrack(config_sound_swingsensitivity);
             configChanged = false;
           }
@@ -194,7 +201,7 @@ void DFPlayer::DFPlayerCode() {
         case config_maincolor:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_MainColor && configChanged) {
-            Serial.println("Play config_sound_MainColor");
+            DEBUG_PRINTLN("Play config_sound_MainColor");
             playconfigTrack(config_sound_MainColor);
             configChanged = false;
           }
@@ -210,7 +217,7 @@ void DFPlayer::DFPlayerCode() {
         case config_clashcolor:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_ClashColor && configChanged) {
-            Serial.println("Play config_sound_ClashColor");
+            DEBUG_PRINTLN("Play config_sound_ClashColor");
             playconfigTrack(config_sound_ClashColor);
             configChanged = false;
           }
@@ -226,7 +233,7 @@ void DFPlayer::DFPlayerCode() {
         case config_blastcolor:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_BlastColor && configChanged) {
-            Serial.println("Play config_sound_BlastColor");
+            DEBUG_PRINTLN("Play config_sound_BlastColor");
             playconfigTrack(config_sound_BlastColor);
             configChanged = false;
           }
@@ -242,7 +249,7 @@ void DFPlayer::DFPlayerCode() {
         case config_batteryLevel:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_batterynominal && configChanged) {
-            Serial.println("Play config_sound_batterynominal");
+            DEBUG_PRINTLN("Play config_sound_batterynominal");
             playconfigTrack(config_sound_batterynominal);
             configChanged = false;
           }
@@ -259,7 +266,7 @@ void DFPlayer::DFPlayerCode() {
           vTaskDelay(pdMS_TO_TICKS(100));  // Convert milliseconds to FreeRTOS ticks
         }
         if (firstBoot) {
-          Serial.println("Playing boot sound");
+          DEBUG_PRINTLN("Playing boot sound");
           firstBoot = false;
         } else {
           //Done playing boot sound
@@ -367,25 +374,25 @@ class DFPlayer::Mp3Notify {
 public:
   static void PrintlnSourceAction(DfMp3_PlaySources source, const char* action) {
     if (source & DfMp3_PlaySources_Sd) {
-      Serial.print("SD Card, ");
+      DEBUG_PRINT("SD Card, ");
     }
     if (source & DfMp3_PlaySources_Usb) {
-      Serial.print("USB Disk, ");
+      DEBUG_PRINT("USB Disk, ");
     }
     if (source & DfMp3_PlaySources_Flash) {
-      Serial.print("Flash, ");
+      DEBUG_PRINT("Flash, ");
     }
-    Serial.println(action);
+    DEBUG_PRINTLN(action);
   }
   static void OnError([[maybe_unused]] DfMp3& mp3, uint16_t errorCode) {
     // see DfMp3_Error for code meaning
-    Serial.println();
-    Serial.print("Communication Error ");
-    Serial.println(errorCode);
+    DEBUG_PRINTLN();
+    DEBUG_PRINT("Communication Error ");
+    DEBUG_PRINTLN(errorCode);
   }
   static void OnPlayFinished([[maybe_unused]] DfMp3& mp3, [[maybe_unused]] DfMp3_PlaySources source, uint16_t track) {
-    Serial.print("Play finished for #");
-    Serial.println(track);
+    DEBUG_PRINT("Play finished for #");
+    DEBUG_PRINTLN(track);
   }
   static void OnPlaySourceOnline([[maybe_unused]] DfMp3& mp3, DfMp3_PlaySources source) {
     PrintlnSourceAction(source, "online");

@@ -36,8 +36,8 @@ void MovementDetection::runTask(void* pvParameters) {
 }
 
 void MovementDetection::MPUCode() {
-  Serial.print("MPUTask running on core ");
-  Serial.println(xPortGetCoreID());
+  DEBUG_PRINT("MPUTask running on core ");
+  DEBUG_PRINTLN(xPortGetCoreID());
   TickType_t xLastWakeTime;
   const TickType_t xFrequency = pdMS_TO_TICKS((1000 / MPU_HZ));
 

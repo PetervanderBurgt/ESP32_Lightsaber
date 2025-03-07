@@ -4,6 +4,7 @@
 #include <Esp.h>
 #include <Preferences.h>
 #include "globalVariables.h"
+#include "pinConfig.h"
 
 
 

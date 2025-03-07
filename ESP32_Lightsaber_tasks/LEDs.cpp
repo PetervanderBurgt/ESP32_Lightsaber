@@ -41,8 +41,8 @@ void Blade::runTask(void* pvParameters) {
 }
 
 void Blade::LEDCode() {
-  Serial.print("LEDTask running on core ");
-  Serial.println(xPortGetCoreID());
+  DEBUG_PRINT("LEDTask running on core ");
+  DEBUG_PRINTLN(xPortGetCoreID());
   TickType_t xLastWakeTime;
   const TickType_t xFrequency = pdMS_TO_TICKS(LEDS_HZ);
 
@@ -54,8 +54,8 @@ void Blade::LEDCode() {
 
   xLastWakeTime = xTaskGetTickCount();
   for (;;) {
-    // Serial.print("lightsaber_on_state: ");
-    // Serial.println(lightsaber_on_state);
+    // DEBUG_PRINT("lightsaber_on_state: ");
+    // DEBUG_PRINTLN(lightsaber_on_state);
     if (global_state == lightsaber_on) {
 
       switch (lightsaber_on_state) {

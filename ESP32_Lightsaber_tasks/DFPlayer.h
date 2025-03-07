@@ -3,6 +3,7 @@
 
 #include <Esp.h>
 #include "globalVariables.h"
+#include <DFMiniMp3.h>
 
 enum lightsaber_sounds {
   sound_boot,
@@ -80,6 +81,7 @@ public:
 
   // Code for task creation and running
   void startTask();
+  void setVolume();
 
   // Code for helper functions in tasks
   uint16_t fontAndEnumtoTrack(lightsaber_sounds sound, uint8_t soundFont);
