@@ -26,7 +26,7 @@ Buttons mainButton(button_double_main);
 Buttons secondaryButton(button_double_secondary);
 ConfigMenu menu = ConfigMenu();
 
-bool print_stats = false;
+bool print_stats = true;
 
 global_states global_state = lightsaber_idle;
 lightsaber_on_states lightsaber_on_state = lightsaber_on_boot;

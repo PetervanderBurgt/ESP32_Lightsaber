@@ -87,6 +87,18 @@ void MovementDetection::MPUCode() {
   DEBUG_PRINTLN(F("Initializing DMP..."));
   devStatus = mpu.dmpInitialize();
 
+  // Set Digital Low and High pass filter
+  mpu.setDLPFMode(3);
+  mpu.setDHPFMode(0);
+
+  // set interrupt when motion is detected
+  mpu.setIntMotionEnabled(true);
+  // set inteerupt off for when no movement detected
+  mpu.setIntZeroMotionEnabled(false);
+
+  mpu.setMotionDetectionThreshold(10);
+  mpu.setMotionDetectionDuration(2);
+
   /* Supply your gyro offsets here, read with MPU zero example */
   mpu.setXAccelOffset(-1226);
   mpu.setYAccelOffset(-2412);
@@ -162,12 +174,12 @@ void MovementDetection::MPUCode() {
       mpu.dmpGetAccel(&aa, FIFOBuffer);
       mpu.dmpGetGravity(&gravity, &q);
       mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-      DEBUG_PRINT("areal\t");
-      DEBUG_PRINT(aaReal.x);
-      DEBUG_PRINT("\t");
-      DEBUG_PRINT(aaReal.y);
-      DEBUG_PRINT("\t");
-      DEBUG_PRINTLN(aaReal.z);
+      // DEBUG_PRINT("areal\t");
+      // DEBUG_PRINT(aaReal.x);
+      // DEBUG_PRINT("\t");
+      // DEBUG_PRINT(aaReal.y);
+      // DEBUG_PRINT("\t");
+      // DEBUG_PRINTLN(aaReal.z);
     }
 
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
