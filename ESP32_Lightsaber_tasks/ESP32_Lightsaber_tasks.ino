@@ -20,7 +20,7 @@
 #define portGET_RUN_TIME_COUNTER_VALUE() (millis())               // Use micros() for more precise time
 
 DFPlayer audio(Serial1);
-MovementDetection mpu;
+MovementDetection mpuClass;
 Blade leds;
 Buttons mainButton(button_double_main);
 Buttons secondaryButton(button_double_secondary);
@@ -55,7 +55,7 @@ void setup() {
   secondaryButton.startTask();
   vTaskDelay(100);
 
-  mpu.startTask();
+  mpuClass.startTask();
   vTaskDelay(100);
 
   leds.startTask();

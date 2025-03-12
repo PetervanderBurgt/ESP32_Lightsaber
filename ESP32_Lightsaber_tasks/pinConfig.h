@@ -4,8 +4,8 @@
 // Pin Definitions
 #define RX_DFPLAYER 16
 #define TX_DFPLAYER 17
-#define MAIN_BUTTON 21
-#define SECOND_BUTTON 22
+#define MAIN_BUTTON 32
+#define SECOND_BUTTON 25
 
 #define LED_OUTPUT 5
 #define NUM_LEDS 100
