@@ -11,6 +11,9 @@
 #define NUM_LEDS 100
 #define BRIGHTNESS 100
 
+#define CLASH_THRESHOLD 10
+#define CLASH_DURATION 2
+
 #define LEDS_HZ 120
 #define BUTTONS_HZ 60
 #define MPU_HZ 60

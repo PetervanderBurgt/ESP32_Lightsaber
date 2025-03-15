@@ -29,9 +29,10 @@ VectorInt16 aaReal;   // [x, y, z]            Gravity-free accel sensor measurem
 VectorFloat gravity;  // [x, y, z]            Gravity vector
 
 /*------Interrupt detection routine------*/
-volatile bool MPUInterrupt = false;  // Indicates whether MPU6050 interrupt pin has gone high
+volatile bool MPUDataReady = false;  // Indicates whether MPU6050 interrupt pin has gone high
 void DMPDataReady() {
-  MPUInterrupt = true;
+  //Data ready, make sure to read
+  MPUDataReady = true;
 }
 
 MovementDetection::MovementDetection() {
@@ -88,16 +89,14 @@ void MovementDetection::MPUCode() {
   devStatus = mpu.dmpInitialize();
 
   // Set Digital Low and High pass filter
-  mpu.setDLPFMode(3);
-  mpu.setDHPFMode(0);
+  mpu.setDHPFMode(4);
 
+  mpu.setMotionDetectionThreshold(CLASH_THRESHOLD);
+  mpu.setMotionDetectionDuration(CLASH_DURATION);
+  mpu.setInterruptMode(false);
+  mpu.setInterruptLatch(true);
   // set interrupt when motion is detected
   mpu.setIntMotionEnabled(true);
-  // set inteerupt off for when no movement detected
-  mpu.setIntZeroMotionEnabled(false);
-
-  mpu.setMotionDetectionThreshold(10);
-  mpu.setMotionDetectionDuration(2);
 
   /* Supply your gyro offsets here, read with MPU zero example */
   mpu.setXAccelOffset(-1226);
@@ -138,48 +137,56 @@ void MovementDetection::MPUCode() {
 
   xLastWakeTime = xTaskGetTickCount();
   for (;;) {
-
-    if (!DMPReady) return;  // Stop the program if DMP programming fails.
-
-    if (MPUInterrupt) {
-      MPUInterrupt = false;  //reset interrupt flag
-
-      // An interrupt has occurred.  get INT_STATUS byte
-      //pulse an output pin to measure getIntStatus() duration
+    // This code makes sure to read the fifo buffer of the MPU to always have the latest data
+    if (MPUDataReady) {
+      MPUDataReady = false;  //reset interrupt flag
       MPUIntStatus = mpu.getIntStatus();
+      bool motionInt = (MPUIntStatus >> 6) && 0x1;  // Only check the motion bit
 
-      // get current FIFO count
-      fifoCount = mpu.getFIFOCount();
-
-      // check for overflow (this should never happen unless our code is too inefficient)
-      if ((MPUIntStatus & bit(MPU6050_INTERRUPT_FIFO_OFLOW_BIT)) || fifoCount >= 1024) {
-        // reset so we can continue cleanly
-        mpu.resetFIFO();
-        //  fifoCount = mpu.getFIFOCount();  // will be zero after reset no need to ask
-        Serial.println(F("FIFO overflow!"));
-
-        // otherwise, check for DMP data ready interrupt (this should happen frequently)
-      } else if (MPUIntStatus & bit(MPU6050_INTERRUPT_DMP_INT_BIT)) {
-        // read all available packets from FIFO
-        while (fifoCount >= packetSize)  // Lets catch up to NOW, in case someone is using the dreaded delay()!
-        {
-          mpu.getFIFOBytes(FIFOBuffer, packetSize);
-          // track FIFO count here in case there is > 1 packet available
-          // (this lets us immediately read more without waiting for an interrupt)
-          fifoCount -= packetSize;
-        }
+      // This is only done when the motion interrupt pin of the interrupt status is set, which can be configured by
+      // setMotionDetectionThreshold and setMotionDetectionDuration
+      if (motionInt) {
+        MPUDataReady = false;  //reset interrupt flag
+        /* Display real acceleration, adjusted to remove gravity */
+        DEBUG_PRINT("areal\t");
+        DEBUG_PRINT(aaReal.x);
+        DEBUG_PRINT("\t");
+        DEBUG_PRINT(aaReal.y);
+        DEBUG_PRINT("\t");
+        DEBUG_PRINTLN(aaReal.z);
       }
-      /* Display real acceleration, adjusted to remove gravity */
-      mpu.dmpGetQuaternion(&q, FIFOBuffer);
-      mpu.dmpGetAccel(&aa, FIFOBuffer);
-      mpu.dmpGetGravity(&gravity, &q);
-      mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-      // DEBUG_PRINT("areal\t");
-      // DEBUG_PRINT(aaReal.x);
-      // DEBUG_PRINT("\t");
-      // DEBUG_PRINT(aaReal.y);
-      // DEBUG_PRINT("\t");
-      // DEBUG_PRINTLN(aaReal.z);
+
+      // This block should house something to detect motion and swings, not clashes
+      {
+
+      }
+
+      // This block makes sure that the fifo is up to date and read correctly
+      {
+        // get current FIFO count
+        fifoCount = mpu.getFIFOCount();
+        // check for overflow (this should never happen unless our code is too inefficient)
+        if ((MPUIntStatus & bit(MPU6050_INTERRUPT_FIFO_OFLOW_BIT)) || fifoCount >= 1024) {
+          // reset so we can continue cleanly
+          mpu.resetFIFO();
+          //  fifoCount = mpu.getFIFOCount();  // will be zero after reset no need to ask
+          Serial.println(F("FIFO overflow!"));
+          // otherwise, check for DMP data ready interrupt (this should happen frequently)
+        } else if (MPUIntStatus & bit(MPU6050_INTERRUPT_DMP_INT_BIT)) {
+          // read all available packets from FIFO
+          while (fifoCount >= packetSize)  // Lets catch up to NOW, in case someone is using the dreaded delay()!
+          {
+            mpu.getFIFOBytes(FIFOBuffer, packetSize);
+            // track FIFO count here in case there is > 1 packet available
+            // (this lets us immediately read more without waiting for an interrupt)
+            fifoCount -= packetSize;
+          }
+        }
+        mpu.dmpGetQuaternion(&q, FIFOBuffer);
+        mpu.dmpGetAccel(&aa, FIFOBuffer);
+        mpu.dmpGetGravity(&gravity, &q);
+        mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
+      }
     }
 
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
