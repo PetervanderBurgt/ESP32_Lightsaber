@@ -7,6 +7,8 @@
 #define MAIN_BUTTON 32
 #define SECOND_BUTTON 25
 
+#define MPU_INTERRUPT 4
+
 #define LED_OUTPUT 5
 #define NUM_LEDS 100
 #define BRIGHTNESS 100

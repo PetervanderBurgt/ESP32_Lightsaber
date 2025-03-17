@@ -5,14 +5,21 @@
 #include "I2Cdev.h"
 #include "MPU6050_6Axis_MotionApps20.h"
 
+extern global_states global_state;
+extern lightsaber_on_states lightsaber_on_state;
+
+
 bool mpu_ready = false;
 
 uint8_t swingSensitivity = 150;
 
 MPU6050 mpu;
 
-int const INTERRUPT_PIN = 4;  // Define the interruption #0 pin
-bool blinkState;
+bool clashTriggered = false;
+uint32_t startClashMillis = 0;
+#define CLASH_FX_DURATION 800
+#define BLASTER_FX_DURATION 150
+#define SWING_FX_DURATION 400
 
 /*---MPU6050 Control/Status Variables---*/
 bool DMPReady = false;   // Set true if DMP init was successful
@@ -72,7 +79,7 @@ void MovementDetection::MPUCode() {
   Wire.begin();
   Wire.setClock(400000);  // 400kHz I2C clock. Comment on this line if having compilation difficulties
   mpu.initialize();
-  pinMode(INTERRUPT_PIN, INPUT);
+  pinMode(MPU_INTERRUPT, INPUT);
 
   /*Verify connection*/
   DEBUG_PRINTLN(F("Testing MPU6050 connection..."));
@@ -116,9 +123,9 @@ void MovementDetection::MPUCode() {
 
     /*Enable Arduino interrupt detection*/
     DEBUG_PRINT(F("Enabling interrupt detection (Arduino external interrupt "));
-    DEBUG_PRINT(digitalPinToInterrupt(INTERRUPT_PIN));
+    DEBUG_PRINT(digitalPinToInterrupt(MPU_INTERRUPT));
     DEBUG_PRINTLN(F(")..."));
-    attachInterrupt(digitalPinToInterrupt(INTERRUPT_PIN), DMPDataReady, RISING);
+    attachInterrupt(digitalPinToInterrupt(MPU_INTERRUPT), DMPDataReady, RISING);
     MPUIntStatus = mpu.getIntStatus();
 
     /* Set the DMP Ready flag so the main loop() function knows it is okay to use it */
@@ -137,30 +144,42 @@ void MovementDetection::MPUCode() {
 
   xLastWakeTime = xTaskGetTickCount();
   for (;;) {
+
+
     // This code makes sure to read the fifo buffer of the MPU to always have the latest data
     if (MPUDataReady) {
       MPUDataReady = false;  //reset interrupt flag
       MPUIntStatus = mpu.getIntStatus();
-      bool motionInt = (MPUIntStatus >> 6) && 0x1;  // Only check the motion bit
 
-      // This is only done when the motion interrupt pin of the interrupt status is set, which can be configured by
-      // setMotionDetectionThreshold and setMotionDetectionDuration
-      if (motionInt) {
-        MPUDataReady = false;  //reset interrupt flag
-        /* Display real acceleration, adjusted to remove gravity */
-        DEBUG_PRINT("areal\t");
-        DEBUG_PRINT(aaReal.x);
-        DEBUG_PRINT("\t");
-        DEBUG_PRINT(aaReal.y);
-        DEBUG_PRINT("\t");
-        DEBUG_PRINTLN(aaReal.z);
+      // Only execute application code if lightsaber is on
+
+      if (global_state == lightsaber_on) {
+        bool motionInt = (MPUIntStatus >> 6) && 0x1;  // Only check the motion bit
+
+        // This is only done when the motion interrupt pin of the interrupt status is set, which can be configured by
+        // setMotionDetectionThreshold and setMotionDetectionDuration
+        if (motionInt) {
+          /* Display real acceleration, adjusted to remove gravity */
+          DEBUG_PRINT("areal\t");
+          DEBUG_PRINT(aaReal.x);
+          DEBUG_PRINT("\t");
+          DEBUG_PRINT(aaReal.y);
+          DEBUG_PRINT("\t");
+          DEBUG_PRINTLN(aaReal.z);
+          clashTriggered = true;
+          startClashMillis = millis();
+          lightsaber_on_state = lightsaber_on_clash;
+        }
+
+        if (clashTriggered && millis() - startClashMillis > CLASH_FX_DURATION) {
+          clashTriggered = false;
+          lightsaber_on_state = lightsaber_on_hum;
+        }
+
+        // This block should house something to detect motion and swings, not clashes
+        {
+        }
       }
-
-      // This block should house something to detect motion and swings, not clashes
-      {
-
-      }
-
       // This block makes sure that the fifo is up to date and read correctly
       {
         // get current FIFO count
