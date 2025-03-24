@@ -11,7 +11,7 @@ extern lightsaber_on_states lightsaber_on_state;
 
 bool mpu_ready = false;
 
-uint8_t swingSensitivity = 150;
+uint16_t swingSensitivity = 960;  // range should be between 0 and 16000 with increments of 160
 
 MPU6050 mpu;
 
@@ -154,11 +154,11 @@ void MovementDetection::MPUCode() {
       // Only execute application code if lightsaber is on
 
       if (global_state == lightsaber_on) {
-        bool motionInt = (MPUIntStatus >> 6) && 0x1;  // Only check the motion bit
+        bool clashInt = (MPUIntStatus >> 6) && 0x1;  // Only check the motion bit
 
         // This is only done when the motion interrupt pin of the interrupt status is set, which can be configured by
         // setMotionDetectionThreshold and setMotionDetectionDuration
-        if (motionInt) {
+        if (clashInt) {
           /* Display real acceleration, adjusted to remove gravity */
           DEBUG_PRINT("areal\t");
           DEBUG_PRINT(aaReal.x);
@@ -166,6 +166,8 @@ void MovementDetection::MPUCode() {
           DEBUG_PRINT(aaReal.y);
           DEBUG_PRINT("\t");
           DEBUG_PRINTLN(aaReal.z);
+          DEBUG_PRINTLN("CLASH DETECTED");
+
           clashTriggered = true;
           startClashMillis = millis();
           lightsaber_on_state = lightsaber_on_clash;
@@ -177,7 +179,18 @@ void MovementDetection::MPUCode() {
         }
 
         // This block should house something to detect motion and swings, not clashes
-        {
+        bool motionInt = abs(aaReal.x) > swingSensitivity || abs(aaReal.y) > swingSensitivity || abs(aaReal.z) > swingSensitivity;
+        if (motionInt) {
+          /* Display real acceleration, adjusted to remove gravity */
+          DEBUG_PRINT("swingSensitivity\t");
+          DEBUG_PRINT(swingSensitivity);
+          DEBUG_PRINT("areal\t");
+          DEBUG_PRINT(abs(aaReal.x) > swingSensitivity);
+          DEBUG_PRINT("\t");
+          DEBUG_PRINT(abs(aaReal.y) > swingSensitivity);
+          DEBUG_PRINT("\t");
+          DEBUG_PRINTLN(abs(aaReal.z) > swingSensitivity);
+          DEBUG_PRINTLN("MOTION DETECTED");
         }
       }
       // This block makes sure that the fifo is up to date and read correctly

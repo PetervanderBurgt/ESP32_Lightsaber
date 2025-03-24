@@ -21,7 +21,7 @@ Before all this happened I set out a couple of things that I would like to attai
     - [x]  Saber off 
     - [x]  Hum sounds
     - [ ]  Swing sounds
-    - [ ]  Clash sounds
+    - [x]  Clash sounds
 - [x]  Config should be possible
 - [x]  Keep settings on power on off
 - [x]  Switch color / rainbow
@@ -33,7 +33,7 @@ Before all this happened I set out a couple of things that I would like to attai
 - [ ]  Pulsating
 - [ ]  Webpage for settings
 - [ ]  Sounds
-    - [ ]  Config sounds
+    - [x]  Config sounds
     - [ ]  Blaster
     - [ ]  Lockup
 
