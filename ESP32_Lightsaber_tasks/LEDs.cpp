@@ -110,6 +110,9 @@ void Blade::LEDCode() {
           lightsaber_on_state = lightsaber_on_idle;
           break;
 
+        // In the mean time fall through to default hum
+        case lightsaber_on_clash:
+        case lightsaber_on_swing:
         case lightsaber_on_hum:
           if (MainColor == Rainbow) {
             fill_rainbow(leds, NUM_LEDS, colorSeed, 255 / NUM_LEDS);

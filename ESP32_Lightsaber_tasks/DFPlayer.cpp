@@ -123,6 +123,21 @@ void DFPlayer::DFPlayerCode() {
             playLightsaberTrack(sound_poweroff);
           }
           break;
+
+        case lightsaber_on_clash:
+          current_sound = getCurrentLightsaberTrack();
+          if (current_sound != sound_clash) {
+            playLightsaberTrack(sound_clash);
+          }
+          break;
+
+        case lightsaber_on_swing:
+          current_sound = getCurrentLightsaberTrack();
+          if (current_sound != sound_swing) {
+            playLightsaberTrack(sound_swing);
+          }
+          break;
+
         case lightsaber_on_hum:
           current_sound = getCurrentLightsaberTrack();
           if (current_sound != sound_hum) {
