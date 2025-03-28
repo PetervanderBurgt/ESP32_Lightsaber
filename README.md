@@ -15,12 +15,12 @@ Before all this happened I set out a couple of things that I would like to attai
 **Must haves:**
 - [x] Light up all 100 LEDS
 - [x] Two buttons to use
-- [ ]  Sound to play:
+- [x]  Sound to play:
     - [x]  Boot sound
     - [x]  Saber on
     - [x]  Saber off 
     - [x]  Hum sounds
-    - [ ]  Swing sounds
+    - [x]  Swing sounds
     - [x]  Clash sounds
 - [x]  Config should be possible
 - [x]  Keep settings on power on off
