@@ -16,10 +16,12 @@ uint16_t swingSensitivity = 960;  // range should be between 0 and 16000 with in
 MPU6050 mpu;
 
 bool clashTriggered = false;
+bool swingTriggered = false;
 uint32_t startClashMillis = 0;
-#define CLASH_FX_DURATION 800
+uint32_t startSwingMillis = 0;
+#define CLASH_FX_DURATION 750
 #define BLASTER_FX_DURATION 150
-#define SWING_FX_DURATION 400
+#define SWING_FX_DURATION 300
 
 /*---MPU6050 Control/Status Variables---*/
 bool DMPReady = false;   // Set true if DMP init was successful
@@ -158,7 +160,7 @@ void MovementDetection::MPUCode() {
 
         // This is only done when the motion interrupt pin of the interrupt status is set, which can be configured by
         // setMotionDetectionThreshold and setMotionDetectionDuration
-        if (clashInt) {
+        if (clashInt && !swingTriggered) {
           /* Display real acceleration, adjusted to remove gravity */
           DEBUG_PRINT("areal\t");
           DEBUG_PRINT(aaReal.x);
@@ -180,7 +182,7 @@ void MovementDetection::MPUCode() {
 
         // This block should house something to detect motion and swings, not clashes
         bool motionInt = abs(aaReal.x) > swingSensitivity || abs(aaReal.y) > swingSensitivity || abs(aaReal.z) > swingSensitivity;
-        if (motionInt) {
+        if (motionInt && !clashTriggered) {
           /* Display real acceleration, adjusted to remove gravity */
           DEBUG_PRINT("swingSensitivity\t");
           DEBUG_PRINT(swingSensitivity);
@@ -191,6 +193,15 @@ void MovementDetection::MPUCode() {
           DEBUG_PRINT("\t");
           DEBUG_PRINTLN(abs(aaReal.z) > swingSensitivity);
           DEBUG_PRINTLN("MOTION DETECTED");
+
+          swingTriggered = true;
+          startSwingMillis = millis();
+          lightsaber_on_state = lightsaber_on_swing;
+        }
+
+        if (swingTriggered && millis() - startSwingMillis > SWING_FX_DURATION) {
+          swingTriggered = false;
+          lightsaber_on_state = lightsaber_on_hum;
         }
       }
       // This block makes sure that the fifo is up to date and read correctly
