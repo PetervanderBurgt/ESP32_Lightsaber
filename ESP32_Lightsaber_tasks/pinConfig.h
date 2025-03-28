@@ -5,7 +5,13 @@
 #define RX_DFPLAYER 16
 #define TX_DFPLAYER 17
 #define MAIN_BUTTON 32
+#define MAIN_RED 23
+#define MAIN_GREEN 19
+#define MAIN_BLUE 18
 #define SECOND_BUTTON 25
+#define SECOND_RED 13
+#define SECOND_GREEN 33
+#define SECOND_BLUE 26
 
 #define MPU_INTERRUPT 4
 
