@@ -72,11 +72,46 @@ void Buttons::ButtonsCode() {
     button.attachDuringLongPress(secondary_button_longPress);
   }
 
+  pinMode(MAIN_RED, OUTPUT);
+  pinMode(MAIN_GREEN, OUTPUT);
+  pinMode(MAIN_BLUE, OUTPUT);
+  pinMode(SECOND_RED, OUTPUT);
+  pinMode(SECOND_GREEN, OUTPUT);
+  pinMode(SECOND_BLUE, OUTPUT);
+  digitalWrite(MAIN_RED, HIGH);
+  digitalWrite(MAIN_GREEN, HIGH);
+  digitalWrite(MAIN_BLUE, HIGH);
+  digitalWrite(SECOND_RED, HIGH);
+  digitalWrite(SECOND_GREEN, HIGH);
+  digitalWrite(SECOND_BLUE, HIGH);
+
   buttons_ready = true;
 
   xLastWakeTime = xTaskGetTickCount();
   for (;;) {
     button.tick();
+    if (global_state == lightsaber_on) {
+      digitalWrite(MAIN_RED, HIGH);
+      digitalWrite(MAIN_GREEN, HIGH);
+      digitalWrite(MAIN_BLUE, LOW);
+      digitalWrite(SECOND_RED, HIGH);
+      digitalWrite(SECOND_GREEN, HIGH);
+      digitalWrite(SECOND_BLUE, LOW);
+    } else if (global_state == lightsaber_config) {
+      digitalWrite(MAIN_RED, HIGH);
+      digitalWrite(MAIN_GREEN, LOW);
+      digitalWrite(MAIN_BLUE, HIGH);
+      digitalWrite(SECOND_RED, HIGH);
+      digitalWrite(SECOND_GREEN, LOW);
+      digitalWrite(SECOND_BLUE, HIGH);
+    } else {
+      digitalWrite(MAIN_RED, LOW);
+      digitalWrite(MAIN_GREEN, HIGH);
+      digitalWrite(MAIN_BLUE, HIGH);
+      digitalWrite(SECOND_RED, LOW);
+      digitalWrite(SECOND_GREEN, HIGH);
+      digitalWrite(SECOND_BLUE, HIGH);
+    }
     // Runs task every 15 MS
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
   }
