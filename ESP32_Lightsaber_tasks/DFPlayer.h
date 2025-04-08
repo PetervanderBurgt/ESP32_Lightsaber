@@ -68,11 +68,12 @@ private:
   lightsaber_sounds getEnumFromGlobalTrack(uint16_t globalTrackInt);
   uint16_t getGlobalTrackFromFolderandTrack(uint8_t folderInt, uint8_t trackInt);
 
+  void playStateSound(lightsaber_sounds sound_to_play);
   void playLightsaberTrack(lightsaber_sounds sound_to_play);
   void loopLightsaberTrack(lightsaber_sounds sound_to_play);
   lightsaber_sounds getCurrentLightsaberTrack();
 
-  void playconfigTrack(config_sounds sound_to_play);
+  void playConfigTrack(config_sounds sound_to_play);
   config_sounds getCurrentconfigTrack();
 
 public:

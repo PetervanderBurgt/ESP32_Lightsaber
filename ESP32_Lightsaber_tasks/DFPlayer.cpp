@@ -74,6 +74,9 @@ void DFPlayer::DFPlayerCode() {
   const TickType_t xFrequency = pdMS_TO_TICKS((1000 / DFPLAYER_HZ));
 
   config_mutex = xSemaphoreCreateMutex();
+  if (config_mutex == NULL) {
+    DEBUG_PRINTLN("Mutex not correctly created");
+  }
 
   dfmp3.begin(/*rx =*/RX_DFPLAYER, /*tx =*/TX_DFPLAYER);
   // for boards that support hardware arbitrary pins
@@ -111,31 +114,19 @@ void DFPlayer::DFPlayerCode() {
     if (global_state == lightsaber_on) {
       switch (lightsaber_on_state) {
         case lightsaber_on_ignition:
-          current_sound = getCurrentLightsaberTrack();
-          if (current_sound != sound_poweron) {
-            playLightsaberTrack(sound_poweron);
-          }
+          playStateSound(sound_poweron);
           break;
 
         case lightsaber_on_retraction:
-          current_sound = getCurrentLightsaberTrack();
-          if (current_sound != sound_poweroff) {
-            playLightsaberTrack(sound_poweroff);
-          }
+          playStateSound(sound_poweroff);
           break;
 
         case lightsaber_on_clash:
-          current_sound = getCurrentLightsaberTrack();
-          if (current_sound != sound_clash) {
-            playLightsaberTrack(sound_clash);
-          }
+          playStateSound(sound_clash);
           break;
 
         case lightsaber_on_swing:
-          current_sound = getCurrentLightsaberTrack();
-          if (current_sound != sound_swing) {
-            playLightsaberTrack(sound_swing);
-          }
+          playStateSound(sound_swing);
           break;
 
         case lightsaber_on_hum:
@@ -156,7 +147,7 @@ void DFPlayer::DFPlayerCode() {
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_configmode) {
             DEBUG_PRINTLN("Play config_sound_configmode");
-            playconfigTrack(config_sound_configmode);
+            playConfigTrack(config_sound_configmode);
           }
           if (configStart) {
             DEBUG_PRINTLN("Playing config sound");
@@ -173,7 +164,7 @@ void DFPlayer::DFPlayerCode() {
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_Soundfont && configChanged) {
             DEBUG_PRINTLN("Play config_sound_Soundfont");
-            playconfigTrack(config_sound_Soundfont);
+            playConfigTrack(config_sound_Soundfont);
             configChanged = false;
           }
           if (soundFontChanged) {
@@ -185,15 +176,15 @@ void DFPlayer::DFPlayerCode() {
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_Volume && configChanged) {
             DEBUG_PRINTLN("Play config_sound_Volume");
-            playconfigTrack(config_sound_Volume);
+            playConfigTrack(config_sound_Volume);
             configChanged = false;
           }
           if (configChangedUp) {
-            playconfigTrack(config_sound_up);
+            playConfigTrack(config_sound_up);
             configChangedUp = false;
           }
           if (configChangedDown) {
-            playconfigTrack(config_sound_down);
+            playConfigTrack(config_sound_down);
             configChangedDown = false;
           }
           break;
@@ -201,15 +192,15 @@ void DFPlayer::DFPlayerCode() {
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_swingsensitivity && configChanged) {
             DEBUG_PRINTLN("Play config_sound_swingsensitivity");
-            playconfigTrack(config_sound_swingsensitivity);
+            playConfigTrack(config_sound_swingsensitivity);
             configChanged = false;
           }
           if (configChangedUp) {
-            playconfigTrack(config_sound_up);
+            playConfigTrack(config_sound_up);
             configChangedUp = false;
           }
           if (configChangedDown) {
-            playconfigTrack(config_sound_down);
+            playConfigTrack(config_sound_down);
             configChangedDown = false;
           }
           break;
@@ -217,15 +208,15 @@ void DFPlayer::DFPlayerCode() {
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_MainColor && configChanged) {
             DEBUG_PRINTLN("Play config_sound_MainColor");
-            playconfigTrack(config_sound_MainColor);
+            playConfigTrack(config_sound_MainColor);
             configChanged = false;
           }
           if (configChangedUp) {
-            playconfigTrack(config_sound_up);
+            playConfigTrack(config_sound_up);
             configChangedUp = false;
           }
           if (configChangedDown) {
-            playconfigTrack(config_sound_down);
+            playConfigTrack(config_sound_down);
             configChangedDown = false;
           }
           break;
@@ -233,15 +224,15 @@ void DFPlayer::DFPlayerCode() {
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_ClashColor && configChanged) {
             DEBUG_PRINTLN("Play config_sound_ClashColor");
-            playconfigTrack(config_sound_ClashColor);
+            playConfigTrack(config_sound_ClashColor);
             configChanged = false;
           }
           if (configChangedUp) {
-            playconfigTrack(config_sound_up);
+            playConfigTrack(config_sound_up);
             configChangedUp = false;
           }
           if (configChangedDown) {
-            playconfigTrack(config_sound_down);
+            playConfigTrack(config_sound_down);
             configChangedDown = false;
           }
           break;
@@ -249,15 +240,15 @@ void DFPlayer::DFPlayerCode() {
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_BlastColor && configChanged) {
             DEBUG_PRINTLN("Play config_sound_BlastColor");
-            playconfigTrack(config_sound_BlastColor);
+            playConfigTrack(config_sound_BlastColor);
             configChanged = false;
           }
           if (configChangedUp) {
-            playconfigTrack(config_sound_up);
+            playConfigTrack(config_sound_up);
             configChangedUp = false;
           }
           if (configChangedDown) {
-            playconfigTrack(config_sound_down);
+            playConfigTrack(config_sound_down);
             configChangedDown = false;
           }
           break;
@@ -265,7 +256,7 @@ void DFPlayer::DFPlayerCode() {
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_batterynominal && configChanged) {
             DEBUG_PRINTLN("Play config_sound_batterynominal");
-            playconfigTrack(config_sound_batterynominal);
+            playConfigTrack(config_sound_batterynominal);
             configChanged = false;
           }
           break;
@@ -297,6 +288,13 @@ void DFPlayer::DFPlayerCode() {
   }
 }
 
+void DFPlayer::playStateSound(lightsaber_sounds sound_to_play) {
+  current_sound = getCurrentLightsaberTrack();
+  if (current_sound != sound_to_play) {
+    playLightsaberTrack(sound_to_play);
+  }
+}
+
 void DFPlayer::playLightsaberTrack(lightsaber_sounds sound_to_play) {
   dfmp3.playGlobalTrack(fontAndEnumtoTrack(sound_to_play, soundFont));
 }
@@ -309,7 +307,7 @@ lightsaber_sounds DFPlayer::getCurrentLightsaberTrack() {
   return getEnumFromGlobalTrack(dfmp3.getCurrentTrack());
 }
 
-void DFPlayer::playconfigTrack(config_sounds sound_to_play) {
+void DFPlayer::playConfigTrack(config_sounds sound_to_play) {
   dfmp3.playGlobalTrack(static_cast<int>(sound_to_play) + 1);
 }
 

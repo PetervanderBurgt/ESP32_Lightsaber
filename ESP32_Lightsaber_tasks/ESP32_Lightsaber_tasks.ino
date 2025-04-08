@@ -18,6 +18,7 @@
 #define configGENERATE_RUN_TIME_STATS 1
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS() (timer_start())  // Configure timer for runtime stats
 #define portGET_RUN_TIME_COUNTER_VALUE() (millis())               // Use micros() for more precise time
+#define TASK_START_DELAY 100
 
 DFPlayer audio(Serial1);
 MovementDetection mpuClass;
@@ -53,16 +54,16 @@ void setup() {
 
   mainButton.startTask();
   secondaryButton.startTask();
-  vTaskDelay(100);
+  vTaskDelay(TASK_START_DELAY);
 
   mpuClass.startTask();
-  vTaskDelay(100);
+  vTaskDelay(TASK_START_DELAY);
 
   leds.startTask();
-  vTaskDelay(100);
+  vTaskDelay(TASK_START_DELAY);
 
   audio.startTask();
-  vTaskDelay(100);
+  vTaskDelay(TASK_START_DELAY);
 
   if (print_stats) {
     // Create a task to print runtime stats every second
@@ -78,5 +79,5 @@ void setup() {
 }
 
 void loop() {
-  vTaskDelete(NULL);
+  //Intentionally left empty as all functionality is done by other tasks
 }
