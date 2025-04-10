@@ -156,9 +156,7 @@ void ConfigMenu::saveConfigMenu() {
   preferences.putUChar("BlastColor", static_cast<uint8_t>(BlastColor));  // Should be a enum number (0-20)
   preferences.end();
 
-  // Hangs the menu, This needs to be looked at
-  
-  // audio.setVolume();  // set the new volume on dfplayer
+  audio.setVolume();  // set the new volume on dfplayer
 }
 
 void ConfigMenu::nextConfigMenu() {
