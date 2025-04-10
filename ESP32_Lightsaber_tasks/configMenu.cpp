@@ -8,7 +8,7 @@
 extern config_states config_state;
 extern uint8_t soundFont;
 extern uint8_t dfplayer_volume;
-extern uint8_t swingSensitivity;
+extern uint16_t swingSensitivity;
 extern lightsaberColor MainColor;
 extern lightsaberColor ClashColor;
 extern lightsaberColor BlastColor;
@@ -156,12 +156,12 @@ void ConfigMenu::saveConfigMenu() {
   preferences.putUChar("BlastColor", static_cast<uint8_t>(BlastColor));  // Should be a enum number (0-20)
   preferences.end();
 
-  audio.setVolume();  // set the new volume on dfplayer
+  // Hangs the menu, This needs to be looked at
+  // audio.setVolume();  // set the new volume on dfplayer
 }
 
 void ConfigMenu::nextConfigMenu() {
   xSemaphoreTake(config_mutex, portMAX_DELAY);
-
   configChanged = true;
   uint8_t state = static_cast<uint8_t>(config_state);
   state = (state == (config_lastMember - 1)) ? 1 : state + 1;

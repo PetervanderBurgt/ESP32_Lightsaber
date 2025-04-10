@@ -111,22 +111,36 @@ void DFPlayer::DFPlayerCode() {
 
   xLastWakeTime = xTaskGetTickCount();
   for (;;) {
+    // DEBUG_PRINTLN("DFPLAYER Tick.");
+
     if (global_state == lightsaber_on) {
       switch (lightsaber_on_state) {
         case lightsaber_on_ignition:
-          playStateSound(sound_poweron);
+          current_sound = getCurrentLightsaberTrack();
+          if (current_sound != sound_poweron) {
+            playLightsaberTrack(sound_poweron);
+          }
           break;
 
         case lightsaber_on_retraction:
-          playStateSound(sound_poweroff);
+          current_sound = getCurrentLightsaberTrack();
+          if (current_sound != sound_poweroff) {
+            playLightsaberTrack(sound_poweroff);
+          }
           break;
 
         case lightsaber_on_clash:
-          playStateSound(sound_clash);
+          current_sound = getCurrentLightsaberTrack();
+          if (current_sound != sound_clash) {
+            playLightsaberTrack(sound_clash);
+          }
           break;
 
         case lightsaber_on_swing:
-          playStateSound(sound_swing);
+          current_sound = getCurrentLightsaberTrack();
+          if (current_sound != sound_swing) {
+            playLightsaberTrack(sound_swing);
+          }
           break;
 
         case lightsaber_on_hum:
@@ -142,7 +156,10 @@ void DFPlayer::DFPlayerCode() {
       }
     } else if (global_state == lightsaber_config) {
       xSemaphoreTake(config_mutex, portMAX_DELAY);
-      switch (config_state) {
+
+      config_states switch_config_state = config_state;
+
+      switch (switch_config_state) {
         case config_idle:
           current_config_sound = getCurrentconfigTrack();
           if (current_config_sound != config_sound_configmode) {
@@ -285,13 +302,6 @@ void DFPlayer::DFPlayerCode() {
     dfmp3.loop();
     // Runs task every 20 MS
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
-  }
-}
-
-void DFPlayer::playStateSound(lightsaber_sounds sound_to_play) {
-  current_sound = getCurrentLightsaberTrack();
-  if (current_sound != sound_to_play) {
-    playLightsaberTrack(sound_to_play);
   }
 }
 

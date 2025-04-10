@@ -89,8 +89,14 @@ void Buttons::ButtonsCode() {
 
   xLastWakeTime = xTaskGetTickCount();
   for (;;) {
+
     button.tick();
+
+    // DEBUG_PRINTLN("Button Tick.");
+
     if (global_state == lightsaber_on) {
+      vTaskPrioritySet(NULL, 1);
+
       digitalWrite(MAIN_RED, HIGH);
       digitalWrite(MAIN_GREEN, HIGH);
       digitalWrite(MAIN_BLUE, LOW);
@@ -98,6 +104,8 @@ void Buttons::ButtonsCode() {
       digitalWrite(SECOND_GREEN, HIGH);
       digitalWrite(SECOND_BLUE, LOW);
     } else if (global_state == lightsaber_config) {
+      vTaskPrioritySet(NULL, 2);
+
       digitalWrite(MAIN_RED, HIGH);
       digitalWrite(MAIN_GREEN, LOW);
       digitalWrite(MAIN_BLUE, HIGH);
@@ -105,6 +113,8 @@ void Buttons::ButtonsCode() {
       digitalWrite(SECOND_GREEN, LOW);
       digitalWrite(SECOND_BLUE, HIGH);
     } else {
+      vTaskPrioritySet(NULL, 1);
+
       digitalWrite(MAIN_RED, LOW);
       digitalWrite(MAIN_GREEN, HIGH);
       digitalWrite(MAIN_BLUE, HIGH);
@@ -120,7 +130,7 @@ void Buttons::ButtonsCode() {
 // ----- Main Button callback functions
 // This function will be called when the button1 was pressed 1 time (and no 2. button press followed).
 void Buttons::main_button_click() {
-  // DEBUG_PRINTLN("Main Button click.");
+  DEBUG_PRINTLN("Main Button click.");
   if (global_state == lightsaber_idle) {
     if (lightsaber_on_state == lightsaber_on_idle) {
       global_state = lightsaber_on;
@@ -136,11 +146,11 @@ void Buttons::main_button_click() {
 }
 // This function will be called when the button1 was pressed 2 times in a short timeframe.
 void Buttons::main_button_doubleclick() {
-  // DEBUG_PRINTLN("Main Button doubleclick.");
+  DEBUG_PRINTLN("Main Button doubleclick.");
 }  // doubleclick1
 // This function will be called once, when the button1 is pressed for a long time.
 void Buttons::main_button_longPressStart() {
-  // DEBUG_PRINTLN("Secondary Button longPress start");
+  DEBUG_PRINTLN("Main Button longPress start");
   if (global_state == lightsaber_on) {
     if (lightsaber_on_state == lightsaber_on_hum) {
       DEBUG_PRINT("global_state: ");
@@ -155,22 +165,22 @@ void Buttons::main_button_longPressStart() {
 }  // longPressStart1
 // This function will be called often, while the button1 is pressed for a long time.
 void Buttons::main_button_longPress() {
-  // DEBUG_PRINTLN("Main Button longPress...");
+  DEBUG_PRINTLN("Main Button longPress...");
 }  // longPress1
 // This function will be called once, when the button1 is released after beeing pressed for a long time.
 void Buttons::main_button_longPressStop() {
-  // DEBUG_PRINTLN("Main Button longPress stop");
+  DEBUG_PRINTLN("Main Button longPress stop");
 }  // longPressStop1
 
 // ... and the same for Secondary Button:
 void Buttons::secondary_button_click() {
-  // DEBUG_PRINTLN("Secondary Button click.");
+  DEBUG_PRINTLN("Secondary Button click.");
   if (global_state == lightsaber_config) {
     menu.runConfigMenu(false, true);
   }
 }  // click2
 void Buttons::secondary_button_doubleclick() {
-  // DEBUG_PRINTLN("Secondary Button doubleclick.");
+  DEBUG_PRINTLN("Secondary Button doubleclick.");
 }  // doubleclick2
 void Buttons::secondary_button_longPressStart() {
   if (global_state == lightsaber_idle) {
@@ -194,11 +204,11 @@ void Buttons::secondary_button_longPressStart() {
     DEBUG_PRINTLN(config_state);
     configStart = true;
   }
-  // DEBUG_PRINTLN("Secondary Button longPress start");
+  DEBUG_PRINTLN("Secondary Button longPress start");
 }  // longPressStart2
 void Buttons::secondary_button_longPress() {
-  // DEBUG_PRINTLN("Secondary Button longPress...");
+  DEBUG_PRINTLN("Secondary Button longPress...");
 }  // longPress2
 void Buttons::secondary_button_longPressStop() {
-  // DEBUG_PRINTLN("Secondary Button longPress stop");
+  DEBUG_PRINTLN("Secondary Button longPress stop");
 }  // longPressStop2
