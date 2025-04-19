@@ -4,6 +4,12 @@
 #include "pinConfig.h"
 #include "globalVariables.h"
 #include "configMenu.h"
+#include "SaberWeb.h"
+
+
+SaberWeb saberwebConfig = SaberWeb();
+
+bool saberWebRunning = false;
 
 extern global_states global_state;
 extern lightsaber_on_states lightsaber_on_state;
@@ -168,6 +174,16 @@ void Buttons::main_button_doubleclick() {
       lightsaber_on_state = lightsaber_on_tipmelt;
       vTaskDelay(TIPMELT_FX_DURATION);
       lightsaber_on_state = lightsaber_on_hum;
+    }
+  } else if (lightsaber_on_state == lightsaber_on_idle) {
+    if (!saberWebRunning) {
+      DEBUG_PRINTLN("Saber web task started from Bttuon.");
+      saberwebConfig.startTask();
+      saberWebRunning = true;
+    } else {
+      DEBUG_PRINTLN("Saber web task stopped from Bttuon.");
+      saberwebConfig.stopTask();
+      saberWebRunning = false;
     }
   }
 }  // doubleclick1

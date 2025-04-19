@@ -10,8 +10,7 @@ private:
   CRGB leds_output_array[NUM_LEDS];
 
   // Code for task creation and running
-  static void
-  runTask(void* pvParameters);
+  static void runTask(void* pvParameters);
   void LEDCode();
 
   // Code for helper functions in tasks
