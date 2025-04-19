@@ -214,6 +214,11 @@ void Buttons::secondary_button_longPressStart() {
     DEBUG_PRINT("config_state: ");
     DEBUG_PRINTLN(config_state);
     configStart = true;
+  } else if (global_state == lightsaber_on) {
+    if (lightsaber_on_state == lightsaber_on_hum) {
+
+      lightsaber_on_state = lightsaber_on_bladelockup;
+    }
   }
   DEBUG_PRINTLN("Secondary Button longPress start");
 }  // longPressStart2
@@ -221,5 +226,11 @@ void Buttons::secondary_button_longPress() {
   DEBUG_PRINTLN("Secondary Button longPress...");
 }  // longPress2
 void Buttons::secondary_button_longPressStop() {
+  if (global_state == lightsaber_on) {
+    if (lightsaber_on_state == lightsaber_on_bladelockup) {
+
+      lightsaber_on_state = lightsaber_on_hum;
+    }
+  }
   DEBUG_PRINTLN("Secondary Button longPress stop");
 }  // longPressStop2
