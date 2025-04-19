@@ -9,6 +9,7 @@ extern global_states global_state;
 extern lightsaber_on_states lightsaber_on_state;
 
 extern bool blaster_enabled;
+extern bool lockup_enabled;
 extern uint8_t effectLeds;
 extern uint8_t effectLedsLength;
 
@@ -21,12 +22,11 @@ MPU6050 mpu;
 bool clashTriggered = false;
 bool swingTriggered = false;
 bool blastTriggered = false;
+bool lockupTriggered = false;
 uint32_t startClashMillis = 0;
 uint32_t startBlastMillis = 0;
+uint32_t startLockupMillis = 0;
 uint32_t startSwingMillis = 0;
-#define CLASH_FX_DURATION 750
-#define BLASTER_FX_DURATION 500
-#define SWING_FX_DURATION 300
 
 /*---MPU6050 Control/Status Variables---*/
 bool DMPReady = false;   // Set true if DMP init was successful
@@ -179,19 +179,33 @@ void MovementDetection::handleClash() {
 
   // This is only done when the motion interrupt pin of the interrupt status is set, which can be configured by
   // setMotionDetectionThreshold and setMotionDetectionDuration
-  if (clashInt && !clashTriggered && !blastTriggered && !swingTriggered) {
-    /* Display real acceleration, adjusted to remove gravity */
-    DEBUG_PRINT("areal\t");
-    DEBUG_PRINT(aaReal.x);
-    DEBUG_PRINT("\t");
-    DEBUG_PRINT(aaReal.y);
-    DEBUG_PRINT("\t");
-    DEBUG_PRINTLN(aaReal.z);
-    DEBUG_PRINTLN("CLASH DETECTED");
+  if (clashInt && !clashTriggered && !blastTriggered && !swingTriggered && !lockupTriggered) {
 
-    clashTriggered = true;
-    startClashMillis = millis();
-    lightsaber_on_state = lightsaber_on_clash;
+    if (lockup_enabled) {
+      lockup_enabled = false;
+
+      lockupTriggered = true;
+      startLockupMillis = millis();
+      lightsaber_on_state = lightsaber_on_bladelockup;
+    } else {
+      /* Display real acceleration, adjusted to remove gravity */
+      DEBUG_PRINT("areal\t");
+      DEBUG_PRINT(aaReal.x);
+      DEBUG_PRINT("\t");
+      DEBUG_PRINT(aaReal.y);
+      DEBUG_PRINT("\t");
+      DEBUG_PRINTLN(aaReal.z);
+      DEBUG_PRINTLN("CLASH DETECTED");
+
+      clashTriggered = true;
+      startClashMillis = millis();
+      lightsaber_on_state = lightsaber_on_clash;
+    }
+  }
+
+  if (lockupTriggered && millis() - startLockupMillis > LOCKUP_FX_DURATION) {
+    lockupTriggered = false;
+    lightsaber_on_state = lightsaber_on_hum;
   }
 
   if (clashTriggered && millis() - startClashMillis > CLASH_FX_DURATION) {
@@ -203,11 +217,10 @@ void MovementDetection::handleClash() {
 void MovementDetection::handleSwing() {
   // This block should house something to detect motion and swings, not clashes
   bool motionInt = abs(aaReal.x) > swingSensitivity || abs(aaReal.y) > swingSensitivity || abs(aaReal.z) > swingSensitivity;
-  if (motionInt && !clashTriggered && !blastTriggered && !swingTriggered) {
+  if (motionInt && !clashTriggered && !blastTriggered && !swingTriggered && !lockupTriggered) {
 
     if (blaster_enabled) {
       blaster_enabled = false;
-      DEBUG_PRINTLN("blaster_disabled");
 
       blastTriggered = true;
       startBlastMillis = millis();
@@ -234,7 +247,6 @@ void MovementDetection::handleSwing() {
 
   if (blastTriggered && millis() - startBlastMillis > BLASTER_FX_DURATION) {
     blastTriggered = false;
-    DEBUG_PRINTLN("blaster_exit");
     lightsaber_on_state = lightsaber_on_hum;
   }
 

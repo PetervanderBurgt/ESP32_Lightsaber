@@ -11,9 +11,13 @@ extern config_states config_state;
 extern bool configStart;
 extern ConfigMenu menu;
 
+extern uint8_t effectLeds;
+extern uint8_t effectLedsLength;
+
 bool buttons_ready = false;
 
 bool blaster_enabled = false;
+bool lockup_enabled = false;
 
 Buttons::Buttons(button_types button_type)
   : current_button_type(button_type) {
@@ -188,10 +192,22 @@ void Buttons::secondary_button_click() {
   DEBUG_PRINTLN("Secondary Button click.");
   if (global_state == lightsaber_config) {
     menu.runConfigMenu(false, true);
+  } else if (global_state == lightsaber_on) {
+    if (lightsaber_on_state == lightsaber_on_hum) {
+      effectLeds = random(effectLedsLength, NUM_LEDS);
+      lightsaber_on_state = lightsaber_on_blasterdeflect;
+      vTaskDelay(BLASTER_FX_DURATION);
+      lightsaber_on_state = lightsaber_on_hum;
+    }
   }
 }  // click2
 void Buttons::secondary_button_doubleclick() {
   DEBUG_PRINTLN("Secondary Button doubleclick.");
+  if (global_state == lightsaber_on) {
+    if (lightsaber_on_state == lightsaber_on_hum) {
+      lockup_enabled = true;
+    }
+  }
 }  // doubleclick2
 void Buttons::secondary_button_longPressStart() {
   if (global_state == lightsaber_idle) {
@@ -216,7 +232,6 @@ void Buttons::secondary_button_longPressStart() {
     configStart = true;
   } else if (global_state == lightsaber_on) {
     if (lightsaber_on_state == lightsaber_on_hum) {
-
       lightsaber_on_state = lightsaber_on_bladelockup;
     }
   }
@@ -228,7 +243,6 @@ void Buttons::secondary_button_longPress() {
 void Buttons::secondary_button_longPressStop() {
   if (global_state == lightsaber_on) {
     if (lightsaber_on_state == lightsaber_on_bladelockup) {
-
       lightsaber_on_state = lightsaber_on_hum;
     }
   }

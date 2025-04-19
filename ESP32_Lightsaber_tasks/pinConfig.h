@@ -22,6 +22,11 @@
 #define CLASH_THRESHOLD 20 // 1mg/LSB  milli G, 1G being earths force
 #define CLASH_DURATION 2
 
+#define CLASH_FX_DURATION 750
+#define LOCKUP_FX_DURATION 4000
+#define BLASTER_FX_DURATION 500
+#define SWING_FX_DURATION 300
+
 #define LEDS_HZ 120
 #define BUTTONS_HZ 60
 #define MPU_HZ 60
