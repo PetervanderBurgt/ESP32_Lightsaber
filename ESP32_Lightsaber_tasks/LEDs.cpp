@@ -124,8 +124,7 @@ void Blade::LEDCode() {
           break;
 
         default:
-          fill_solid(leds_output_array, NUM_LEDS, CRGB::Black);
-          FastLED.show();  // Update the LEDs to reflect changes
+          setSolidColor(CRGB::Black);
           break;
       }
     } else if (global_state == lightsaber_config) {
@@ -159,17 +158,20 @@ void Blade::LEDCode() {
           break;
 
         default:
-          fill_solid(leds_output_array, NUM_LEDS, CRGB::Black);  // Hex value 0xFF5733
-          FastLED.show();                                        // Update the LEDs to reflect changes
+          setSolidColor(CRGB::Black);
           break;
       }
     } else {
-      fill_solid(leds_output_array, NUM_LEDS, CRGB::Black);
-      FastLED.show();  // Update the LEDs to reflect changes
+          setSolidColor(CRGB::Black);
     }
     // Runs task every 25 MS
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
   }
+}
+
+void Blade::setSolidColor(CRGB color) {
+  fill_solid(leds_output_array, NUM_LEDS, color);
+  FastLED.show();
 }
 
 void Blade::setLedsWithFlicker(lightsaberColor color) {

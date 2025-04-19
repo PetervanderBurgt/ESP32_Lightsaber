@@ -4,7 +4,6 @@
 #include "globalVariables.h"
 #include "pinConfig.h"
 
-
 class Blade {
 private:
   // Code for LED creating objects
@@ -15,6 +14,7 @@ private:
   runTask(void* pvParameters);
   void LEDCode();
   void setLedsWithFlicker(lightsaberColor color);
+  void setSolidColor(CRGB color);
 
   // Code for helper functions in tasks
 
