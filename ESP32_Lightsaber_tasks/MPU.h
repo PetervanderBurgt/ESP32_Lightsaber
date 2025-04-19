@@ -8,10 +8,12 @@ private:
   // Code for task creation and running
   static void runTask(void* pvParameters);
   void MPUCode();
-  TimerHandle_t MPUtimer;
-  static void IRAM_ATTR mpuTimerCallback(TimerHandle_t xTimer);
 
   // Code for helper functions in tasks
+  void initMPU();
+  void handleClash();
+  void handleSwing();
+  void readMPUData();
 
 public:
   // Code for movement objects

@@ -69,14 +69,18 @@ void Blade::runTask(void* pvParameters) {
   instance->LEDCode();
 }
 
+void Blade::initLEDS() {
+  FastLED.addLeds<WS2811, LED_OUTPUT, GRB>(leds_output_array, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);  // Set brightness level (0-255)
+}
+
 void Blade::LEDCode() {
   DEBUG_PRINT("LEDTask running on core ");
   DEBUG_PRINTLN(xPortGetCoreID());
   TickType_t xLastWakeTime;
   const TickType_t xFrequency = pdMS_TO_TICKS(LEDS_HZ);
 
-  FastLED.addLeds<WS2811, LED_OUTPUT, GRB>(leds_output_array, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(BRIGHTNESS);  // Set brightness level (0-255)
+  initLEDS();
 
   leds_ready = true;
 
@@ -162,7 +166,7 @@ void Blade::LEDCode() {
           break;
       }
     } else {
-          setSolidColor(CRGB::Black);
+      setSolidColor(CRGB::Black);
     }
     // Runs task every 25 MS
     vTaskDelayUntil(&xLastWakeTime, xFrequency);

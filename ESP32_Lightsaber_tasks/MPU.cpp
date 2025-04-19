@@ -8,7 +8,6 @@
 extern global_states global_state;
 extern lightsaber_on_states lightsaber_on_state;
 
-
 bool mpu_ready = false;
 
 uint16_t swingSensitivity = 960;  // range should be between 0 and 16000 with increments of 160
@@ -71,12 +70,7 @@ void MovementDetection::runTask(void* pvParameters) {
   instance->MPUCode();
 }
 
-void MovementDetection::MPUCode() {
-  DEBUG_PRINT("MPUTask running on core ");
-  DEBUG_PRINTLN(xPortGetCoreID());
-  TickType_t xLastWakeTime;
-  const TickType_t xFrequency = pdMS_TO_TICKS((1000 / MPU_HZ));
-
+void MovementDetection::initMPU() {
   //Connect and start i2c
   Wire.begin();
   Wire.setClock(400000);  // 400kHz I2C clock. Comment on this line if having compilation difficulties
@@ -141,97 +135,113 @@ void MovementDetection::MPUCode() {
     // 1 = initial memory load failed
     // 2 = DMP configuration updates failed
   }
+}
+
+void MovementDetection::MPUCode() {
+  DEBUG_PRINT("MPUTask running on core ");
+  DEBUG_PRINTLN(xPortGetCoreID());
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = pdMS_TO_TICKS((1000 / MPU_HZ));
+  initMPU();
 
   mpu_ready = true;
 
   xLastWakeTime = xTaskGetTickCount();
   for (;;) {
-
-
     // This code makes sure to read the fifo buffer of the MPU to always have the latest data
     if (MPUDataReady) {
       MPUDataReady = false;  //reset interrupt flag
       MPUIntStatus = mpu.getIntStatus();
 
       // Only execute application code if lightsaber is on
-
       if (global_state == lightsaber_on) {
-        bool clashInt = (MPUIntStatus >> 6) && 0x1;  // Only check the motion bit
+        handleClash();
 
-        // This is only done when the motion interrupt pin of the interrupt status is set, which can be configured by
-        // setMotionDetectionThreshold and setMotionDetectionDuration
-        if (clashInt && !swingTriggered) {
-          /* Display real acceleration, adjusted to remove gravity */
-          DEBUG_PRINT("areal\t");
-          DEBUG_PRINT(aaReal.x);
-          DEBUG_PRINT("\t");
-          DEBUG_PRINT(aaReal.y);
-          DEBUG_PRINT("\t");
-          DEBUG_PRINTLN(aaReal.z);
-          DEBUG_PRINTLN("CLASH DETECTED");
-
-          clashTriggered = true;
-          startClashMillis = millis();
-          lightsaber_on_state = lightsaber_on_clash;
-        }
-
-        if (clashTriggered && millis() - startClashMillis > CLASH_FX_DURATION) {
-          clashTriggered = false;
-          lightsaber_on_state = lightsaber_on_hum;
-        }
-
-        // This block should house something to detect motion and swings, not clashes
-        bool motionInt = abs(aaReal.x) > swingSensitivity || abs(aaReal.y) > swingSensitivity || abs(aaReal.z) > swingSensitivity;
-        if (motionInt && !clashTriggered) {
-          /* Display real acceleration, adjusted to remove gravity */
-          DEBUG_PRINT("swingSensitivity\t");
-          DEBUG_PRINT(swingSensitivity);
-          DEBUG_PRINT("areal\t");
-          DEBUG_PRINT(abs(aaReal.x) > swingSensitivity);
-          DEBUG_PRINT("\t");
-          DEBUG_PRINT(abs(aaReal.y) > swingSensitivity);
-          DEBUG_PRINT("\t");
-          DEBUG_PRINTLN(abs(aaReal.z) > swingSensitivity);
-          DEBUG_PRINTLN("MOTION DETECTED");
-
-          swingTriggered = true;
-          startSwingMillis = millis();
-          lightsaber_on_state = lightsaber_on_swing;
-        }
-
-        if (swingTriggered && millis() - startSwingMillis > SWING_FX_DURATION) {
-          swingTriggered = false;
-          lightsaber_on_state = lightsaber_on_hum;
-        }
+        handleSwing();
       }
       // This block makes sure that the fifo is up to date and read correctly
-      {
-        // get current FIFO count
-        fifoCount = mpu.getFIFOCount();
-        // check for overflow (this should never happen unless our code is too inefficient)
-        if ((MPUIntStatus & bit(MPU6050_INTERRUPT_FIFO_OFLOW_BIT)) || fifoCount >= 1024) {
-          // reset so we can continue cleanly
-          mpu.resetFIFO();
-          //  fifoCount = mpu.getFIFOCount();  // will be zero after reset no need to ask
-          Serial.println(F("FIFO overflow!"));
-          // otherwise, check for DMP data ready interrupt (this should happen frequently)
-        } else if (MPUIntStatus & bit(MPU6050_INTERRUPT_DMP_INT_BIT)) {
-          // read all available packets from FIFO
-          while (fifoCount >= packetSize)  // Lets catch up to NOW, in case someone is using the dreaded delay()!
-          {
-            mpu.getFIFOBytes(FIFOBuffer, packetSize);
-            // track FIFO count here in case there is > 1 packet available
-            // (this lets us immediately read more without waiting for an interrupt)
-            fifoCount -= packetSize;
-          }
-        }
-        mpu.dmpGetQuaternion(&q, FIFOBuffer);
-        mpu.dmpGetAccel(&aa, FIFOBuffer);
-        mpu.dmpGetGravity(&gravity, &q);
-        mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-      }
     }
+
+    readMPUData();
 
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
   }
+}
+
+void MovementDetection::handleClash() {
+  bool clashInt = (MPUIntStatus >> 6) && 0x1;  // Only check the motion bit
+
+  // This is only done when the motion interrupt pin of the interrupt status is set, which can be configured by
+  // setMotionDetectionThreshold and setMotionDetectionDuration
+  if (clashInt && !swingTriggered) {
+    /* Display real acceleration, adjusted to remove gravity */
+    DEBUG_PRINT("areal\t");
+    DEBUG_PRINT(aaReal.x);
+    DEBUG_PRINT("\t");
+    DEBUG_PRINT(aaReal.y);
+    DEBUG_PRINT("\t");
+    DEBUG_PRINTLN(aaReal.z);
+    DEBUG_PRINTLN("CLASH DETECTED");
+
+    clashTriggered = true;
+    startClashMillis = millis();
+    lightsaber_on_state = lightsaber_on_clash;
+  }
+
+  if (clashTriggered && millis() - startClashMillis > CLASH_FX_DURATION) {
+    clashTriggered = false;
+    lightsaber_on_state = lightsaber_on_hum;
+  }
+}
+
+void MovementDetection::handleSwing() {
+  // This block should house something to detect motion and swings, not clashes
+  bool motionInt = abs(aaReal.x) > swingSensitivity || abs(aaReal.y) > swingSensitivity || abs(aaReal.z) > swingSensitivity;
+  if (motionInt && !clashTriggered) {
+    /* Display real acceleration, adjusted to remove gravity */
+    DEBUG_PRINT("swingSensitivity\t");
+    DEBUG_PRINT(swingSensitivity);
+    DEBUG_PRINT("areal\t");
+    DEBUG_PRINT(abs(aaReal.x) > swingSensitivity);
+    DEBUG_PRINT("\t");
+    DEBUG_PRINT(abs(aaReal.y) > swingSensitivity);
+    DEBUG_PRINT("\t");
+    DEBUG_PRINTLN(abs(aaReal.z) > swingSensitivity);
+    DEBUG_PRINTLN("MOTION DETECTED");
+
+    swingTriggered = true;
+    startSwingMillis = millis();
+    lightsaber_on_state = lightsaber_on_swing;
+  }
+
+  if (swingTriggered && millis() - startSwingMillis > SWING_FX_DURATION) {
+    swingTriggered = false;
+    lightsaber_on_state = lightsaber_on_hum;
+  }
+}
+
+void MovementDetection::readMPUData() {
+  // get current FIFO count
+  fifoCount = mpu.getFIFOCount();
+  // check for overflow (this should never happen unless our code is too inefficient)
+  if ((MPUIntStatus & bit(MPU6050_INTERRUPT_FIFO_OFLOW_BIT)) || fifoCount >= 1024) {
+    // reset so we can continue cleanly
+    mpu.resetFIFO();
+    //  fifoCount = mpu.getFIFOCount();  // will be zero after reset no need to ask
+    Serial.println(F("FIFO overflow!"));
+    // otherwise, check for DMP data ready interrupt (this should happen frequently)
+  } else if (MPUIntStatus & bit(MPU6050_INTERRUPT_DMP_INT_BIT)) {
+    // read all available packets from FIFO
+    while (fifoCount >= packetSize)  // Lets catch up to NOW, in case someone is using the dreaded delay()!
+    {
+      mpu.getFIFOBytes(FIFOBuffer, packetSize);
+      // track FIFO count here in case there is > 1 packet available
+      // (this lets us immediately read more without waiting for an interrupt)
+      fifoCount -= packetSize;
+    }
+  }
+  mpu.dmpGetQuaternion(&q, FIFOBuffer);
+  mpu.dmpGetAccel(&aa, FIFOBuffer);
+  mpu.dmpGetGravity(&gravity, &q);
+  mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
 }

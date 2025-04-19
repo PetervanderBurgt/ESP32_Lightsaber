@@ -67,12 +67,7 @@ void DFPlayer::runTask(void* pvParameters) {
   instance->DFPlayerCode();
 }
 
-void DFPlayer::DFPlayerCode() {
-  DEBUG_PRINT("DFPlayerTask running on core ");
-  DEBUG_PRINTLN(xPortGetCoreID());
-  TickType_t xLastWakeTime;
-  const TickType_t xFrequency = pdMS_TO_TICKS((1000 / DFPLAYER_HZ));
-
+void DFPlayer::initDFPlayer() {
   config_mutex = xSemaphoreCreateMutex();
   if (config_mutex == NULL) {
     DEBUG_PRINTLN("Mutex not correctly created");
@@ -107,6 +102,16 @@ void DFPlayer::DFPlayerCode() {
   DEBUG_PRINTLN(mode);
 
   DEBUG_PRINTLN("starting...");
+}
+
+void DFPlayer::DFPlayerCode() {
+  DEBUG_PRINT("DFPlayerTask running on core ");
+  DEBUG_PRINTLN(xPortGetCoreID());
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = pdMS_TO_TICKS((1000 / DFPLAYER_HZ));
+
+  initDFPlayer();
+
   dfplayer_ready = true;
 
   xLastWakeTime = xTaskGetTickCount();

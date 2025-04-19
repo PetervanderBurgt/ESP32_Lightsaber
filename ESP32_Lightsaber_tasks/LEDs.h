@@ -13,10 +13,11 @@ private:
   static void
   runTask(void* pvParameters);
   void LEDCode();
-  void setLedsWithFlicker(lightsaberColor color);
-  void setSolidColor(CRGB color);
 
   // Code for helper functions in tasks
+  void initLEDS();
+  void setLedsWithFlicker(lightsaberColor color);
+  void setSolidColor(CRGB color);
 
 public:
   // Code for LED creating objects
