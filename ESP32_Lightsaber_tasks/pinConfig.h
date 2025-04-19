@@ -16,7 +16,8 @@
 #define MPU_INTERRUPT 4
 
 #define LED_OUTPUT 5
-#define NUM_LEDS 100
+#define NUM_LEDS 60
+#define TIPMELT_LEDS 10
 #define BRIGHTNESS 100
 
 #define CLASH_THRESHOLD 20 // 1mg/LSB  milli G, 1G being earths force
@@ -26,6 +27,7 @@
 #define LOCKUP_FX_DURATION 4000
 #define BLASTER_FX_DURATION 500
 #define SWING_FX_DURATION 300
+#define TIPMELT_FX_DURATION 4000
 
 #define LEDS_HZ 120
 #define BUTTONS_HZ 60

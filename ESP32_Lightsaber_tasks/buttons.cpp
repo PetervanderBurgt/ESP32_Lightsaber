@@ -162,6 +162,14 @@ void Buttons::main_button_click() {
 // This function will be called when the button1 was pressed 2 times in a short timeframe.
 void Buttons::main_button_doubleclick() {
   DEBUG_PRINTLN("Main Button doubleclick.");
+  if (global_state == lightsaber_on) {
+    if (lightsaber_on_state == lightsaber_on_hum) {
+      effectLeds = random(effectLedsLength, NUM_LEDS);
+      lightsaber_on_state = lightsaber_on_tipmelt;
+      vTaskDelay(TIPMELT_FX_DURATION);
+      lightsaber_on_state = lightsaber_on_hum;
+    }
+  }
 }  // doubleclick1
 // This function will be called once, when the button1 is pressed for a long time.
 void Buttons::main_button_longPressStart() {
