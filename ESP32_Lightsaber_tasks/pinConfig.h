@@ -19,7 +19,7 @@
 #define NUM_LEDS 100
 #define BRIGHTNESS 100
 
-#define CLASH_THRESHOLD 10 // 1mg/LSB  milli G, 1G being earths force
+#define CLASH_THRESHOLD 20 // 1mg/LSB  milli G, 1G being earths force
 #define CLASH_DURATION 2
 
 #define LEDS_HZ 120

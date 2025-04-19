@@ -13,6 +13,7 @@ extern ConfigMenu menu;
 
 bool buttons_ready = false;
 
+bool blaster_enabled = false;
 
 Buttons::Buttons(button_types button_type)
   : current_button_type(button_type) {
@@ -102,7 +103,7 @@ void Buttons::ButtonsCode() {
       vTaskPrioritySet(NULL, 1);
       //set button green
       setLEDColorForButton(current_button_type, LOW, LOW, HIGH);
-      
+
     } else if (global_state == lightsaber_config) {
       vTaskPrioritySet(NULL, 2);
       //set button green
@@ -112,7 +113,6 @@ void Buttons::ButtonsCode() {
       vTaskPrioritySet(NULL, 1);
       //set button red
       setLEDColorForButton(current_button_type, HIGH, LOW, LOW);
-
     }
     // Runs task every 15 MS
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
@@ -148,6 +148,11 @@ void Buttons::main_button_click() {
     }
   } else if (global_state == lightsaber_config) {
     menu.runConfigMenu(true, false);
+  } else if (global_state == lightsaber_on) {
+    if (lightsaber_on_state == lightsaber_on_hum) {
+      blaster_enabled = true;
+      DEBUG_PRINTLN("blaster_enabled");
+    }
   }
 }
 // This function will be called when the button1 was pressed 2 times in a short timeframe.

@@ -8,6 +8,10 @@
 extern global_states global_state;
 extern lightsaber_on_states lightsaber_on_state;
 
+extern bool blaster_enabled;
+extern uint8_t effectLeds;
+extern uint8_t effectLedsLength;
+
 bool mpu_ready = false;
 
 uint16_t swingSensitivity = 960;  // range should be between 0 and 16000 with increments of 160
@@ -16,10 +20,12 @@ MPU6050 mpu;
 
 bool clashTriggered = false;
 bool swingTriggered = false;
+bool blastTriggered = false;
 uint32_t startClashMillis = 0;
+uint32_t startBlastMillis = 0;
 uint32_t startSwingMillis = 0;
 #define CLASH_FX_DURATION 750
-#define BLASTER_FX_DURATION 150
+#define BLASTER_FX_DURATION 500
 #define SWING_FX_DURATION 300
 
 /*---MPU6050 Control/Status Variables---*/
@@ -173,7 +179,7 @@ void MovementDetection::handleClash() {
 
   // This is only done when the motion interrupt pin of the interrupt status is set, which can be configured by
   // setMotionDetectionThreshold and setMotionDetectionDuration
-  if (clashInt && !swingTriggered) {
+  if (clashInt && !clashTriggered && !blastTriggered && !swingTriggered) {
     /* Display real acceleration, adjusted to remove gravity */
     DEBUG_PRINT("areal\t");
     DEBUG_PRINT(aaReal.x);
@@ -197,21 +203,39 @@ void MovementDetection::handleClash() {
 void MovementDetection::handleSwing() {
   // This block should house something to detect motion and swings, not clashes
   bool motionInt = abs(aaReal.x) > swingSensitivity || abs(aaReal.y) > swingSensitivity || abs(aaReal.z) > swingSensitivity;
-  if (motionInt && !clashTriggered) {
-    /* Display real acceleration, adjusted to remove gravity */
-    DEBUG_PRINT("swingSensitivity\t");
-    DEBUG_PRINT(swingSensitivity);
-    DEBUG_PRINT("areal\t");
-    DEBUG_PRINT(abs(aaReal.x) > swingSensitivity);
-    DEBUG_PRINT("\t");
-    DEBUG_PRINT(abs(aaReal.y) > swingSensitivity);
-    DEBUG_PRINT("\t");
-    DEBUG_PRINTLN(abs(aaReal.z) > swingSensitivity);
-    DEBUG_PRINTLN("MOTION DETECTED");
+  if (motionInt && !clashTriggered && !blastTriggered && !swingTriggered) {
 
-    swingTriggered = true;
-    startSwingMillis = millis();
-    lightsaber_on_state = lightsaber_on_swing;
+    if (blaster_enabled) {
+      blaster_enabled = false;
+      DEBUG_PRINTLN("blaster_disabled");
+
+      blastTriggered = true;
+      startBlastMillis = millis();
+      effectLeds = random(effectLedsLength, NUM_LEDS);
+
+      lightsaber_on_state = lightsaber_on_blasterdeflect;
+    } else {
+      /* Display real acceleration, adjusted to remove gravity */
+      DEBUG_PRINT("swingSensitivity\t");
+      DEBUG_PRINT(swingSensitivity);
+      DEBUG_PRINT("areal\t");
+      DEBUG_PRINT(abs(aaReal.x) > swingSensitivity);
+      DEBUG_PRINT("\t");
+      DEBUG_PRINT(abs(aaReal.y) > swingSensitivity);
+      DEBUG_PRINT("\t");
+      DEBUG_PRINTLN(abs(aaReal.z) > swingSensitivity);
+      DEBUG_PRINTLN("MOTION DETECTED");
+
+      swingTriggered = true;
+      startSwingMillis = millis();
+      lightsaber_on_state = lightsaber_on_swing;
+    }
+  }
+
+  if (blastTriggered && millis() - startBlastMillis > BLASTER_FX_DURATION) {
+    blastTriggered = false;
+    DEBUG_PRINTLN("blaster_exit");
+    lightsaber_on_state = lightsaber_on_hum;
   }
 
   if (swingTriggered && millis() - startSwingMillis > SWING_FX_DURATION) {

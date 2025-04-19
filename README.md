@@ -31,12 +31,12 @@ Before all this happened I set out a couple of things that I would like to attai
 - [ ]  Webpage for settings
 - [ ]  LED Functionality
     - [ ]  Tip melt
-    - [ ]  Blaster
-        - [ ]  Random places for blaster
+    - [x]  Blaster
+        - [x]  Random places for blaster
     - [ ]  Lockup
 - [ ]  Sounds
     - [x]  Config sounds
-    - [ ]  Blaster
+    - [x]  Blaster
     - [ ]  Lockup
 
 ## Hardware gathering
