@@ -14,7 +14,8 @@ lightsaberColor MainColor = Silver_blue;
 lightsaberColor ClashColor = Pink_red;
 lightsaberColor BlastColor = Sky_Blue;
 
-uint8_t colorSeed = 0;  // Starting hue for the rainbow animation
+uint16_t colorNoiseSeed = 0;   // Starting hue for the rainbow animation
+uint16_t colorNoiseSpeed = 2;  // Starting hue for the rainbow animation
 
 
 // This array order should match the one that is given in the enum above
@@ -78,7 +79,7 @@ void Blade::LEDCode() {
   DEBUG_PRINT("LEDTask running on core ");
   DEBUG_PRINTLN(xPortGetCoreID());
   TickType_t xLastWakeTime;
-  const TickType_t xFrequency = pdMS_TO_TICKS(LEDS_HZ);
+  const TickType_t xFrequency = pdMS_TO_TICKS((1000 / LEDS_HZ));
 
   initLEDS();
 
@@ -94,7 +95,7 @@ void Blade::LEDCode() {
         case lightsaber_on_ignition:
           for (int i = 0; i < NUM_LEDS; i++) {
             if (MainColor == Rainbow) {
-              leds_output_array[i] = CHSV((i * 255 / NUM_LEDS) + colorSeed, 255, 255);  // CHSV: Hue, Saturation, Value (Brightness), Shift the hue for different starting point
+              leds_output_array[i] = CHSV((i * 255 / NUM_LEDS) + colorNoiseSeed, 255, 255);  // CHSV: Hue, Saturation, Value (Brightness), Shift the hue for different starting point
             } else {
               leds_output_array[i] = CRGB(lightsaberColorHex[MainColor]);  // You can change the color here (e.g., CRGB::Blue or CRGB::Red)
             }
@@ -119,8 +120,8 @@ void Blade::LEDCode() {
         case lightsaber_on_swing:
         case lightsaber_on_hum:
           if (MainColor == Rainbow) {
-            fill_rainbow(leds_output_array, NUM_LEDS, colorSeed, 255 / NUM_LEDS);
-            colorSeed = colorSeed + 5;
+            fill_rainbow(leds_output_array, NUM_LEDS, colorNoiseSeed, 255 / NUM_LEDS);
+            colorNoiseSeed = colorNoiseSeed + colorNoiseSpeed;
           } else {
             setLedsWithFlicker(MainColor);
           }
@@ -179,5 +180,18 @@ void Blade::setSolidColor(CRGB color) {
 }
 
 void Blade::setLedsWithFlicker(lightsaberColor color) {
-  fill_solid(leds_output_array, NUM_LEDS, CRGB(lightsaberColorHex[MainColor]));
+  CRGB base = CRGB(lightsaberColorHex[color]);
+
+  for (int i = 0; i < NUM_LEDS; i++) {
+    // Start with base color
+    leds_output_array[i] = base;
+    // Add time and position to get smooth noise
+    uint8_t noise = inoise8(i * 10, colorNoiseSeed);  // i*10 gives spacing between LEDs
+
+    // Map noise to a usable flicker brightness range
+    uint8_t flicker = map(noise, 0, 255, 108, 255);  // More subtle
+
+    leds_output_array[i].nscale8_video(flicker);  // Safe flicker scaler
+    colorNoiseSeed += colorNoiseSpeed; // Animate the noise field over time
+  }
 }
