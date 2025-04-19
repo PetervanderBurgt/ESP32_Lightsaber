@@ -148,6 +148,7 @@ void DFPlayer::DFPlayerCode() {
           }
           break;
 
+        case lightsaber_on_tipmelt:
         case lightsaber_on_bladelockup:
           current_sound = getCurrentLightsaberTrack();
           if (current_sound != sound_lockup) {

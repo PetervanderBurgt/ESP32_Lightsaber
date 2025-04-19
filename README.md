@@ -29,8 +29,8 @@ Before all this happened I set out a couple of things that I would like to attai
 **Could haves:**
 - [x]  Flicker in leds
 - [ ]  Webpage for settings
-- [ ]  LED Functionality
-    - [ ]  Tip melt
+- [x]  LED Functionality
+    - [x]  Tip melt
     - [x]  Blaster
         - [x]  Random places for blaster
     - [x]  Lockup
