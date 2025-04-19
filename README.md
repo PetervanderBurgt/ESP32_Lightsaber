@@ -27,7 +27,7 @@ Before all this happened I set out a couple of things that I would like to attai
 - [x]  Switch color / rainbow
 
 **Could haves:**
-- [ ]  Flicker in leds
+- [x]  Flicker in leds
 - [ ]  Random places for blaster
 - [ ]  Tip melt
 - [ ]  Webpage for settings
