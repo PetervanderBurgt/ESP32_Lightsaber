@@ -121,11 +121,23 @@ void Blade::LEDCode() {
         case lightsaber_on_blasterdeflect:
           if (MainColor == Rainbow) {
             fill_rainbow(leds_output_array, NUM_LEDS, colorNoiseSeed, 255 / NUM_LEDS);
+            addBlasterToLeds(BlastColor);
             colorNoiseSeed = colorNoiseSeed + colorNoiseSpeed;
           } else {
             setLedsWithFlicker(MainColor);
             addBlasterToLeds(BlastColor);
             DEBUG_PRINTLN("BLASTER LEDS");
+          }
+          FastLED.show();  // Update the LEDs to reflect changes
+          break;
+
+        case lightsaber_on_bladelockup:
+          if (MainColor == Rainbow) {
+            fill_rainbow(leds_output_array, NUM_LEDS, colorNoiseSeed, 255 / NUM_LEDS);
+            setLedsToLockup();
+            colorNoiseSeed = colorNoiseSeed + colorNoiseSpeed;
+          } else {
+            setLedsToLockup();
           }
           FastLED.show();  // Update the LEDs to reflect changes
           break;
@@ -215,6 +227,30 @@ void Blade::addBlasterToLeds(lightsaberColor color) {
 
   for (int i = effectLeds - effectLedsLength; i < effectLeds; i++) {
     leds_output_array[i] = base;
+    // Add time and position to get smooth noise
+    uint8_t noise = inoise8(i * 10, colorNoiseSeed);  // i*10 gives spacing between LEDs
+
+    // Map noise to a usable flicker brightness range
+    uint8_t flicker = map(noise, 0, 255, 108, 255);  // More subtle
+
+    leds_output_array[i].nscale8_video(flicker);  // Safe flicker scaler
+  }
+}
+
+void Blade::setLedsToLockup() {
+  DEBUG_PRINTLN("Setting lockup colors");
+  CRGB main = CRGB(lightsaberColorHex[MainColor]);
+  CRGB clash = CRGB(lightsaberColorHex[ClashColor]);
+
+  for (int i = 0; i < NUM_LEDS; i++) {
+    int lockupFlick = random(0, 39);
+    if (lockupFlick < 20 && MainColor != Rainbow) {
+      leds_output_array[i] = main;
+    } else if (lockupFlick < 30) {
+      leds_output_array[i] = clash;
+    } else {  // simple white
+      leds_output_array[i] = CRGB::White;
+    }
     // Add time and position to get smooth noise
     uint8_t noise = inoise8(i * 10, colorNoiseSeed);  // i*10 gives spacing between LEDs
 

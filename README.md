@@ -33,11 +33,11 @@ Before all this happened I set out a couple of things that I would like to attai
     - [ ]  Tip melt
     - [x]  Blaster
         - [x]  Random places for blaster
-    - [ ]  Lockup
-- [ ]  Sounds
+    - [x]  Lockup
+- [x]  Sounds
     - [x]  Config sounds
     - [x]  Blaster
-    - [ ]  Lockup
+    - [x]  Lockup
 
 ## Hardware gathering
 All links given are based on availability in the Netherlands

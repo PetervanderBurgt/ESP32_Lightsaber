@@ -19,6 +19,7 @@ private:
   void setLedsWithFlicker(lightsaberColor color);
   void setSolidColor(CRGB color);
   void addBlasterToLeds(lightsaberColor color);
+  void setLedsToLockup();
 
 public:
   // Code for LED creating objects
