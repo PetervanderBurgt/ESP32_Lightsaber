@@ -30,7 +30,6 @@ Before all this happened I set out a couple of things that I would like to attai
 - [ ]  Flicker in leds
 - [ ]  Random places for blaster
 - [ ]  Tip melt
-- [ ]  Pulsating
 - [ ]  Webpage for settings
 - [ ]  Sounds
     - [x]  Config sounds
