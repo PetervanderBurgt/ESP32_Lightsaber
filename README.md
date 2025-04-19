@@ -28,12 +28,15 @@ Before all this happened I set out a couple of things that I would like to attai
 
 **Could haves:**
 - [x]  Flicker in leds
-- [ ]  Random places for blaster
-- [ ]  Tip melt
 - [ ]  Webpage for settings
+- [ ]  LED Functionality
+    - [ ]  Tip melt
+    - [x]  Blaster
+        - [x]  Random places for blaster
+    - [ ]  Lockup
 - [ ]  Sounds
     - [x]  Config sounds
-    - [ ]  Blaster
+    - [x]  Blaster
     - [ ]  Lockup
 
 ## Hardware gathering

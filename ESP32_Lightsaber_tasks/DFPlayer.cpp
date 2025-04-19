@@ -141,6 +141,13 @@ void DFPlayer::DFPlayerCode() {
           }
           break;
 
+        case lightsaber_on_blasterdeflect:
+          current_sound = getCurrentLightsaberTrack();
+          if (current_sound != sound_blaster) {
+            playLightsaberTrack(sound_blaster);
+          }
+          break;
+
         case lightsaber_on_swing:
           current_sound = getCurrentLightsaberTrack();
           if (current_sound != sound_swing) {

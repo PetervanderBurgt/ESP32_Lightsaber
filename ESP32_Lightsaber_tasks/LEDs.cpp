@@ -17,6 +17,8 @@ lightsaberColor BlastColor = Sky_Blue;
 uint16_t colorNoiseSeed = 0;   // Starting hue for the rainbow animation
 uint16_t colorNoiseSpeed = 2;  // Starting hue for the rainbow animation
 
+uint8_t effectLeds = 0;
+uint8_t effectLedsLength = 10;
 
 // This array order should match the one that is given in the enum above
 uint32_t lightsaberColorHex[] = {
@@ -116,6 +118,18 @@ void Blade::LEDCode() {
           break;
 
         // In the mean time fall through to default hum
+        case lightsaber_on_blasterdeflect:
+          if (MainColor == Rainbow) {
+            fill_rainbow(leds_output_array, NUM_LEDS, colorNoiseSeed, 255 / NUM_LEDS);
+            colorNoiseSeed = colorNoiseSeed + colorNoiseSpeed;
+          } else {
+            setLedsWithFlicker(MainColor);
+            addBlasterToLeds(BlastColor);
+            DEBUG_PRINTLN("BLASTER LEDS");
+          }
+          FastLED.show();  // Update the LEDs to reflect changes
+          break;
+
         case lightsaber_on_clash:
         case lightsaber_on_swing:
         case lightsaber_on_hum:
@@ -192,6 +206,21 @@ void Blade::setLedsWithFlicker(lightsaberColor color) {
     uint8_t flicker = map(noise, 0, 255, 108, 255);  // More subtle
 
     leds_output_array[i].nscale8_video(flicker);  // Safe flicker scaler
-    colorNoiseSeed += colorNoiseSpeed; // Animate the noise field over time
+    colorNoiseSeed += colorNoiseSpeed;            // Animate the noise field over time
+  }
+}
+
+void Blade::addBlasterToLeds(lightsaberColor color) {
+  CRGB base = CRGB(lightsaberColorHex[color]);
+
+  for (int i = effectLeds - effectLedsLength; i < effectLeds; i++) {
+    leds_output_array[i] = base;
+    // Add time and position to get smooth noise
+    uint8_t noise = inoise8(i * 10, colorNoiseSeed);  // i*10 gives spacing between LEDs
+
+    // Map noise to a usable flicker brightness range
+    uint8_t flicker = map(noise, 0, 255, 108, 255);  // More subtle
+
+    leds_output_array[i].nscale8_video(flicker);  // Safe flicker scaler
   }
 }
