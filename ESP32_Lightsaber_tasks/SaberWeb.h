@@ -5,7 +5,6 @@
 #include <Preferences.h>
 #include "globalVariables.h"
 #include "pinConfig.h"
-#include "ESPAsyncWebServer.h"
 
 
 
@@ -18,7 +17,8 @@ private:
   void WEBCode();
 
   void readConfig();
-  void saveSaberWeb(AsyncWebServerRequest *request);
+  void handleRoot();
+  void saveSaberWeb();
   void initSaberWeb();
   void runSaberWeb();
   static SaberWeb* instance;  // static pointer to store 'this'

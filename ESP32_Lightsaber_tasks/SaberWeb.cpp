@@ -5,19 +5,167 @@
 #include "pinConfig.h"
 #include "DFPlayer.h"
 
-#include <DNSServer.h>
 #include <WiFi.h>
-#include <AsyncTCP.h>
-#include "ESPAsyncWebServer.h"
+#include <WebServer.h>
+#include <DNSServer.h>
 
 const char* ssid = "Saber_Config";
 const char* password = "lightsaber123";
 
-AsyncWebServer server(80);
+// IP Address for the ESP32 Access Point
+IPAddress local_IP(192, 168, 4, 1);
+IPAddress gateway(192, 168, 4, 1);
+IPAddress subnet(255, 255, 255, 0);
+
+WebServer server(80);
 SaberWeb* SaberWeb::instance = nullptr;
 // Set up DNS server (this will redirect any requests to the AP's IP address)
 DNSServer dnsServer;
-const char index_html[] PROGMEM = R"rawliteral(
+
+
+extern config_states config_state;
+extern uint8_t soundFont;
+extern uint8_t dfplayer_volume;
+extern uint16_t swingSensitivity;
+extern lightsaberColor MainColor;
+extern lightsaberColor ClashColor;
+extern lightsaberColor BlastColor;
+
+extern bool configChanged;
+extern bool soundFontChanged;
+extern bool configChangedUp;
+extern bool configChangedDown;
+
+extern DFPlayer audio;
+
+extern SemaphoreHandle_t config_mutex;
+
+SaberWeb::SaberWeb() {
+  saberWebTaskHandle = NULL;
+  SaberWeb::instance = this;
+}
+
+// Start the task by creating a FreeRTOS task
+void SaberWeb::startTask() {
+  // Create the task, passing `this` (the instance of the class) as the parameter
+  DEBUG_PRINTLN("Saber web task started.");
+  xTaskCreatePinnedToCore(
+    runTask,             /* Task function. */
+    "WEBTask",           /* name of task. */
+    8192,                /* Stack size of task */
+    this,                /* parameter of the task */
+    1,                   /* priority of the task */
+    &saberWebTaskHandle, /* Task handle to keep track of created task */
+    0);                  /* pin task to core 0 */
+}
+
+void SaberWeb::stopTask() {
+  if (saberWebTaskHandle != NULL) {
+    vTaskDelete(saberWebTaskHandle);
+    saberWebTaskHandle = NULL;
+    DEBUG_PRINTLN("Saber web task stopped.");
+  }
+}
+
+// Static task function called by FreeRTOS
+void SaberWeb::runTask(void* pvParameters) {
+  // Cast the parameter to a pointer to the MyTaskClass instance
+  SaberWeb* instance = static_cast<SaberWeb*>(pvParameters);
+
+  // Call the instance's non-static method (the actual task)
+  instance->WEBCode();
+}
+
+void SaberWeb::WEBCode() {
+  DEBUG_PRINT("LEDTask running on core ");
+  DEBUG_PRINTLN(xPortGetCoreID());
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = pdMS_TO_TICKS((1000 / 60));
+
+  initSaberWeb();
+
+  xLastWakeTime = xTaskGetTickCount();
+  for (;;) {
+    runSaberWeb();
+    vTaskDelayUntil(&xLastWakeTime, xFrequency);
+  }
+}
+
+
+void SaberWeb::initSaberWeb() {
+  // Start AP
+
+  // Set up the ESP32 as an access point
+  if (!WiFi.softAPConfig(local_IP, gateway, subnet)) {
+    Serial.println("STA Failed to configure");
+  }
+
+  // Set up DNS server to redirect all HTTP requests to the AP IP
+  dnsServer.start(53, "*", local_IP);
+
+  if (WiFi.softAP(ssid, password)) {
+    Serial.println("Access Point Started");
+    Serial.print("IP Address: ");
+    Serial.println(WiFi.softAPIP());  // Shows the IP address
+  }
+
+  // Handle the root URL and redirect to a specific page
+  server.on("/", HTTP_GET, []() {
+    server.sendHeader("Location", "http://192.168.4.1/index.html", true);
+    server.send(302, "text/plain", "Redirecting...");
+  });
+
+  // Routes
+  server.on("/index.html", []() {
+    instance->handleRoot();
+  });
+  server.on("/submit", []() {
+    instance->saveSaberWeb();
+  });
+  server.begin();
+}
+
+void SaberWeb::runSaberWeb() {
+  server.handleClient();
+}
+
+// Handle the submitted form
+void SaberWeb::saveSaberWeb() {
+  String soundFont = server.arg("Sound Font");
+  String volume = server.arg("Volume");
+  String swingSensitivity = server.arg("SwingSensitivity");
+  String mainColor = server.arg("mainColor");
+  String blastColor = server.arg("blastColor");
+  String clashColor = server.arg("clashColor");
+  String customColor1 = server.arg("UserColor1");
+  String customColor2 = server.arg("UserColor2");
+  String customColor3 = server.arg("UserColor3");
+
+  Serial.println("=== Config Received ===");
+  Serial.println("soundFont: " + soundFont);
+  Serial.println("volume: " + volume);
+  Serial.println("swingSensitivity: " + swingSensitivity);
+  Serial.println("mainColor: " + mainColor);
+  Serial.println("blastColor: " + blastColor);
+  Serial.println("clashColor: " + clashColor);
+  Serial.println("customColor1: " + customColor1);
+  Serial.println("customColor2: " + customColor2);
+  Serial.println("customColor3: " + customColor3);
+
+  // // Optionally parse hex color
+  // uint32_t hex = strtol(customColor.c_str() + 1, NULL, 16);
+  // uint8_t r = (hex >> 16) & 0xFF;
+  // uint8_t g = (hex >> 8) & 0xFF;
+  // uint8_t b = hex & 0xFF;
+
+  // Serial.printf("Parsed RGB: (%d, %d, %d)\n", r, g, b);
+
+  server.send(200, "text/html", "<h3>Settings saved!</h3><a href='/'>Back</a>");
+}
+
+// Serve the HTML form
+void SaberWeb::handleRoot() {
+  server.send(200, "text/html", R"rawliteral(
 <!DOCTYPE html>
 <html>
 <head>
@@ -147,147 +295,5 @@ const char index_html[] PROGMEM = R"rawliteral(
   </form>
 </body>
 </html>
-  )rawliteral";
-
-class CaptiveRequestHandler : public AsyncWebHandler {
-public:
-  CaptiveRequestHandler() {}
-  virtual ~CaptiveRequestHandler() {}
-
-  bool canHandle(AsyncWebServerRequest* request) {
-    //request->addInterestingHeader("ANY");
-    return true;
-  }
-
-  void handleRequest(AsyncWebServerRequest* request) {
-    request->send_P(200, "text/html", index_html);
-  }
-};
-
-extern config_states config_state;
-extern uint8_t soundFont;
-extern uint8_t dfplayer_volume;
-extern uint16_t swingSensitivity;
-extern lightsaberColor MainColor;
-extern lightsaberColor ClashColor;
-extern lightsaberColor BlastColor;
-
-extern bool configChanged;
-extern bool soundFontChanged;
-extern bool configChangedUp;
-extern bool configChangedDown;
-
-extern DFPlayer audio;
-
-extern SemaphoreHandle_t config_mutex;
-
-SaberWeb::SaberWeb() {
-  saberWebTaskHandle = NULL;
-  SaberWeb::instance = this;
-}
-
-// Start the task by creating a FreeRTOS task
-void SaberWeb::startTask() {
-  // Create the task, passing `this` (the instance of the class) as the parameter
-  DEBUG_PRINTLN("Saber web task started.");
-  xTaskCreatePinnedToCore(
-    runTask,             /* Task function. */
-    "WEBTask",           /* name of task. */
-    8192,                /* Stack size of task */
-    this,                /* parameter of the task */
-    1,                   /* priority of the task */
-    &saberWebTaskHandle, /* Task handle to keep track of created task */
-    0);                  /* pin task to core 0 */
-}
-
-void SaberWeb::stopTask() {
-  if (saberWebTaskHandle != NULL) {
-    vTaskDelete(saberWebTaskHandle);
-    saberWebTaskHandle = NULL;
-    DEBUG_PRINTLN("Saber web task stopped.");
-  }
-}
-
-// Static task function called by FreeRTOS
-void SaberWeb::runTask(void* pvParameters) {
-  // Cast the parameter to a pointer to the MyTaskClass instance
-  SaberWeb* instance = static_cast<SaberWeb*>(pvParameters);
-
-  // Call the instance's non-static method (the actual task)
-  instance->WEBCode();
-}
-
-void SaberWeb::WEBCode() {
-  DEBUG_PRINT("LEDTask running on core ");
-  DEBUG_PRINTLN(xPortGetCoreID());
-  TickType_t xLastWakeTime;
-  const TickType_t xFrequency = pdMS_TO_TICKS((1000 / 60));
-
-  initSaberWeb();
-
-  xLastWakeTime = xTaskGetTickCount();
-  for (;;) {
-    runSaberWeb();
-    vTaskDelayUntil(&xLastWakeTime, xFrequency);
-  }
-}
-
-void SaberWeb::initSaberWeb() {
-  if (WiFi.softAP(ssid, password)) {
-    Serial.println("Access Point Started");
-    Serial.print("IP Address: ");
-    Serial.println(WiFi.softAPIP());  // Shows the IP address
-  }
-  // Set up DNS server to redirect all HTTP requests to the AP IP
-  dnsServer.start(53, "*", WiFi.softAPIP());
-
-  // Handle the root URL and redirect to a specific page
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
-    request->send_P(200, "text/html", index_html);
-    Serial.println("Client Connected");
-  });
-
-  server.on("/submit", [](AsyncWebServerRequest* request) {
-    instance->saveSaberWeb(request);
-    request->send(200, "text/html", "<h3>Settings saved!</h3><a href='/'>Back</a>");
-  });
-  server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);  //only when requested from AP
-
-  server.begin();
-}
-
-void SaberWeb::runSaberWeb() {
-  dnsServer.processNextRequest();
-}
-
-// Handle the submitted form
-void SaberWeb::saveSaberWeb(AsyncWebServerRequest* request) {
-  String soundFont = request->getParam("Sound Font")->value();
-  String volume = request->getParam("Volume")->value();
-  String swingSensitivity = request->getParam("SwingSensitivity")->value();
-  String mainColor = request->getParam("mainColor")->value();
-  String blastColor = request->getParam("blastColor")->value();
-  String clashColor = request->getParam("clashColor")->value();
-  String customColor1 = request->getParam("UserColor1")->value();
-  String customColor2 = request->getParam("UserColor2")->value();
-  String customColor3 = request->getParam("UserColor3")->value();
-
-  Serial.println("=== Config Received ===");
-  Serial.println("soundFont: " + soundFont);
-  Serial.println("volume: " + volume);
-  Serial.println("swingSensitivity: " + swingSensitivity);
-  Serial.println("mainColor: " + mainColor);
-  Serial.println("blastColor: " + blastColor);
-  Serial.println("clashColor: " + clashColor);
-  Serial.println("customColor1: " + customColor1);
-  Serial.println("customColor2: " + customColor2);
-  Serial.println("customColor3: " + customColor3);
-
-  // // Optionally parse hex color
-  // uint32_t hex = strtol(customColor.c_str() + 1, NULL, 16);
-  // uint8_t r = (hex >> 16) & 0xFF;
-  // uint8_t g = (hex >> 8) & 0xFF;
-  // uint8_t b = hex & 0xFF;
-
-  // Serial.printf("Parsed RGB: (%d, %d, %d)\n", r, g, b);
+  )rawliteral");
 }
