@@ -1,14 +1,20 @@
 #ifndef LEDS_H
 #define LEDS_H
+#include <FastLED.h>
+#include "globalVariables.h"
+#include "pinConfig.h"
 
 
 class Blade {
 private:
   // Code for LED creating objects
+  CRGB leds_output_array[NUM_LEDS];
 
   // Code for task creation and running
-  static void runTask(void* pvParameters);
+  static void
+  runTask(void* pvParameters);
   void LEDCode();
+  void setLedsWithFlicker(lightsaberColor color);
 
   // Code for helper functions in tasks
 
