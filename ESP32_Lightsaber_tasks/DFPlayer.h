@@ -65,6 +65,8 @@ private:
   void DFPlayerCode();
 
   // Code for helper functions in tasks
+  void initDFPlayer();
+
   lightsaber_sounds getEnumFromGlobalTrack(uint16_t globalTrackInt);
   uint16_t getGlobalTrackFromFolderandTrack(uint8_t folderInt, uint8_t trackInt);
 
@@ -72,7 +74,7 @@ private:
   void loopLightsaberTrack(lightsaber_sounds sound_to_play);
   lightsaber_sounds getCurrentLightsaberTrack();
 
-  void playconfigTrack(config_sounds sound_to_play);
+  void playConfigTrack(config_sounds sound_to_play);
   config_sounds getCurrentconfigTrack();
 
 public:

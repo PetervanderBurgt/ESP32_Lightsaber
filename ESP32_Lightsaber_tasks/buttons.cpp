@@ -16,6 +16,7 @@ bool buttons_ready = false;
 
 Buttons::Buttons(button_types button_type)
   : current_button_type(button_type) {
+  button;
 }
 
 // Start the task by creating a FreeRTOS task
@@ -43,14 +44,7 @@ void Buttons::runTask(void* pvParameters) {
   instance->ButtonsCode();
 }
 
-void Buttons::ButtonsCode() {
-
-  DEBUG_PRINT("Button running on core ");
-  DEBUG_PRINTLN(xPortGetCoreID());
-  TickType_t xLastWakeTime;
-  const TickType_t xFrequency = pdMS_TO_TICKS((1000 / BUTTONS_HZ));
-
-  OneButton button;
+void Buttons::initButton() {
   if (current_button_type == button_double_main) {
     button.setup(MAIN_BUTTON, INPUT_PULLUP, true);
     button.setClickMs(CLICK);
@@ -60,6 +54,12 @@ void Buttons::ButtonsCode() {
     button.attachLongPressStart(main_button_longPressStart);
     button.attachLongPressStop(main_button_longPressStop);
     button.attachDuringLongPress(main_button_longPress);
+    pinMode(MAIN_RED, OUTPUT);
+    pinMode(MAIN_GREEN, OUTPUT);
+    pinMode(MAIN_BLUE, OUTPUT);
+    digitalWrite(MAIN_RED, HIGH);
+    digitalWrite(MAIN_GREEN, HIGH);
+    digitalWrite(MAIN_BLUE, HIGH);
 
   } else if (current_button_type == button_double_secondary) {
     button.setup(SECOND_BUTTON, INPUT_PULLUP, true);
@@ -70,57 +70,73 @@ void Buttons::ButtonsCode() {
     button.attachLongPressStart(secondary_button_longPressStart);
     button.attachLongPressStop(secondary_button_longPressStop);
     button.attachDuringLongPress(secondary_button_longPress);
-  }
 
-  pinMode(MAIN_RED, OUTPUT);
-  pinMode(MAIN_GREEN, OUTPUT);
-  pinMode(MAIN_BLUE, OUTPUT);
-  pinMode(SECOND_RED, OUTPUT);
-  pinMode(SECOND_GREEN, OUTPUT);
-  pinMode(SECOND_BLUE, OUTPUT);
-  digitalWrite(MAIN_RED, HIGH);
-  digitalWrite(MAIN_GREEN, HIGH);
-  digitalWrite(MAIN_BLUE, HIGH);
-  digitalWrite(SECOND_RED, HIGH);
-  digitalWrite(SECOND_GREEN, HIGH);
-  digitalWrite(SECOND_BLUE, HIGH);
+    pinMode(SECOND_RED, OUTPUT);
+    pinMode(SECOND_GREEN, OUTPUT);
+    pinMode(SECOND_BLUE, OUTPUT);
+    digitalWrite(SECOND_RED, HIGH);
+    digitalWrite(SECOND_GREEN, HIGH);
+    digitalWrite(SECOND_BLUE, HIGH);
+  }
+}
+
+void Buttons::ButtonsCode() {
+
+  DEBUG_PRINT("Button running on core ");
+  DEBUG_PRINTLN(xPortGetCoreID());
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = pdMS_TO_TICKS((1000 / BUTTONS_HZ));
+
+  initButton();
 
   buttons_ready = true;
 
   xLastWakeTime = xTaskGetTickCount();
   for (;;) {
+
     button.tick();
+
+    // DEBUG_PRINTLN("Button Tick.");
+
     if (global_state == lightsaber_on) {
-      digitalWrite(MAIN_RED, HIGH);
-      digitalWrite(MAIN_GREEN, HIGH);
-      digitalWrite(MAIN_BLUE, LOW);
-      digitalWrite(SECOND_RED, HIGH);
-      digitalWrite(SECOND_GREEN, HIGH);
-      digitalWrite(SECOND_BLUE, LOW);
+      vTaskPrioritySet(NULL, 1);
+      //set button green
+      setLEDColorForButton(current_button_type, LOW, LOW, HIGH);
+      
     } else if (global_state == lightsaber_config) {
-      digitalWrite(MAIN_RED, HIGH);
-      digitalWrite(MAIN_GREEN, LOW);
-      digitalWrite(MAIN_BLUE, HIGH);
-      digitalWrite(SECOND_RED, HIGH);
-      digitalWrite(SECOND_GREEN, LOW);
-      digitalWrite(SECOND_BLUE, HIGH);
+      vTaskPrioritySet(NULL, 2);
+      //set button green
+      setLEDColorForButton(current_button_type, LOW, HIGH, LOW);
+
     } else {
-      digitalWrite(MAIN_RED, LOW);
-      digitalWrite(MAIN_GREEN, HIGH);
-      digitalWrite(MAIN_BLUE, HIGH);
-      digitalWrite(SECOND_RED, LOW);
-      digitalWrite(SECOND_GREEN, HIGH);
-      digitalWrite(SECOND_BLUE, HIGH);
+      vTaskPrioritySet(NULL, 1);
+      //set button red
+      setLEDColorForButton(current_button_type, HIGH, LOW, LOW);
+
     }
     // Runs task every 15 MS
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
   }
 }
 
+void Buttons::setLEDColorForButton(button_types btn, bool r, bool g, bool b) {
+  if (btn == button_double_main) {
+    setLEDColor(MAIN_RED, MAIN_GREEN, MAIN_BLUE, r, g, b);
+  } else if (btn == button_double_secondary) {
+    setLEDColor(SECOND_RED, SECOND_GREEN, SECOND_BLUE, r, g, b);
+  }
+}
+
+void Buttons::setLEDColor(uint8_t rPin, uint8_t gPin, uint8_t bPin, bool r, bool g, bool b) {
+  digitalWrite(rPin, !r);
+  digitalWrite(gPin, !g);
+  digitalWrite(bPin, !b);
+}
+
 // ----- Main Button callback functions
 // This function will be called when the button1 was pressed 1 time (and no 2. button press followed).
 void Buttons::main_button_click() {
-  // DEBUG_PRINTLN("Main Button click.");
+  DEBUG_PRINTLN("Main Button click.");
   if (global_state == lightsaber_idle) {
     if (lightsaber_on_state == lightsaber_on_idle) {
       global_state = lightsaber_on;
@@ -136,11 +152,11 @@ void Buttons::main_button_click() {
 }
 // This function will be called when the button1 was pressed 2 times in a short timeframe.
 void Buttons::main_button_doubleclick() {
-  // DEBUG_PRINTLN("Main Button doubleclick.");
+  DEBUG_PRINTLN("Main Button doubleclick.");
 }  // doubleclick1
 // This function will be called once, when the button1 is pressed for a long time.
 void Buttons::main_button_longPressStart() {
-  // DEBUG_PRINTLN("Secondary Button longPress start");
+  DEBUG_PRINTLN("Main Button longPress start");
   if (global_state == lightsaber_on) {
     if (lightsaber_on_state == lightsaber_on_hum) {
       DEBUG_PRINT("global_state: ");
@@ -155,22 +171,22 @@ void Buttons::main_button_longPressStart() {
 }  // longPressStart1
 // This function will be called often, while the button1 is pressed for a long time.
 void Buttons::main_button_longPress() {
-  // DEBUG_PRINTLN("Main Button longPress...");
+  DEBUG_PRINTLN("Main Button longPress...");
 }  // longPress1
 // This function will be called once, when the button1 is released after beeing pressed for a long time.
 void Buttons::main_button_longPressStop() {
-  // DEBUG_PRINTLN("Main Button longPress stop");
+  DEBUG_PRINTLN("Main Button longPress stop");
 }  // longPressStop1
 
 // ... and the same for Secondary Button:
 void Buttons::secondary_button_click() {
-  // DEBUG_PRINTLN("Secondary Button click.");
+  DEBUG_PRINTLN("Secondary Button click.");
   if (global_state == lightsaber_config) {
     menu.runConfigMenu(false, true);
   }
 }  // click2
 void Buttons::secondary_button_doubleclick() {
-  // DEBUG_PRINTLN("Secondary Button doubleclick.");
+  DEBUG_PRINTLN("Secondary Button doubleclick.");
 }  // doubleclick2
 void Buttons::secondary_button_longPressStart() {
   if (global_state == lightsaber_idle) {
@@ -194,11 +210,11 @@ void Buttons::secondary_button_longPressStart() {
     DEBUG_PRINTLN(config_state);
     configStart = true;
   }
-  // DEBUG_PRINTLN("Secondary Button longPress start");
+  DEBUG_PRINTLN("Secondary Button longPress start");
 }  // longPressStart2
 void Buttons::secondary_button_longPress() {
-  // DEBUG_PRINTLN("Secondary Button longPress...");
+  DEBUG_PRINTLN("Secondary Button longPress...");
 }  // longPress2
 void Buttons::secondary_button_longPressStop() {
-  // DEBUG_PRINTLN("Secondary Button longPress stop");
+  DEBUG_PRINTLN("Secondary Button longPress stop");
 }  // longPressStop2

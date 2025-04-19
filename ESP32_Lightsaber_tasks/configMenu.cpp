@@ -8,7 +8,7 @@
 extern config_states config_state;
 extern uint8_t soundFont;
 extern uint8_t dfplayer_volume;
-extern uint8_t swingSensitivity;
+extern uint16_t swingSensitivity;
 extern lightsaberColor MainColor;
 extern lightsaberColor ClashColor;
 extern lightsaberColor BlastColor;
@@ -161,7 +161,6 @@ void ConfigMenu::saveConfigMenu() {
 
 void ConfigMenu::nextConfigMenu() {
   xSemaphoreTake(config_mutex, portMAX_DELAY);
-
   configChanged = true;
   uint8_t state = static_cast<uint8_t>(config_state);
   state = (state == (config_lastMember - 1)) ? 1 : state + 1;

@@ -43,6 +43,7 @@ uint32_t lightsaberColorHex[] = {
 };
 
 Blade::Blade() {
+  leds_output_array[NUM_LEDS] = {};
   // Any other initialization you need for this class
 }
 
@@ -68,15 +69,18 @@ void Blade::runTask(void* pvParameters) {
   instance->LEDCode();
 }
 
+void Blade::initLEDS() {
+  FastLED.addLeds<WS2811, LED_OUTPUT, GRB>(leds_output_array, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);  // Set brightness level (0-255)
+}
+
 void Blade::LEDCode() {
   DEBUG_PRINT("LEDTask running on core ");
   DEBUG_PRINTLN(xPortGetCoreID());
   TickType_t xLastWakeTime;
   const TickType_t xFrequency = pdMS_TO_TICKS(LEDS_HZ);
 
-  CRGB leds[NUM_LEDS];
-  FastLED.addLeds<WS2811, LED_OUTPUT, GRB>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.setBrightness(BRIGHTNESS);  // Set brightness level (0-255)
+  initLEDS();
 
   leds_ready = true;
 
@@ -90,9 +94,9 @@ void Blade::LEDCode() {
         case lightsaber_on_ignition:
           for (int i = 0; i < NUM_LEDS; i++) {
             if (MainColor == Rainbow) {
-              leds[i] = CHSV((i * 255 / NUM_LEDS) + colorSeed, 255, 255);   // CHSV: Hue, Saturation, Value (Brightness), Shift the hue for different starting point 
+              leds_output_array[i] = CHSV((i * 255 / NUM_LEDS) + colorSeed, 255, 255);  // CHSV: Hue, Saturation, Value (Brightness), Shift the hue for different starting point
             } else {
-              leds[i] = CRGB(lightsaberColorHex[MainColor]);  // You can change the color here (e.g., CRGB::Blue or CRGB::Red)
+              leds_output_array[i] = CRGB(lightsaberColorHex[MainColor]);  // You can change the color here (e.g., CRGB::Blue or CRGB::Red)
             }
             FastLED.show();
             vTaskDelay(10 / portTICK_PERIOD_MS);  // Delay to control the speed of the effect (adjust as needed)
@@ -102,7 +106,7 @@ void Blade::LEDCode() {
 
         case lightsaber_on_retraction:
           for (int i = NUM_LEDS - 1; i >= 0; i--) {
-            leds[i] = CRGB::Black;
+            leds_output_array[i] = CRGB::Black;
             FastLED.show();
             vTaskDelay(10 / portTICK_PERIOD_MS);
           }
@@ -115,59 +119,65 @@ void Blade::LEDCode() {
         case lightsaber_on_swing:
         case lightsaber_on_hum:
           if (MainColor == Rainbow) {
-            fill_rainbow(leds, NUM_LEDS, colorSeed, 255 / NUM_LEDS);
+            fill_rainbow(leds_output_array, NUM_LEDS, colorSeed, 255 / NUM_LEDS);
             colorSeed = colorSeed + 5;
           } else {
-            fill_solid(leds, NUM_LEDS, CRGB(lightsaberColorHex[MainColor]));
+            setLedsWithFlicker(MainColor);
           }
           FastLED.show();  // Update the LEDs to reflect changes
           break;
 
         default:
-          fill_solid(leds, NUM_LEDS, CRGB::Black);
-          FastLED.show();  // Update the LEDs to reflect changes
+          setSolidColor(CRGB::Black);
           break;
       }
     } else if (global_state == lightsaber_config) {
       switch (config_state) {
         case config_maincolor:
           if (MainColor == Rainbow) {
-            fill_rainbow(leds, NUM_LEDS, 0, 255 / NUM_LEDS);
+            fill_rainbow(leds_output_array, NUM_LEDS, 0, 255 / NUM_LEDS);
           } else {
-            fill_solid(leds, NUM_LEDS, CRGB(lightsaberColorHex[MainColor]));
+            fill_solid(leds_output_array, NUM_LEDS, CRGB(lightsaberColorHex[MainColor]));
           }
           FastLED.show();  // Update the LEDs to reflect changes
           break;
 
         case config_clashcolor:
           if (ClashColor == Rainbow) {
-            fill_rainbow(leds, NUM_LEDS, 0, 255 / NUM_LEDS);
+            fill_rainbow(leds_output_array, NUM_LEDS, 0, 255 / NUM_LEDS);
           } else {
-            fill_solid(leds, NUM_LEDS, CRGB(lightsaberColorHex[ClashColor]));
+            fill_solid(leds_output_array, NUM_LEDS, CRGB(lightsaberColorHex[ClashColor]));
           }
           FastLED.show();  // Update the LEDs to reflect changes
           break;
 
         case config_blastcolor:
           if (BlastColor == Rainbow) {
-            fill_rainbow(leds, NUM_LEDS, 0, 255 / NUM_LEDS);
+            fill_rainbow(leds_output_array, NUM_LEDS, 0, 255 / NUM_LEDS);
 
           } else {
-            fill_solid(leds, NUM_LEDS, CRGB(lightsaberColorHex[BlastColor]));
+            fill_solid(leds_output_array, NUM_LEDS, CRGB(lightsaberColorHex[BlastColor]));
           }
           FastLED.show();  // Update the LEDs to reflect changes
           break;
 
         default:
-          fill_solid(leds, NUM_LEDS, CRGB::Black);  // Hex value 0xFF5733
-          FastLED.show();                           // Update the LEDs to reflect changes
+          setSolidColor(CRGB::Black);
           break;
       }
     } else {
-      fill_solid(leds, NUM_LEDS, CRGB::Black);
-      FastLED.show();  // Update the LEDs to reflect changes
+      setSolidColor(CRGB::Black);
     }
     // Runs task every 25 MS
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
   }
+}
+
+void Blade::setSolidColor(CRGB color) {
+  fill_solid(leds_output_array, NUM_LEDS, color);
+  FastLED.show();
+}
+
+void Blade::setLedsWithFlicker(lightsaberColor color) {
+  fill_solid(leds_output_array, NUM_LEDS, CRGB(lightsaberColorHex[MainColor]));
 }
