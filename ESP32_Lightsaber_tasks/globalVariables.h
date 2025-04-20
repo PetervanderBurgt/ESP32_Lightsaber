@@ -17,6 +17,7 @@ enum lightsaber_on_states {
   lightsaber_on_clash,
   lightsaber_on_swing,
   lightsaber_on_idle,
+  lightsaber_on_web_config,
   lightsaber_on_boot
 };
 

@@ -28,7 +28,7 @@ Before all this happened I set out a couple of things that I would like to attai
 
 **Could haves:**
 - [x]  Flicker in leds
-- [ ]  Webpage for settings
+- [x]  Webpage for settings
 - [x]  LED Functionality
     - [x]  Tip melt
     - [x]  Blaster
@@ -59,3 +59,17 @@ All links given are based on availability in the Netherlands
 |  |  |
 
 
+## Software BOM
+All can be found within Arduino IDE 2.3.6
+| **Software / Library** | **Version** |
+| ----------- | ----------- |
+| Arduino IDE | 2.3.6 |
+| esp32 board library (Espressif Systems) | 3.2.0 |
+| MPU6050 (Electronic Cats) | 1.4.3 |
+| OneButton (Matthias Hertel) | 2.6.1 |
+| FastLED (Daniel Garcia) | 3.9.16 |
+| DFPlayer Mini Mp3 (Makuna) | 1.2.3 |
+| ESP Async TCP (ESP32Async) | 2.0.0 |
+| ESP Async WebServer (ESP32Async) | 3.7.6 |
+| Async TCP (ESP32Async) | 3.3.8 |
+|  |  |

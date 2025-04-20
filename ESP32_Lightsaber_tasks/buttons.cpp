@@ -4,6 +4,10 @@
 #include "pinConfig.h"
 #include "globalVariables.h"
 #include "configMenu.h"
+#include "SaberWeb.h"
+
+
+SaberWeb saberwebConfig = SaberWeb();
 
 extern global_states global_state;
 extern lightsaber_on_states lightsaber_on_state;
@@ -115,8 +119,15 @@ void Buttons::ButtonsCode() {
 
     } else {
       vTaskPrioritySet(NULL, 1);
+      if(lightsaber_on_state == lightsaber_on_web_config){
+      //set button green
+      setLEDColorForButton(current_button_type, LOW, HIGH, LOW);
+      }else{
       //set button red
       setLEDColorForButton(current_button_type, HIGH, LOW, LOW);
+      }
+      
+
     }
     // Runs task every 15 MS
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
@@ -168,6 +179,16 @@ void Buttons::main_button_doubleclick() {
       lightsaber_on_state = lightsaber_on_tipmelt;
       vTaskDelay(TIPMELT_FX_DURATION);
       lightsaber_on_state = lightsaber_on_hum;
+    }
+  } else if (global_state == lightsaber_idle) {
+    if (lightsaber_on_state == lightsaber_on_idle) {
+      DEBUG_PRINTLN("Saber web task started from Bttuon.");
+      saberwebConfig.startTask();
+      lightsaber_on_state = lightsaber_on_web_config;
+    } else if (lightsaber_on_state == lightsaber_on_web_config) {
+      DEBUG_PRINTLN("Saber web task stopped from Bttuon.");
+      saberwebConfig.stopTask();
+      lightsaber_on_state = lightsaber_on_idle;
     }
   }
 }  // doubleclick1

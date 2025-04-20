@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lightsaber Config</title>
+</head>
+<body>
+  <h2>Configure Your Lightsaber</h2>
+  <form action="/submit" method="GET">
+
+    <label>Sound Font:</label>
+    <select name="Sound Font">
+        <option value="1">Vanilla Lyte</option>
+        <option value="2">Vanilla Dark</option>
+        <option value="3">Vanilla Swirl</option>
+        <option value="4">In Vader</option>
+        <option value="5">Fallen Son</option>
+        <option value="6">Ancient Weapon</option>
+        <option value="7">Arcane</option>
+        <option value="8">Assassin</option>
+        <option value="9">Astrium Blue</option>
+        <option value="10">Corvus Tano</option>
+        <option value="11">Crispity</option>
+        <option value="12">Decimate</option>
+        <option value="13">Exalted</option>
+        <option value="14">Grey</option>
+        <option value="15">Metropolis</option>
+        <option value="16">Ra</option>
+        <option value="17">Senate Majority</option>
+        <option value="18">Slave</option>
+    </select><br><br>
+
+    <label for="Volume">Volume:</label><br>
+    <input type="range" id="Volume" name="Volume" min="1" max="30" value="30" oninput="this.nextElementSibling.value = this.value">
+    <output>30</output>
+    <br><br>
+
+    <label for="SwingSensitivity">Swing sensitivity:</label><br>
+    <input type="range" id="SwingSensitivity" name="SwingSensitivity" min="0" max="16000" step="160" value="960" oninput="this.nextElementSibling.value = this.value">
+    <output>960</output>
+    <br><br>
+
+    <label>Main Color:</label>
+    <select id="mainColor" name="mainColor"  onchange="updateDropdownColor(this)">
+        <option value="0" style="background-color:#6464C8; color:white;">Silver_blue</option>
+        <option value="1" style="background-color:#969696; color:white;">White</option>
+        <option value="2" style="background-color:#FF0505; color:white;">Pink_red</option>
+        <option value="3" style="background-color:#FF0000; color:white;">Red</option>
+        <option value="4" style="background-color:#FF0F00; color:white;">Blood_Orange</option>
+        <option value="5" style="background-color:#FF1E00; color:white;">Orange</option>
+        <option value="6" style="background-color:#FFB300; color:black;">Gold</option>
+        <option value="7" style="background-color:#FFFF00; color:black;">Yellow</option>
+        <option value="8" style="background-color:#B3FF00; color:black;">Neon_Green</option>
+        <option value="9" style="background-color:#46FF00; color:black;">Lime</option>
+        <option value="10" style="background-color:#00FF00; color:black;">Green</option>
+        <option value="11" style="background-color:#00FF3C; color:black;">Mint_Green</option>
+        <option value="12" style="background-color:#00FF8C; color:black;">Cyan</option>
+        <option value="13" style="background-color:#008CFF; color:black;">Sky_Blue</option>
+        <option value="14" style="background-color:#0000FF; color:white;">Blue</option>
+        <option value="15" style="background-color:#7300FF; color:white;">Purple</option>
+        <option value="16" style="background-color:#DC00FF; color:white;">Magenta</option>
+        <option value="17" style="background-color:#ABCDEF; color:black;">Rainbow</option>
+        <option value="18" style="background-color:#C0FF00; color:black;">UserColor1</option>
+        <option value="19" style="background-color:#809BCE; color:black;">UserColor2</option>
+        <option value="20" style="background-color:#F19953; color:black;">UserColor3</option>
+    </select><br><br>
+
+    <label>Clash Color:</label>
+    <select id="clashColor" name="clashColor"  onchange="updateDropdownColor(this)">
+        <option value="0" style="background-color:#6464C8; color:white;">Silver_blue</option>
+        <option value="1" style="background-color:#969696; color:white;">White</option>
+        <option value="2" style="background-color:#FF0505; color:white;">Pink_red</option>
+        <option value="3" style="background-color:#FF0000; color:white;">Red</option>
+        <option value="4" style="background-color:#FF0F00; color:white;">Blood_Orange</option>
+        <option value="5" style="background-color:#FF1E00; color:white;">Orange</option>
+        <option value="6" style="background-color:#FFB300; color:black;">Gold</option>
+        <option value="7" style="background-color:#FFFF00; color:black;">Yellow</option>
+        <option value="8" style="background-color:#B3FF00; color:black;">Neon_Green</option>
+        <option value="9"  style="background-color:#46FF00; color:black;">Lime</option>
+        <option value="10" style="background-color:#00FF00; color:black;">Green</option>
+        <option value="11" style="background-color:#00FF3C; color:black;">Mint_Green</option>
+        <option value="12" style="background-color:#00FF8C; color:black;">Cyan</option>
+        <option value="13" style="background-color:#008CFF; color:black;">Sky_Blue</option>
+        <option value="14" style="background-color:#0000FF; color:white;">Blue</option>
+        <option value="15" style="background-color:#7300FF; color:white;">Purple</option>
+        <option value="16" style="background-color:#DC00FF; color:white;">Magenta</option>
+        <option value="17" style="background-color:#ABCDEF; color:black;">Rainbow</option>
+        <option value="18" style="background-color:#C0FF00; color:black;">UserColor1</option>
+        <option value="19" style="background-color:#809BCE; color:black;">UserColor2</option>
+        <option value="20" style="background-color:#F19953; color:black;">UserColor3</option>
+    </select><br><br>
+
+    <label>Blast Color:</label>
+    <select id="blastColor" name="blastColor"  onchange="updateDropdownColor(this)">
+        <option value="0" style="background-color:#6464C8; color:white;">Silver_blue</option>
+        <option value="1" style="background-color:#969696; color:white;">White</option>
+        <option value="2" style="background-color:#FF0505; color:white;">Pink_red</option>
+        <option value="3" style="background-color:#FF0000; color:white;">Red</option>
+        <option value="4" style="background-color:#FF0F00; color:white;">Blood_Orange</option>
+        <option value="5" style="background-color:#FF1E00; color:white;">Orange</option>
+        <option value="6" style="background-color:#FFB300; color:black;">Gold</option>
+        <option value="7" style="background-color:#FFFF00; color:black;">Yellow</option>
+        <option value="8" style="background-color:#B3FF00; color:black;">Neon_Green</option>
+        <option value="9"  style="background-color:#46FF00; color:black;">Lime</option>
+        <option value="10" style="background-color:#00FF00; color:black;">Green</option>
+        <option value="11" style="background-color:#00FF3C; color:black;">Mint_Green</option>
+        <option value="12" style="background-color:#00FF8C; color:black;">Cyan</option>
+        <option value="13" style="background-color:#008CFF; color:black;">Sky_Blue</option>
+        <option value="14" style="background-color:#0000FF; color:white;">Blue</option>
+        <option value="15" style="background-color:#7300FF; color:white;">Purple</option>
+        <option value="16" style="background-color:#DC00FF; color:white;">Magenta</option>
+        <option value="17" style="background-color:#ABCDEF; color:black;">Rainbow</option>
+        <option value="18" style="background-color:#C0FF00; color:black;">UserColor1</option>
+        <option value="19" style="background-color:#809BCE; color:black;">UserColor2</option>
+        <option value="20" style="background-color:#F19953; color:black;">UserColor3</option>
+    </select><br><br>
+
+    <label>User Color 1:</label>
+    <input type="color" name="UserColor1" value="#C0FF00">
+    </br>Or enter Hex Color:
+    <input type="text" name="UserColor1Hex" value="" pattern="^([A-Fa-f0-9]{6})$">
+    <br><br>
+
+    <label>User Color 2:</label>
+    <input type="color" name="UserColor2" value="#809BCE">
+    </br>Or enter Hex Color:
+    <input type="text" name="UserColor2Hex" value="" pattern="^([A-Fa-f0-9]{6})$">
+    <br><br>
+    
+    <label>User Color 3:</label>
+    <input type="color" name="UserColor3" value="#F19953">
+    </br>Or enter Hex Color:
+    <input type="text" name="UserColor3Hex" value="" pattern="^([A-Fa-f0-9]{6})$">
+    <br><br>
+
+    <input type="submit" value="Save Settings">
+  </form>
+</body>
+</html>

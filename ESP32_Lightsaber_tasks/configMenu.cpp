@@ -12,6 +12,7 @@ extern uint16_t swingSensitivity;
 extern lightsaberColor MainColor;
 extern lightsaberColor ClashColor;
 extern lightsaberColor BlastColor;
+extern uint32_t lightsaberColorHex[];
 
 extern bool configChanged;
 extern bool soundFontChanged;
@@ -35,6 +36,9 @@ void ConfigMenu::readConfig() {
   MainColor = static_cast<lightsaberColor>(preferences.getUChar("MainColor", 0));     // Should be a enum number (0-20)
   ClashColor = static_cast<lightsaberColor>(preferences.getUChar("ClashColor", 3));   // Should be a enum number (0-20)
   BlastColor = static_cast<lightsaberColor>(preferences.getUChar("BlastColor", 13));  // Should be a enum number (0-20)
+  lightsaberColorHex[18] = preferences.getUInt("UserColor1", 0xC0FF00);               // Should be a uint32 hex color
+  lightsaberColorHex[19] = preferences.getUInt("UserColor2", 0x809BCE);               // Should be a uint32 hex color
+  lightsaberColorHex[20] = preferences.getUInt("UserColor3", 0xF19953);               // Should be a uint32 hex color
   preferences.end();
 }
 
