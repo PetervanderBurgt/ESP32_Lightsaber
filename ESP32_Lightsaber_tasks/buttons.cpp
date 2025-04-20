@@ -9,8 +9,6 @@
 
 SaberWeb saberwebConfig = SaberWeb();
 
-bool saberWebRunning = false;
-
 extern global_states global_state;
 extern lightsaber_on_states lightsaber_on_state;
 extern config_states config_state;
@@ -121,8 +119,15 @@ void Buttons::ButtonsCode() {
 
     } else {
       vTaskPrioritySet(NULL, 1);
+      if(lightsaber_on_state == lightsaber_on_web_config){
+      //set button green
+      setLEDColorForButton(current_button_type, LOW, HIGH, LOW);
+      }else{
       //set button red
       setLEDColorForButton(current_button_type, HIGH, LOW, LOW);
+      }
+      
+
     }
     // Runs task every 15 MS
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
@@ -175,15 +180,15 @@ void Buttons::main_button_doubleclick() {
       vTaskDelay(TIPMELT_FX_DURATION);
       lightsaber_on_state = lightsaber_on_hum;
     }
-  } else if (lightsaber_on_state == lightsaber_on_idle) {
-    if (!saberWebRunning) {
+  } else if (global_state == lightsaber_idle) {
+    if (lightsaber_on_state == lightsaber_on_idle) {
       DEBUG_PRINTLN("Saber web task started from Bttuon.");
       saberwebConfig.startTask();
-      saberWebRunning = true;
-    } else {
+      lightsaber_on_state = lightsaber_on_web_config;
+    } else if (lightsaber_on_state == lightsaber_on_web_config) {
       DEBUG_PRINTLN("Saber web task stopped from Bttuon.");
       saberwebConfig.stopTask();
-      saberWebRunning = false;
+      lightsaber_on_state = lightsaber_on_idle;
     }
   }
 }  // doubleclick1

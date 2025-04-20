@@ -10,7 +10,7 @@
 #include <AsyncTCP.h>
 #include "ESPAsyncWebServer.h"
 
-const char* ssid = "Saber_Config";
+const char* ssid = "SaberWeb";
 const char* password = "lightsaber123";
 
 AsyncWebServer server(80);
@@ -29,24 +29,24 @@ const char index_html[] PROGMEM = R"rawliteral(
 
     <label>Sound Font:</label>
     <select name="Sound Font">
-        <option value="Vanilla Lyte">Vanilla Lyte</option>
-        <option value="Vanilla Dark">Vanilla Dark</option>
-        <option value="Vanilla Swirl">Vanilla Swirl</option>
-        <option value="In Vader">In Vader</option>
-        <option value="Fallen Son">Fallen Son</option>
-        <option value="Ancient Weapon">Ancient Weapon</option>
-        <option value="Arcane">Arcane</option>
-        <option value="Assassin">Assassin</option>
-        <option value="Astrium Blue">Astrium Blue</option>
-        <option value="Corvus Tano">Corvus Tano</option>
-        <option value="Crispity">Crispity</option>
-        <option value="Decimate">Decimate</option>
-        <option value="Exalted">Exalted</option>
-        <option value="Grey">Grey</option>
-        <option value="Metropolis">Metropolis</option>
-        <option value="Ra">Ra</option>
-        <option value="Senate Majority">Senate Majority</option>
-        <option value="Slave">Slave</option>
+        <option value="1">Vanilla Lyte</option>
+        <option value="2">Vanilla Dark</option>
+        <option value="3">Vanilla Swirl</option>
+        <option value="4">In Vader</option>
+        <option value="5">Fallen Son</option>
+        <option value="6">Ancient Weapon</option>
+        <option value="7">Arcane</option>
+        <option value="8">Assassin</option>
+        <option value="9">Astrium Blue</option>
+        <option value="10">Corvus Tano</option>
+        <option value="11">Crispity</option>
+        <option value="12">Decimate</option>
+        <option value="13">Exalted</option>
+        <option value="14">Grey</option>
+        <option value="15">Metropolis</option>
+        <option value="16">Ra</option>
+        <option value="17">Senate Majority</option>
+        <option value="18">Slave</option>
     </select><br><br>
 
     <label for="Volume">Volume:</label><br>
@@ -61,87 +61,96 @@ const char index_html[] PROGMEM = R"rawliteral(
 
     <label>Main Color:</label>
     <select id="mainColor" name="mainColor"  onchange="updateDropdownColor(this)">
-        <option value="0x6464C8" style="background-color:#6464C8; color:white;">Silver_blue</option>
-        <option value="0x969696" style="background-color:#969696; color:white;">White</option>
-        <option value="0xFF0505" style="background-color:#FF0505; color:white;">Pink_red</option>
-        <option value="0xFF0000" style="background-color:#FF0000; color:white;">Red</option>
-        <option value="0xFF0F00" style="background-color:#FF0F00; color:white;">Blood_Orange</option>
-        <option value="0xFF1E00" style="background-color:#FF1E00; color:white;">Orange</option>
-        <option value="0xFFB300" style="background-color:#FFB300; color:black;">Gold</option>
-        <option value="0xFFFF00" style="background-color:#FFFF00; color:black;">Yellow</option>
-        <option value="0xB3FF00" style="background-color:#B3FF00; color:black;">Neon_Green</option>
-        <option value="0x46FF00" style="background-color:#46FF00; color:black;">Lime</option>
-        <option value="0x00FF00" style="background-color:#00FF00; color:black;">Green</option>
-        <option value="0x00FF3C" style="background-color:#00FF3C; color:black;">Mint_Green</option>
-        <option value="0x00FF8C" style="background-color:#00FF8C; color:black;">Cyan</option>
-        <option value="0x008CFF" style="background-color:#008CFF; color:black;">Sky_Blue</option>
-        <option value="0x0000FF" style="background-color:#0000FF; color:white;">Blue</option>
-        <option value="0x7300FF" style="background-color:#7300FF; color:white;">Purple</option>
-        <option value="0xDC00FF" style="background-color:#DC00FF; color:white;">Magenta</option>
-        <option value="0xABCDEF" style="background-color:#ABCDEF; color:black;">Rainbow</option>
-        <option value="0xC0FF00" style="background-color:#C0FF00; color:black;">UserColor1</option>
-        <option value="0x809BCE" style="background-color:#809BCE; color:black;">UserColor2</option>
-        <option value="0xF19953" style="background-color:#F19953; color:black;">UserColor3</option>
+        <option value="0" style="background-color:#6464C8; color:white;">Silver_blue</option>
+        <option value="1" style="background-color:#969696; color:white;">White</option>
+        <option value="2" style="background-color:#FF0505; color:white;">Pink_red</option>
+        <option value="3" style="background-color:#FF0000; color:white;">Red</option>
+        <option value="4" style="background-color:#FF0F00; color:white;">Blood_Orange</option>
+        <option value="5" style="background-color:#FF1E00; color:white;">Orange</option>
+        <option value="6" style="background-color:#FFB300; color:black;">Gold</option>
+        <option value="7" style="background-color:#FFFF00; color:black;">Yellow</option>
+        <option value="8" style="background-color:#B3FF00; color:black;">Neon_Green</option>
+        <option value="9" style="background-color:#46FF00; color:black;">Lime</option>
+        <option value="10" style="background-color:#00FF00; color:black;">Green</option>
+        <option value="11" style="background-color:#00FF3C; color:black;">Mint_Green</option>
+        <option value="12" style="background-color:#00FF8C; color:black;">Cyan</option>
+        <option value="13" style="background-color:#008CFF; color:black;">Sky_Blue</option>
+        <option value="14" style="background-color:#0000FF; color:white;">Blue</option>
+        <option value="15" style="background-color:#7300FF; color:white;">Purple</option>
+        <option value="16" style="background-color:#DC00FF; color:white;">Magenta</option>
+        <option value="17" style="background-color:#ABCDEF; color:black;">Rainbow</option>
+        <option value="18" style="background-color:#C0FF00; color:black;">UserColor1</option>
+        <option value="19" style="background-color:#809BCE; color:black;">UserColor2</option>
+        <option value="20" style="background-color:#F19953; color:black;">UserColor3</option>
     </select><br><br>
 
     <label>Clash Color:</label>
     <select id="clashColor" name="clashColor"  onchange="updateDropdownColor(this)">
-        <option value="0x6464C8" style="background-color:#6464C8; color:white;">Silver_blue</option>
-        <option value="0x969696" style="background-color:#969696; color:white;">White</option>
-        <option value="0xFF0505" style="background-color:#FF0505; color:white;">Pink_red</option>
-        <option value="0xFF0000" style="background-color:#FF0000; color:white;">Red</option>
-        <option value="0xFF0F00" style="background-color:#FF0F00; color:white;">Blood_Orange</option>
-        <option value="0xFF1E00" style="background-color:#FF1E00; color:white;">Orange</option>
-        <option value="0xFFB300" style="background-color:#FFB300; color:black;">Gold</option>
-        <option value="0xFFFF00" style="background-color:#FFFF00; color:black;">Yellow</option>
-        <option value="0xB3FF00" style="background-color:#B3FF00; color:black;">Neon_Green</option>
-        <option value="0x46FF00" style="background-color:#46FF00; color:black;">Lime</option>
-        <option value="0x00FF00" style="background-color:#00FF00; color:black;">Green</option>
-        <option value="0x00FF3C" style="background-color:#00FF3C; color:black;">Mint_Green</option>
-        <option value="0x00FF8C" style="background-color:#00FF8C; color:black;">Cyan</option>
-        <option value="0x008CFF" style="background-color:#008CFF; color:black;">Sky_Blue</option>
-        <option value="0x0000FF" style="background-color:#0000FF; color:white;">Blue</option>
-        <option value="0x7300FF" style="background-color:#7300FF; color:white;">Purple</option>
-        <option value="0xDC00FF" style="background-color:#DC00FF; color:white;">Magenta</option>
-        <option value="0xABCDEF" style="background-color:#ABCDEF; color:black;">Rainbow</option>
-        <option value="0xC0FF00" style="background-color:#C0FF00; color:black;">UserColor1</option>
-        <option value="0x809BCE" style="background-color:#809BCE; color:black;">UserColor2</option>
-        <option value="0xF19953" style="background-color:#F19953; color:black;">UserColor3</option>
+        <option value="0" style="background-color:#6464C8; color:white;">Silver_blue</option>
+        <option value="1" style="background-color:#969696; color:white;">White</option>
+        <option value="2" style="background-color:#FF0505; color:white;">Pink_red</option>
+        <option value="3" style="background-color:#FF0000; color:white;">Red</option>
+        <option value="4" style="background-color:#FF0F00; color:white;">Blood_Orange</option>
+        <option value="5" style="background-color:#FF1E00; color:white;">Orange</option>
+        <option value="6" style="background-color:#FFB300; color:black;">Gold</option>
+        <option value="7" style="background-color:#FFFF00; color:black;">Yellow</option>
+        <option value="8" style="background-color:#B3FF00; color:black;">Neon_Green</option>
+        <option value="9"  style="background-color:#46FF00; color:black;">Lime</option>
+        <option value="10" style="background-color:#00FF00; color:black;">Green</option>
+        <option value="11" style="background-color:#00FF3C; color:black;">Mint_Green</option>
+        <option value="12" style="background-color:#00FF8C; color:black;">Cyan</option>
+        <option value="13" style="background-color:#008CFF; color:black;">Sky_Blue</option>
+        <option value="14" style="background-color:#0000FF; color:white;">Blue</option>
+        <option value="15" style="background-color:#7300FF; color:white;">Purple</option>
+        <option value="16" style="background-color:#DC00FF; color:white;">Magenta</option>
+        <option value="17" style="background-color:#ABCDEF; color:black;">Rainbow</option>
+        <option value="18" style="background-color:#C0FF00; color:black;">UserColor1</option>
+        <option value="19" style="background-color:#809BCE; color:black;">UserColor2</option>
+        <option value="20" style="background-color:#F19953; color:black;">UserColor3</option>
     </select><br><br>
 
     <label>Blast Color:</label>
     <select id="blastColor" name="blastColor"  onchange="updateDropdownColor(this)">
-        <option value="0x6464C8" style="background-color:#6464C8; color:white;">Silver_blue</option>
-        <option value="0x969696" style="background-color:#969696; color:white;">White</option>
-        <option value="0xFF0505" style="background-color:#FF0505; color:white;">Pink_red</option>
-        <option value="0xFF0000" style="background-color:#FF0000; color:white;">Red</option>
-        <option value="0xFF0F00" style="background-color:#FF0F00; color:white;">Blood_Orange</option>
-        <option value="0xFF1E00" style="background-color:#FF1E00; color:white;">Orange</option>
-        <option value="0xFFB300" style="background-color:#FFB300; color:black;">Gold</option>
-        <option value="0xFFFF00" style="background-color:#FFFF00; color:black;">Yellow</option>
-        <option value="0xB3FF00" style="background-color:#B3FF00; color:black;">Neon_Green</option>
-        <option value="0x46FF00" style="background-color:#46FF00; color:black;">Lime</option>
-        <option value="0x00FF00" style="background-color:#00FF00; color:black;">Green</option>
-        <option value="0x00FF3C" style="background-color:#00FF3C; color:black;">Mint_Green</option>
-        <option value="0x00FF8C" style="background-color:#00FF8C; color:black;">Cyan</option>
-        <option value="0x008CFF" style="background-color:#008CFF; color:black;">Sky_Blue</option>
-        <option value="0x0000FF" style="background-color:#0000FF; color:white;">Blue</option>
-        <option value="0x7300FF" style="background-color:#7300FF; color:white;">Purple</option>
-        <option value="0xDC00FF" style="background-color:#DC00FF; color:white;">Magenta</option>
-        <option value="0xABCDEF" style="background-color:#ABCDEF; color:black;">Rainbow</option>
-        <option value="0xC0FF00" style="background-color:#C0FF00; color:black;">UserColor1</option>
-        <option value="0x809BCE" style="background-color:#809BCE; color:black;">UserColor2</option>
-        <option value="0xF19953" style="background-color:#F19953; color:black;">UserColor3</option>
+        <option value="0" style="background-color:#6464C8; color:white;">Silver_blue</option>
+        <option value="1" style="background-color:#969696; color:white;">White</option>
+        <option value="2" style="background-color:#FF0505; color:white;">Pink_red</option>
+        <option value="3" style="background-color:#FF0000; color:white;">Red</option>
+        <option value="4" style="background-color:#FF0F00; color:white;">Blood_Orange</option>
+        <option value="5" style="background-color:#FF1E00; color:white;">Orange</option>
+        <option value="6" style="background-color:#FFB300; color:black;">Gold</option>
+        <option value="7" style="background-color:#FFFF00; color:black;">Yellow</option>
+        <option value="8" style="background-color:#B3FF00; color:black;">Neon_Green</option>
+        <option value="9"  style="background-color:#46FF00; color:black;">Lime</option>
+        <option value="10" style="background-color:#00FF00; color:black;">Green</option>
+        <option value="11" style="background-color:#00FF3C; color:black;">Mint_Green</option>
+        <option value="12" style="background-color:#00FF8C; color:black;">Cyan</option>
+        <option value="13" style="background-color:#008CFF; color:black;">Sky_Blue</option>
+        <option value="14" style="background-color:#0000FF; color:white;">Blue</option>
+        <option value="15" style="background-color:#7300FF; color:white;">Purple</option>
+        <option value="16" style="background-color:#DC00FF; color:white;">Magenta</option>
+        <option value="17" style="background-color:#ABCDEF; color:black;">Rainbow</option>
+        <option value="18" style="background-color:#C0FF00; color:black;">UserColor1</option>
+        <option value="19" style="background-color:#809BCE; color:black;">UserColor2</option>
+        <option value="20" style="background-color:#F19953; color:black;">UserColor3</option>
     </select><br><br>
 
     <label>User Color 1:</label>
-    <input type="color" name="UserColor1" value="#C0FF00"><br><br>
+    <input type="color" name="UserColor1" value="#C0FF00">
+    </br>Or enter Hex Color:
+    <input type="text" name="UserColor1Hex" value="" pattern="^([A-Fa-f0-9]{6})$">
+    <br><br>
 
     <label>User Color 2:</label>
-    <input type="color" name="UserColor2" value="#809BCE"><br><br>
-
+    <input type="color" name="UserColor2" value="#809BCE">
+    </br>Or enter Hex Color:
+    <input type="text" name="UserColor2Hex" value="" pattern="^([A-Fa-f0-9]{6})$">
+    <br><br>
+    
     <label>User Color 3:</label>
-    <input type="color" name="UserColor3" value="#F19953"><br><br>
+    <input type="color" name="UserColor3" value="#F19953">
+    </br>Or enter Hex Color:
+    <input type="text" name="UserColor3Hex" value="" pattern="^([A-Fa-f0-9]{6})$">
+    <br><br>
 
     <input type="submit" value="Save Settings">
   </form>
@@ -149,18 +158,21 @@ const char index_html[] PROGMEM = R"rawliteral(
 </html>
   )rawliteral";
 
-class CaptiveRequestHandler : public AsyncWebHandler {
+class CaptivePortalHandler : public AsyncWebHandler {
 public:
-  CaptiveRequestHandler() {}
-  virtual ~CaptiveRequestHandler() {}
+  CaptivePortalHandler() {}
+  virtual ~CaptivePortalHandler() {}
 
   bool canHandle(AsyncWebServerRequest* request) {
-    //request->addInterestingHeader("ANY");
-    return true;
+    return request->url() == "/";
   }
 
   void handleRequest(AsyncWebServerRequest* request) {
-    request->send_P(200, "text/html", index_html);
+    if (request->method() == HTTP_GET && request->url() == "/") {
+      request->send_P(200, "text/html", index_html);
+    } else {
+      request->send_P(200, "text/html", index_html);
+    }
   }
 };
 
@@ -171,6 +183,7 @@ extern uint16_t swingSensitivity;
 extern lightsaberColor MainColor;
 extern lightsaberColor ClashColor;
 extern lightsaberColor BlastColor;
+extern uint32_t lightsaberColorHex[];
 
 extern bool configChanged;
 extern bool soundFontChanged;
@@ -234,24 +247,27 @@ void SaberWeb::WEBCode() {
 
 void SaberWeb::initSaberWeb() {
   if (WiFi.softAP(ssid, password)) {
-    Serial.println("Access Point Started");
-    Serial.print("IP Address: ");
-    Serial.println(WiFi.softAPIP());  // Shows the IP address
+    DEBUG_PRINTLN("Access Point Started");
+    DEBUG_PRINT("IP Address: ");
+    DEBUG_PRINTLN(WiFi.softAPIP());  // Shows the IP address
   }
   // Set up DNS server to redirect all HTTP requests to the AP IP
   dnsServer.start(53, "*", WiFi.softAPIP());
 
   // Handle the root URL and redirect to a specific page
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) {
+  server.onNotFound([&](AsyncWebServerRequest* request) {
     request->send_P(200, "text/html", index_html);
-    Serial.println("Client Connected");
   });
 
   server.on("/submit", [](AsyncWebServerRequest* request) {
     instance->saveSaberWeb(request);
     request->send(200, "text/html", "<h3>Settings saved!</h3><a href='/'>Back</a>");
   });
-  server.addHandler(new CaptiveRequestHandler()).setFilter(ON_AP_FILTER);  //only when requested from AP
+  server.addHandler(new CaptivePortalHandler()).setFilter(ON_AP_FILTER);  //only when requested from AP
+
+  dnsServer.setErrorReplyCode(DNSReplyCode::NoError);
+  dnsServer.setTTL(300);
+  dnsServer.start(53, "*", WiFi.softAPIP());
 
   server.begin();
 }
@@ -262,32 +278,90 @@ void SaberWeb::runSaberWeb() {
 
 // Handle the submitted form
 void SaberWeb::saveSaberWeb(AsyncWebServerRequest* request) {
-  String soundFont = request->getParam("Sound Font")->value();
-  String volume = request->getParam("Volume")->value();
-  String swingSensitivity = request->getParam("SwingSensitivity")->value();
-  String mainColor = request->getParam("mainColor")->value();
-  String blastColor = request->getParam("blastColor")->value();
-  String clashColor = request->getParam("clashColor")->value();
-  String customColor1 = request->getParam("UserColor1")->value();
-  String customColor2 = request->getParam("UserColor2")->value();
-  String customColor3 = request->getParam("UserColor3")->value();
+  String str_soundFont = request->getParam("Sound Font")->value();
+  String str_volume = request->getParam("Volume")->value();
+  String str_swingSensitivity = request->getParam("SwingSensitivity")->value();
+  String str_mainColor = request->getParam("mainColor")->value();
+  String str_blastColor = request->getParam("blastColor")->value();
+  String str_clashColor = request->getParam("clashColor")->value();
+  String str_customColor1 = (request->getParam("UserColor1")->value()).substring(1);
+  String str_customColor1Hex = (request->getParam("UserColor1Hex")->value());
+  String str_customColor2 = (request->getParam("UserColor2")->value()).substring(1);
+  String str_customColor2Hex = (request->getParam("UserColor2Hex")->value());
+  String str_customColor3 = (request->getParam("UserColor3")->value()).substring(1);
+  String str_customColor3Hex = (request->getParam("UserColor3Hex")->value());
 
-  Serial.println("=== Config Received ===");
-  Serial.println("soundFont: " + soundFont);
-  Serial.println("volume: " + volume);
-  Serial.println("swingSensitivity: " + swingSensitivity);
-  Serial.println("mainColor: " + mainColor);
-  Serial.println("blastColor: " + blastColor);
-  Serial.println("clashColor: " + clashColor);
-  Serial.println("customColor1: " + customColor1);
-  Serial.println("customColor2: " + customColor2);
-  Serial.println("customColor3: " + customColor3);
+  uint8_t web_soundFont = str_soundFont.toInt();
+  uint8_t web_volume = str_volume.toInt();
+  uint16_t web_swingSensitivity = str_swingSensitivity.toInt();
+  uint8_t web_mainColor = str_mainColor.toInt();
+  uint8_t web_blastColor = str_blastColor.toInt();
+  uint8_t web_clashColor = str_clashColor.toInt();
+  uint32_t web_customColor1 = (uint32_t)strtol(str_customColor1.c_str(), NULL, 16);
+  uint32_t web_customColor1Hex = (uint32_t)strtol(str_customColor1Hex.c_str(), NULL, 16);
+  uint32_t web_customColor2 = (uint32_t)strtol(str_customColor2.c_str(), NULL, 16);
+  uint32_t web_customColor2Hex = (uint32_t)strtol(str_customColor2Hex.c_str(), NULL, 16);
+  uint32_t web_customColor3 = (uint32_t)strtol(str_customColor3.c_str(), NULL, 16);
+  uint32_t web_customColor3Hex = (uint32_t)strtol(str_customColor3Hex.c_str(), NULL, 16);
 
-  // // Optionally parse hex color
-  // uint32_t hex = strtol(customColor.c_str() + 1, NULL, 16);
-  // uint8_t r = (hex >> 16) & 0xFF;
-  // uint8_t g = (hex >> 8) & 0xFF;
-  // uint8_t b = hex & 0xFF;
+  if (web_customColor1Hex != 0) {
+    web_customColor1 = web_customColor1Hex;
+  }
+  if (web_customColor2Hex != 0) {
+    web_customColor2 = web_customColor2Hex;
+  }
+  if (web_customColor3Hex != 0) {
+    web_customColor3 = web_customColor3Hex;
+  }
 
-  // Serial.printf("Parsed RGB: (%d, %d, %d)\n", r, g, b);
+  DEBUG_PRINTLN("=== Config Received ===");
+  DEBUG_PRINT("soundFont: ");
+  DEBUG_PRINTLN(web_soundFont);
+  DEBUG_PRINT("volume: ");
+  DEBUG_PRINTLN(web_volume);
+  DEBUG_PRINT("swingSensitivity: ");
+  DEBUG_PRINTLN(web_swingSensitivity);
+  DEBUG_PRINT("mainColor: ");
+  DEBUG_PRINTLN(web_mainColor);
+  DEBUG_PRINT("blastColor: ");
+  DEBUG_PRINTLN(web_blastColor);
+  DEBUG_PRINT("clashColor: ");
+  DEBUG_PRINTLN(web_clashColor);
+  DEBUG_PRINT("customColor1: ");
+  DEBUG_PRINTLN(web_customColor1);
+  DEBUG_PRINT("customColor1Hex: ");
+  DEBUG_PRINTLN(web_customColor1Hex);
+  DEBUG_PRINT("customColor2: ");
+  DEBUG_PRINTLN(web_customColor2);
+  DEBUG_PRINT("customColor2Hex: ");
+  DEBUG_PRINTLN(web_customColor2Hex);
+  DEBUG_PRINT("customColor3: ");
+  DEBUG_PRINTLN(web_customColor3);
+  DEBUG_PRINT("customColor3Hex: ");
+  DEBUG_PRINTLN(web_customColor3Hex);
+
+  soundFont = web_soundFont;  // between 1 and 18
+  dfplayer_volume = web_volume;                               // between 0 and 30
+  swingSensitivity = web_swingSensitivity;                  // between 0 and 16000
+  MainColor = static_cast<lightsaberColor>(web_mainColor);     // Should be a enum number (0-20)
+  ClashColor = static_cast<lightsaberColor>(web_blastColor);   // Should be a enum number (0-20)
+  BlastColor = static_cast<lightsaberColor>(web_clashColor);  // Should be a enum number (0-20)
+  lightsaberColorHex[18] = web_customColor1;               // Should be a uint32 hex color
+  lightsaberColorHex[19] = web_customColor2;               // Should be a uint32 hex color
+  lightsaberColorHex[20] = web_customColor3;               // Should be a uint32 hex color
+
+  DEBUG_PRINTLN("Saving new Config");
+  preferences.begin("Lightsaber", false);                                // Lightsaber namespace, and false to be able to read/write
+  preferences.putUChar("SoundFont", soundFont);                          // between 1 and 18
+  preferences.putUChar("Volume", dfplayer_volume);                       // between 0 and 30
+  preferences.putUShort("SwingSensitivity", swingSensitivity);           // between 0 and 16000
+  preferences.putUChar("MainColor", static_cast<uint8_t>(MainColor));    // Should be a enum number (0-20)
+  preferences.putUChar("ClashColor", static_cast<uint8_t>(ClashColor));  // Should be a enum number (0-20)
+  preferences.putUChar("BlastColor", static_cast<uint8_t>(BlastColor));  // Should be a enum number (0-20)
+  preferences.putUInt("UserColor1", web_customColor1);  // Should be a uint32 hex color
+  preferences.putUInt("UserColor2", web_customColor2);  // Should be a uint32 hex color
+  preferences.putUInt("UserColor3", web_customColor3);  // Should be a uint32 hex color
+  preferences.end();
+
+  audio.setVolume();  // set the new volume on dfplayer
 }
