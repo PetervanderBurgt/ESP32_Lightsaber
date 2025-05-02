@@ -16,7 +16,7 @@
 #define MPU_INTERRUPT 4
 
 #define LED_OUTPUT 5
-#define NUM_LEDS 60
+#define NUM_LEDS 100
 #define TIPMELT_LEDS 10
 #define BRIGHTNESS 100
 
