@@ -8,6 +8,7 @@ class Blade {
 private:
   // Code for LED creating objects
   CRGB leds_output_array[NUM_LEDS];
+  CRGB crystal_output_array[NUM_LEDS];
 
   // Code for task creation and running
   static void runTask(void* pvParameters);

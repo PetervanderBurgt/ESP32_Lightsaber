@@ -47,6 +47,7 @@ uint32_t lightsaberColorHex[] = {
 
 Blade::Blade() {
   leds_output_array[NUM_LEDS] = {};
+  crystal_output_array[NUM_LEDS_CRYSTAL] = {};
   // Any other initialization you need for this class
 }
 
@@ -74,6 +75,7 @@ void Blade::runTask(void* pvParameters) {
 
 void Blade::initLEDS() {
   FastLED.addLeds<WS2811, LED_OUTPUT, GRB>(leds_output_array, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2811, CRYSTAL_LED_OUTPUT, GRB>(crystal_output_array, NUM_LEDS).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);  // Set brightness level (0-255)
 }
 
@@ -92,12 +94,16 @@ void Blade::LEDCode() {
     // DEBUG_PRINT("lightsaber_on_state: ");
     // DEBUG_PRINTLN(lightsaber_on_state);
     if (global_state == lightsaber_on) {
-
       switch (lightsaber_on_state) {
         case lightsaber_on_ignition:
+          if (MainColor == Rainbow) {
+            fill_rainbow(crystal_output_array, NUM_LEDS_CRYSTAL, colorNoiseSeed, 255 / NUM_LEDS_CRYSTAL);
+          } else {
+            crystal_output_array[0] = CRGB(lightsaberColorHex[MainColor]);
+          }
           for (int i = 0; i < NUM_LEDS; i++) {
             if (MainColor == Rainbow) {
-              leds_output_array[i] = CHSV((i * 255 / NUM_LEDS) + colorNoiseSeed, 255, 255);  // CHSV: Hue, Saturation, Value (Brightness), Shift the hue for different starting point
+              fill_rainbow(leds_output_array, NUM_LEDS, colorNoiseSeed, 255 / NUM_LEDS);
             } else {
               leds_output_array[i] = CRGB(lightsaberColorHex[MainColor]);  // You can change the color here (e.g., CRGB::Blue or CRGB::Red)
             }
@@ -108,6 +114,7 @@ void Blade::LEDCode() {
           break;
 
         case lightsaber_on_retraction:
+          crystal_output_array[0] = CRGB::Black;
           for (int i = NUM_LEDS - 1; i >= 0; i--) {
             leds_output_array[i] = CRGB::Black;
             FastLED.show();
@@ -119,6 +126,7 @@ void Blade::LEDCode() {
 
         // In the mean time fall through to default hum
         case lightsaber_on_blasterdeflect:
+          crystal_output_array[0] = CRGB(lightsaberColorHex[MainColor]);
           if (MainColor == Rainbow) {
             fill_rainbow(leds_output_array, NUM_LEDS, colorNoiseSeed, 255 / NUM_LEDS);
             addBlasterToLeds();
@@ -132,6 +140,7 @@ void Blade::LEDCode() {
           break;
 
         case lightsaber_on_bladelockup:
+          crystal_output_array[0] = CRGB(lightsaberColorHex[MainColor]);
           if (MainColor == Rainbow) {
             fill_rainbow(leds_output_array, NUM_LEDS, colorNoiseSeed, 255 / NUM_LEDS);
             setLedsToLockup();
@@ -143,6 +152,7 @@ void Blade::LEDCode() {
           break;
 
         case lightsaber_on_tipmelt:
+          crystal_output_array[0] = CRGB(lightsaberColorHex[MainColor]);
           if (MainColor == Rainbow) {
             fill_rainbow(leds_output_array, NUM_LEDS, colorNoiseSeed, 255 / NUM_LEDS);
             setLedsToTipmelt();
@@ -156,6 +166,7 @@ void Blade::LEDCode() {
         case lightsaber_on_clash:
         case lightsaber_on_swing:
         case lightsaber_on_hum:
+          crystal_output_array[0] = CRGB(lightsaberColorHex[MainColor]);
           if (MainColor == Rainbow) {
             fill_rainbow(leds_output_array, NUM_LEDS, colorNoiseSeed, 255 / NUM_LEDS);
             colorNoiseSeed = colorNoiseSeed + colorNoiseSpeed;
@@ -173,9 +184,15 @@ void Blade::LEDCode() {
       switch (config_state) {
         case config_maincolor:
           if (MainColor == Rainbow) {
-            fill_rainbow(leds_output_array, NUM_LEDS, 0, 255 / NUM_LEDS);
+            fill_rainbow(crystal_output_array, NUM_LEDS_CRYSTAL, colorNoiseSeed, 255 / NUM_LEDS_CRYSTAL);
           } else {
-            fill_solid(leds_output_array, NUM_LEDS, CRGB(lightsaberColorHex[MainColor]));
+            crystal_output_array[0] = CRGB(lightsaberColorHex[MainColor]);
+          }
+          if (MainColor == Rainbow) {
+            fill_rainbow(leds_output_array, NUM_LEDS, 0, 255 / NUM_LEDS);
+            fill_rainbow(crystal_output_array, NUM_LEDS_CRYSTAL, colorNoiseSeed, 255 / NUM_LEDS_CRYSTAL);
+          } else {
+            setSolidColor(CRGB(lightsaberColorHex[MainColor]));
           }
           FastLED.show();  // Update the LEDs to reflect changes
           break;
@@ -183,8 +200,9 @@ void Blade::LEDCode() {
         case config_clashcolor:
           if (ClashColor == Rainbow) {
             fill_rainbow(leds_output_array, NUM_LEDS, 0, 255 / NUM_LEDS);
+            fill_rainbow(crystal_output_array, NUM_LEDS_CRYSTAL, 0, 255 / NUM_LEDS_CRYSTAL);
           } else {
-            fill_solid(leds_output_array, NUM_LEDS, CRGB(lightsaberColorHex[ClashColor]));
+            setSolidColor(CRGB(lightsaberColorHex[ClashColor]));
           }
           FastLED.show();  // Update the LEDs to reflect changes
           break;
@@ -192,9 +210,9 @@ void Blade::LEDCode() {
         case config_blastcolor:
           if (BlastColor == Rainbow) {
             fill_rainbow(leds_output_array, NUM_LEDS, 0, 255 / NUM_LEDS);
-
+            fill_rainbow(crystal_output_array, NUM_LEDS_CRYSTAL, 0, 255 / NUM_LEDS_CRYSTAL);
           } else {
-            fill_solid(leds_output_array, NUM_LEDS, CRGB(lightsaberColorHex[BlastColor]));
+            setSolidColor(CRGB(lightsaberColorHex[BlastColor]));
           }
           FastLED.show();  // Update the LEDs to reflect changes
           break;
@@ -204,7 +222,9 @@ void Blade::LEDCode() {
           break;
       }
     } else {
-      setSolidColor(CRGB::Black);
+      // IF idle state, turn on crystal output, but not normal leds
+      fill_solid(leds_output_array, NUM_LEDS, CRGB::Black);
+      fill_solid(crystal_output_array, NUM_LEDS_CRYSTAL, CRGB(lightsaberColorHex[MainColor]));
     }
     // Runs task every 25 MS
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
@@ -213,6 +233,7 @@ void Blade::LEDCode() {
 
 void Blade::setSolidColor(CRGB color) {
   fill_solid(leds_output_array, NUM_LEDS, color);
+  fill_solid(crystal_output_array, NUM_LEDS_CRYSTAL, color);
   FastLED.show();
 }
 
