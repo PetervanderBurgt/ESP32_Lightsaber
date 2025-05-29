@@ -30,6 +30,7 @@ Before all this happened I set out a couple of things that I would like to attai
 - [x]  Flicker in leds
 - [x]  Webpage for settings
 - [x]  LED Functionality
+    - [ ]  Clash color on clash sound
     - [x]  Tip melt
     - [x]  Blaster
         - [x]  Random places for blaster
