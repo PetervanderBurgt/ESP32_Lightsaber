@@ -101,10 +101,10 @@ void Blade::LEDCode() {
           for (int i = 0; i < NUM_LEDS; i++) {
             if (MainColor == Rainbow) {
               // Compute hue based on i (like fill_rainbow does)
-              uint8_t hue = colorNoiseSeed + (i * (255 / NUM_LEDS));
-              leds_output_array[i] = CHSV(hue, 255, 255);
+              fillRainbowLEDs(leds_output_array, i, colorNoiseSeed);
+              colorNoiseSeed += colorNoiseSpeed;  // Animate the noise field over time
             } else {
-              leds_output_array[i] = CRGB(lightsaberColorHex[MainColor]);  // You can change the color here (e.g., CRGB::Blue or CRGB::Red)
+              fillFlickerLEDs(leds_output_array, i, CRGB(lightsaberColorHex[MainColor]), colorNoiseSeed, colorNoiseSpeed);
             }
             FastLED.show();
             vTaskDelay(10 / portTICK_PERIOD_MS);  // Delay to control the speed of the effect (adjust as needed)
@@ -115,7 +115,19 @@ void Blade::LEDCode() {
         case lightsaber_on_retraction:
           fill_solid(crystal_output_array, NUM_LEDS_CRYSTAL, CRGB::Black);
           for (int i = NUM_LEDS - 1; i >= 0; i--) {
-            leds_output_array[i] = CRGB::Black;
+            if (MainColor == Rainbow) {
+              // Compute hue based on i (like fill_rainbow does)
+              fillRainbowLEDs(leds_output_array, i, colorNoiseSeed);
+              for (int j = i; j < NUM_LEDS; j++) {
+                leds_output_array[j] = CRGB::Black;
+              }
+              colorNoiseSeed += colorNoiseSpeed;  // Animate the noise field over time
+            } else {
+              fillFlickerLEDs(leds_output_array, i, CRGB(lightsaberColorHex[MainColor]), colorNoiseSeed, colorNoiseSpeed);
+              for (int j = i; j < NUM_LEDS; j++) {
+                leds_output_array[j] = CRGB::Black;
+              }
+            }
             FastLED.show();
             vTaskDelay(10 / portTICK_PERIOD_MS);
           }
@@ -335,5 +347,22 @@ void Blade::setColorOrRainbow(lightsaberColor color) {
     colorNoiseSeed = colorNoiseSeed + colorNoiseSpeed;
   } else {
     setSolidColor(CRGB(lightsaberColorHex[color]));
+  }
+}
+
+void Blade::fillRainbowLEDs(CRGB* leds, int count, uint16_t baseHue) {
+  for (int j = 0; j < count; j++) {
+    uint8_t hue = baseHue + (j * (255 / NUM_LEDS));
+    leds[j] = CHSV(hue, 255, 255);
+  }
+}
+
+void Blade::fillFlickerLEDs(CRGB* leds, int count, CRGB color, uint16_t& seed, uint16_t speed) {
+  for (int j = 0; j < count; j++) {
+    leds[j] = color;
+    uint8_t noise = inoise8(j * 10, seed);
+    uint8_t flicker = map(noise, 0, 255, 108, 255);
+    leds[j].nscale8_video(flicker);
+    seed += speed;
   }
 }
