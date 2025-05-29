@@ -23,6 +23,8 @@ private:
   void setLedsToLockup();
   void setLedsToTipmelt();
   void setColorOrRainbow(lightsaberColor color);
+  void fillRainbowLEDs(CRGB* leds, int count, uint16_t baseHue);
+  void fillFlickerLEDs(CRGB* leds, int count, CRGB color, uint16_t& seed, uint16_t speed);
 
   uint16_t colorNoiseSeed = 0;   // Starting hue for the rainbow animation
   uint16_t colorNoiseSpeed = 2;  // Starting hue for the rainbow animation
