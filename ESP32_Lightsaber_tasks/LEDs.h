@@ -22,6 +22,12 @@ private:
   void addBlasterToLeds();
   void setLedsToLockup();
   void setLedsToTipmelt();
+  void setColorOrRainbow(lightsaberColor color);
+
+  uint16_t colorNoiseSeed = 0;   // Starting hue for the rainbow animation
+  uint16_t colorNoiseSpeed = 2;  // Starting hue for the rainbow animation
+  unsigned long clashStartTime = 0;
+  const int pulseInterval = 20;  // ms between pulses
 
 public:
   // Code for LED creating objects

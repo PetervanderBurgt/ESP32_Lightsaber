@@ -22,6 +22,7 @@ private:
 
   // Code for helper functions in tasks
   void initButton();
+  void initRGBPins(uint8_t rPin, uint8_t gPin, uint8_t bPin);
 
   void setLEDColorForButton(button_types btn, bool r, bool g, bool b);
   void setLEDColor(uint8_t rPin, uint8_t gPin, uint8_t bPin, bool r, bool g, bool b);

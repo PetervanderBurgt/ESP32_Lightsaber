@@ -12,7 +12,7 @@ class ConfigMenu {
 private:
   // Code for button objects
   Preferences preferences;
-
+  lightsaberColor cycleColor(lightsaberColor color, bool increase);
 
 public:
   // Code for button objects

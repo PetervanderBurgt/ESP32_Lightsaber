@@ -28,7 +28,7 @@ const char index_html[] PROGMEM = R"rawliteral(
   <form action="/submit" method="GET">
 
     <label>Sound Font:</label>
-    <select name="Sound Font">
+    <select name="SoundFont">
         <option value="1">Vanilla Lyte</option>
         <option value="2">Vanilla Dark</option>
         <option value="3">Vanilla Swirl</option>
@@ -251,8 +251,6 @@ void SaberWeb::initSaberWeb() {
     DEBUG_PRINT("IP Address: ");
     DEBUG_PRINTLN(WiFi.softAPIP());  // Shows the IP address
   }
-  // Set up DNS server to redirect all HTTP requests to the AP IP
-  dnsServer.start(53, "*", WiFi.softAPIP());
 
   // Handle the root URL and redirect to a specific page
   server.onNotFound([&](AsyncWebServerRequest* request) {
@@ -278,7 +276,7 @@ void SaberWeb::runSaberWeb() {
 
 // Handle the submitted form
 void SaberWeb::saveSaberWeb(AsyncWebServerRequest* request) {
-  String str_soundFont = request->getParam("Sound Font")->value();
+  String str_soundFont = request->getParam("SoundFont")->value();
   String str_volume = request->getParam("Volume")->value();
   String str_swingSensitivity = request->getParam("SwingSensitivity")->value();
   String str_mainColor = request->getParam("mainColor")->value();
@@ -304,13 +302,13 @@ void SaberWeb::saveSaberWeb(AsyncWebServerRequest* request) {
   uint32_t web_customColor3 = (uint32_t)strtol(str_customColor3.c_str(), NULL, 16);
   uint32_t web_customColor3Hex = (uint32_t)strtol(str_customColor3Hex.c_str(), NULL, 16);
 
-  if (web_customColor1Hex != 0) {
+  if (str_customColor1Hex.length() > 0) {
     web_customColor1 = web_customColor1Hex;
   }
-  if (web_customColor2Hex != 0) {
+  if (str_customColor2Hex.length() > 0) {
     web_customColor2 = web_customColor2Hex;
   }
-  if (web_customColor3Hex != 0) {
+  if (str_customColor3Hex.length() > 0) {
     web_customColor3 = web_customColor3Hex;
   }
 
@@ -344,8 +342,8 @@ void SaberWeb::saveSaberWeb(AsyncWebServerRequest* request) {
   dfplayer_volume = web_volume;                               // between 0 and 30
   swingSensitivity = web_swingSensitivity;                  // between 0 and 16000
   MainColor = static_cast<lightsaberColor>(web_mainColor);     // Should be a enum number (0-20)
-  ClashColor = static_cast<lightsaberColor>(web_blastColor);   // Should be a enum number (0-20)
-  BlastColor = static_cast<lightsaberColor>(web_clashColor);  // Should be a enum number (0-20)
+  ClashColor = static_cast<lightsaberColor>(web_clashColor);   // Should be a enum number (0-20)
+  BlastColor = static_cast<lightsaberColor>(web_blastColor);  // Should be a enum number (0-20)
   lightsaberColorHex[18] = web_customColor1;               // Should be a uint32 hex color
   lightsaberColorHex[19] = web_customColor2;               // Should be a uint32 hex color
   lightsaberColorHex[20] = web_customColor3;               // Should be a uint32 hex color

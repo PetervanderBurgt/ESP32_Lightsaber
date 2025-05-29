@@ -77,6 +77,12 @@ private:
   void playConfigTrack(config_sounds sound_to_play);
   config_sounds getCurrentconfigTrack();
 
+
+lightsaber_sounds current_sound = sound_unknown;
+config_sounds current_config_sound = config_sound_unknown;
+  TaskHandle_t dfTaskHandle = NULL;  // Declare a global task handle
+  bool firstBoot = true;
+
 public:
   // Code for sound creating objects
   DFPlayer(HardwareSerial& serialPort);
