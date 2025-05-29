@@ -4,7 +4,6 @@
 #include "pinConfig.h"
 #include "globalVariables.h"
 
-
 bool dfplayer_ready = false;
 extern bool leds_ready;
 extern bool mpu_ready;
@@ -22,15 +21,9 @@ bool soundFontChanged = false;
 bool configChangedUp = false;
 bool configChangedDown = false;
 
-lightsaber_sounds current_sound = sound_unknown;
-config_sounds current_config_sound = config_sound_unknown;
 
 SemaphoreHandle_t config_mutex;
 
-TaskHandle_t dfTaskHandle = NULL;  // Declare a global task handle
-
-
-bool firstBoot = true;
 bool configStart = true;
 
 DFPlayer::DFPlayer(HardwareSerial& serialPort)

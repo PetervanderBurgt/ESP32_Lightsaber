@@ -25,7 +25,7 @@ bool lockup_enabled = false;
 
 Buttons::Buttons(button_types button_type)
   : current_button_type(button_type) {
-  button;
+  // Any other initialization you need for this class
 }
 
 // Start the task by creating a FreeRTOS task
@@ -63,12 +63,8 @@ void Buttons::initButton() {
     button.attachLongPressStart(main_button_longPressStart);
     button.attachLongPressStop(main_button_longPressStop);
     button.attachDuringLongPress(main_button_longPress);
-    pinMode(MAIN_RED, OUTPUT);
-    pinMode(MAIN_GREEN, OUTPUT);
-    pinMode(MAIN_BLUE, OUTPUT);
-    digitalWrite(MAIN_RED, HIGH);
-    digitalWrite(MAIN_GREEN, HIGH);
-    digitalWrite(MAIN_BLUE, HIGH);
+
+    initRGBPins(MAIN_RED, MAIN_GREEN, MAIN_BLUE);
 
   } else if (current_button_type == button_double_secondary) {
     button.setup(SECOND_BUTTON, INPUT_PULLUP, true);
@@ -80,13 +76,17 @@ void Buttons::initButton() {
     button.attachLongPressStop(secondary_button_longPressStop);
     button.attachDuringLongPress(secondary_button_longPress);
 
-    pinMode(SECOND_RED, OUTPUT);
-    pinMode(SECOND_GREEN, OUTPUT);
-    pinMode(SECOND_BLUE, OUTPUT);
-    digitalWrite(SECOND_RED, HIGH);
-    digitalWrite(SECOND_GREEN, HIGH);
-    digitalWrite(SECOND_BLUE, HIGH);
+    initRGBPins(SECOND_RED, SECOND_GREEN, SECOND_BLUE);
   }
+}
+
+void Buttons::initRGBPins(uint8_t rPin, uint8_t gPin, uint8_t bPin) {
+  pinMode(rPin, OUTPUT);
+  pinMode(gPin, OUTPUT);
+  pinMode(bPin, OUTPUT);
+  digitalWrite(rPin, HIGH);
+  digitalWrite(gPin, HIGH);
+  digitalWrite(bPin, HIGH);
 }
 
 void Buttons::ButtonsCode() {
@@ -119,15 +119,13 @@ void Buttons::ButtonsCode() {
 
     } else {
       vTaskPrioritySet(NULL, 1);
-      if(lightsaber_on_state == lightsaber_on_web_config){
-      //set button green
-      setLEDColorForButton(current_button_type, LOW, HIGH, LOW);
-      }else{
-      //set button red
-      setLEDColorForButton(current_button_type, HIGH, LOW, LOW);
+      if (lightsaber_on_state == lightsaber_on_web_config) {
+        //set button green
+        setLEDColorForButton(current_button_type, LOW, HIGH, LOW);
+      } else {
+        //set button red
+        setLEDColorForButton(current_button_type, HIGH, LOW, LOW);
       }
-      
-
     }
     // Runs task every 15 MS
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
@@ -182,11 +180,11 @@ void Buttons::main_button_doubleclick() {
     }
   } else if (global_state == lightsaber_idle) {
     if (lightsaber_on_state == lightsaber_on_idle) {
-      DEBUG_PRINTLN("Saber web task started from Bttuon.");
+      DEBUG_PRINTLN("Saber web task started from Button.");
       saberwebConfig.startTask();
       lightsaber_on_state = lightsaber_on_web_config;
     } else if (lightsaber_on_state == lightsaber_on_web_config) {
-      DEBUG_PRINTLN("Saber web task stopped from Bttuon.");
+      DEBUG_PRINTLN("Saber web task stopped from Button.");
       saberwebConfig.stopTask();
       lightsaber_on_state = lightsaber_on_idle;
     }

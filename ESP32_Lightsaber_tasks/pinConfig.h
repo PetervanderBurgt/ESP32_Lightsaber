@@ -4,10 +4,12 @@
 // Pin Definitions
 #define RX_DFPLAYER 16
 #define TX_DFPLAYER 17
+
 #define MAIN_BUTTON 32
 #define MAIN_RED 23
 #define MAIN_GREEN 19
 #define MAIN_BLUE 18
+
 #define SECOND_BUTTON 25
 #define SECOND_RED 13
 #define SECOND_GREEN 33
@@ -21,6 +23,13 @@
 #define NUM_LEDS 100
 #define TIPMELT_LEDS 10
 #define BRIGHTNESS 100
+
+#define X_ACCEL_OFFSET -1226
+#define Y_ACCEL_OFFSET -2412
+#define Z_ACCEL_OFFSET 656
+#define X_GYRO_OFFSET 132
+#define Y_GYRO_OFFSET -15
+#define Z_GYRO_OFFSET 11
 
 #define CLASH_THRESHOLD 20 // 1mg/LSB  milli G, 1G being earths force
 #define CLASH_DURATION 2

@@ -19,28 +19,6 @@ uint16_t swingSensitivity = 960;  // range should be between 0 and 16000 with in
 
 MPU6050 mpu;
 
-bool clashTriggered = false;
-bool swingTriggered = false;
-bool blastTriggered = false;
-bool lockupTriggered = false;
-uint32_t startClashMillis = 0;
-uint32_t startBlastMillis = 0;
-uint32_t startLockupMillis = 0;
-uint32_t startSwingMillis = 0;
-
-/*---MPU6050 Control/Status Variables---*/
-bool DMPReady = false;   // Set true if DMP init was successful
-uint8_t MPUIntStatus;    // Holds actual interrupt status byte from MPU
-uint8_t devStatus;       // Return status after each device operation (0 = success, !0 = error)
-uint16_t packetSize;     // Expected DMP packet size (default is 42 bytes)
-uint16_t fifoCount;      // count of all bytes currently in FIFO
-uint8_t FIFOBuffer[64];  // FIFO storage buffer
-
-/*---Orientation/Motion Variables---*/
-Quaternion q;         // [w, x, y, z]         Quaternion container
-VectorInt16 aa;       // [x, y, z]            Accel sensor measurements
-VectorInt16 aaReal;   // [x, y, z]            Gravity-free accel sensor measurements
-VectorFloat gravity;  // [x, y, z]            Gravity vector
 
 /*------Interrupt detection routine------*/
 volatile bool MPUDataReady = false;  // Indicates whether MPU6050 interrupt pin has gone high
@@ -108,12 +86,12 @@ void MovementDetection::initMPU() {
   mpu.setIntMotionEnabled(true);
 
   /* Supply your gyro offsets here, read with MPU zero example */
-  mpu.setXAccelOffset(-1226);
-  mpu.setYAccelOffset(-2412);
-  mpu.setZAccelOffset(656);
-  mpu.setXGyroOffset(132);
-  mpu.setYGyroOffset(-15);
-  mpu.setZGyroOffset(11);
+  mpu.setXAccelOffset(X_ACCEL_OFFSET);
+  mpu.setYAccelOffset(Y_ACCEL_OFFSET);
+  mpu.setZAccelOffset(Z_ACCEL_OFFSET);
+  mpu.setXGyroOffset(X_GYRO_OFFSET);
+  mpu.setYGyroOffset(Y_GYRO_OFFSET);
+  mpu.setZGyroOffset(X_GYRO_OFFSET);
 
 
   /* Making sure it worked (returns 0 if so) */
@@ -175,7 +153,7 @@ void MovementDetection::MPUCode() {
 }
 
 void MovementDetection::handleClash() {
-  bool clashInt = (MPUIntStatus >> 6) && 0x1;  // Only check the motion bit
+  bool clashInt = ((MPUIntStatus >> 6) & 0x1) != 0;  // Only check the motion bit
 
   // This is only done when the motion interrupt pin of the interrupt status is set, which can be configured by
   // setMotionDetectionThreshold and setMotionDetectionDuration
