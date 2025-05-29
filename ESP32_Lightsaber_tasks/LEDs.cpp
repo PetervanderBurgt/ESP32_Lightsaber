@@ -11,14 +11,17 @@ extern lightsaber_on_states lightsaber_on_state;
 extern config_states config_state;
 
 lightsaberColor MainColor = Silver_blue;
-lightsaberColor ClashColor = Pink_red;
 lightsaberColor BlastColor = Sky_Blue;
+lightsaberColor ClashColor = Pink_red;
 
 uint16_t colorNoiseSeed = 0;   // Starting hue for the rainbow animation
 uint16_t colorNoiseSpeed = 2;  // Starting hue for the rainbow animation
 
 uint8_t effectLeds = 0;
 uint8_t effectLedsLength = 10;
+
+unsigned long clashStartTime = 0;
+const int pulseInterval = 20;  // ms between pulses
 
 // This array order should match the one that is given in the enum above
 uint32_t lightsaberColorHex[] = {
@@ -103,7 +106,9 @@ void Blade::LEDCode() {
           }
           for (int i = 0; i < NUM_LEDS; i++) {
             if (MainColor == Rainbow) {
-              fill_rainbow(leds_output_array, NUM_LEDS, colorNoiseSeed, 255 / NUM_LEDS);
+              // Compute hue based on i (like fill_rainbow does)
+              uint8_t hue = colorNoiseSeed + (i * (255 / NUM_LEDS));
+              leds_output_array[i] = CHSV(hue, 255, 255);
             } else {
               leds_output_array[i] = CRGB(lightsaberColorHex[MainColor]);  // You can change the color here (e.g., CRGB::Blue or CRGB::Red)
             }
@@ -164,6 +169,21 @@ void Blade::LEDCode() {
           break;
 
         case lightsaber_on_clash:
+          {
+            // Add the code for small clashes here
+            crystal_output_array[0] = CRGB(lightsaberColorHex[MainColor]);
+            colorNoiseSeed = colorNoiseSeed + colorNoiseSpeed;
+            if (MainColor == Rainbow) {
+              fill_rainbow(leds_output_array, NUM_LEDS, colorNoiseSeed, 255 / NUM_LEDS);
+              addClashToLeds();
+            } else {
+              fill_solid(leds_output_array, NUM_LEDS, CRGB(lightsaberColorHex[MainColor]));
+              addClashToLeds();
+            }
+            FastLED.show();  // Update the LEDs to reflect changes
+          }
+          break;
+
         case lightsaber_on_swing:
         case lightsaber_on_hum:
           crystal_output_array[0] = CRGB(lightsaberColorHex[MainColor]);
@@ -251,6 +271,14 @@ void Blade::setLedsWithFlicker(lightsaberColor color) {
 
     leds_output_array[i].nscale8_video(flicker);  // Safe flicker scaler
     colorNoiseSeed += colorNoiseSpeed;            // Animate the noise field over time
+  }
+}
+
+void Blade::addClashToLeds() {
+  float phase = sin8((colorNoiseSeed * 255) / pulseInterval);  // 0–255 sine wave
+  // Add pulsating
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds_output_array[i] = blend(leds_output_array[i], CRGB(lightsaberColorHex[ClashColor]), phase);
   }
 }
 
