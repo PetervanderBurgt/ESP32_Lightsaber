@@ -164,6 +164,7 @@ void Blade::LEDCode() {
           break;
 
         case lightsaber_on_clash:
+        // Add the code for small clashes here
         case lightsaber_on_swing:
         case lightsaber_on_hum:
           crystal_output_array[0] = CRGB(lightsaberColorHex[MainColor]);
