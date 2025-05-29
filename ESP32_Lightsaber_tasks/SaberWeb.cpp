@@ -251,8 +251,6 @@ void SaberWeb::initSaberWeb() {
     DEBUG_PRINT("IP Address: ");
     DEBUG_PRINTLN(WiFi.softAPIP());  // Shows the IP address
   }
-  // Set up DNS server to redirect all HTTP requests to the AP IP
-  dnsServer.start(53, "*", WiFi.softAPIP());
 
   // Handle the root URL and redirect to a specific page
   server.onNotFound([&](AsyncWebServerRequest* request) {
