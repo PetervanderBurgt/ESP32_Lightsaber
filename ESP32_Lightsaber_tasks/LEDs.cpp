@@ -20,6 +20,9 @@ uint16_t colorNoiseSpeed = 2;  // Starting hue for the rainbow animation
 uint8_t effectLeds = 0;
 uint8_t effectLedsLength = 10;
 
+unsigned long clashStartTime = 0;
+const int pulseInterval = 20;  // ms between pulses
+
 // This array order should match the one that is given in the enum above
 uint32_t lightsaberColorHex[] = {
   0x6464C8,  // Silver_blue,
@@ -164,7 +167,28 @@ void Blade::LEDCode() {
           break;
 
         case lightsaber_on_clash:
-        // Add the code for small clashes here
+          {
+            // Add the code for small clashes here
+            crystal_output_array[0] = CRGB(lightsaberColorHex[MainColor]);
+            float phase = sin8((colorNoiseSeed * 255) / pulseInterval);  // 0–255 sine wave
+            colorNoiseSeed = colorNoiseSeed + colorNoiseSpeed;
+            if (MainColor == Rainbow) {
+              fill_rainbow(leds_output_array, NUM_LEDS, colorNoiseSeed, 255 / NUM_LEDS);
+              // Add pulsating
+              for (int i = 0; i < NUM_LEDS; i++) {
+                leds_output_array[i] = blend(leds_output_array[i], CRGB(lightsaberColorHex[ClashColor]), phase);
+              }
+            } else {
+              fill_solid(leds_output_array, NUM_LEDS, CRGB(lightsaberColorHex[MainColor]));
+              // Add pulsating
+              for (int i = 0; i < NUM_LEDS; i++) {
+                leds_output_array[i] = blend(leds_output_array[i], CRGB(lightsaberColorHex[ClashColor]), phase);
+              }
+            }
+            FastLED.show();  // Update the LEDs to reflect changes
+          }
+          break;
+
         case lightsaber_on_swing:
         case lightsaber_on_hum:
           crystal_output_array[0] = CRGB(lightsaberColorHex[MainColor]);
