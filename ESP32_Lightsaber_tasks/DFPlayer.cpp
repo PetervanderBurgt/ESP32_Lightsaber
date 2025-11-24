@@ -37,9 +37,9 @@ void DFPlayer::startTask() {
   xTaskCreatePinnedToCore(
     runTask,        /* Task function. */
     "DFPlayerTask", /* name of task. */
-    2048,           /* Stack size of task */
+    DFPLAYER_TASK_STACK_SIZE,           /* Stack size of task */
     this,           /* parameter of the task */
-    1,              /* priority of the task */
+    DFPLAYER_TASK_PRIORITY,              /* priority of the task */
     &dfTaskHandle,  /* Task handle to keep track of created task */
     1);             /* pin task to core 1 */
 }

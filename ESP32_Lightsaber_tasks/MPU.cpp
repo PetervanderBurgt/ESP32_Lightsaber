@@ -38,9 +38,9 @@ void MovementDetection::startTask() {
   xTaskCreatePinnedToCore(
     runTask,   /* Task function. */
     "MPUTask", /* name of task. */
-    2048,      /* Stack size of task */
+    MPU_TASK_STACK_SIZE,      /* Stack size of task */
     this,      /* parameter of the task */
-    1,         /* priority of the task */
+    MPU_TASK_PRIORITY,         /* priority of the task */
     NULL,      /* Task handle to keep track of created task */
     1);        /* pin task to core 1 */
 }
@@ -143,6 +143,7 @@ void MovementDetection::MPUCode() {
 
         handleSwing();
       }
+      DEBUG_PRINTLN("MPU RUNNING");
       // This block makes sure that the fifo is up to date and read correctly
     }
 
