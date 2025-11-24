@@ -17,6 +17,7 @@ Before all this happened I set out a couple of things that I would like to attai
 - [ ] Look at instable connection with MPU6050
     - [ ] Check HW faults
     - [ ] Check SW faults
+- [ ] Have a look at task priorities
 
 **Must haves:**
 - [x] Light up all 100 LEDS
