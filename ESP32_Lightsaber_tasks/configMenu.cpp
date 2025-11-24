@@ -35,14 +35,14 @@ void ConfigMenu::readConfig() {
   soundFont = preferences.getUChar("SoundFont", 1);  // between 1 and 18
   DEBUG_PRINT("Readback Soundfont ");
   DEBUG_PRINTLN(soundFont);
-  dfplayer_volume = preferences.getUChar("Volume", MAX_VOLUME);                       // between 0 and 30
-  swingSensitivity = preferences.getUShort("SwingSensitivity", 960);                  // between 0 and 16000
-  MainColor = static_cast<lightsaberColor>(preferences.getUChar("MainColor", 0));     // Should be a enum number (0-20)
-  ClashColor = static_cast<lightsaberColor>(preferences.getUChar("ClashColor", 3));   // Should be a enum number (0-20)
-  BlastColor = static_cast<lightsaberColor>(preferences.getUChar("BlastColor", 13));  // Should be a enum number (0-20)
-  lightsaberColorHex[18] = preferences.getUInt("UserColor1", 0xC0FF00);               // Should be a uint32 hex color
-  lightsaberColorHex[19] = preferences.getUInt("UserColor2", 0x809BCE);               // Should be a uint32 hex color
-  lightsaberColorHex[20] = preferences.getUInt("UserColor3", 0xF19953);               // Should be a uint32 hex color
+  dfplayer_volume = preferences.getUChar("Volume", MAX_VOLUME);                             // between 0 and 30
+  swingSensitivity = preferences.getUShort("SwingSensitivity", SWING_SENSITIVITY_INITIAL);  // between 0 and 16000
+  MainColor = static_cast<lightsaberColor>(preferences.getUChar("MainColor", 0));           // Should be a enum number (0-20)
+  ClashColor = static_cast<lightsaberColor>(preferences.getUChar("ClashColor", 3));         // Should be a enum number (0-20)
+  BlastColor = static_cast<lightsaberColor>(preferences.getUChar("BlastColor", 13));        // Should be a enum number (0-20)
+  lightsaberColorHex[18] = preferences.getUInt("UserColor1", 0xC0FF00);                     // Should be a uint32 hex color
+  lightsaberColorHex[19] = preferences.getUInt("UserColor2", 0x809BCE);                     // Should be a uint32 hex color
+  lightsaberColorHex[20] = preferences.getUInt("UserColor3", 0xF19953);                     // Should be a uint32 hex color
   preferences.end();
 }
 

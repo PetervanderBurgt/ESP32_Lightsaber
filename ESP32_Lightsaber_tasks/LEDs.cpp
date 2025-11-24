@@ -72,7 +72,7 @@ void Blade::runTask(void* pvParameters) {
 
 void Blade::initLEDS() {
   FastLED.addLeds<WS2811, LED_OUTPUT, GRB>(leds_output_array, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, CRYSTAL_LED_OUTPUT, GRB>(crystal_output_array, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2811, CRYSTAL_LED_OUTPUT, GRB>(crystal_output_array, NUM_LEDS_CRYSTAL).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);  // Set brightness level (0-255)
 }
 
@@ -107,7 +107,7 @@ void Blade::LEDCode() {
               fillFlickerLEDs(leds_output_array, i, CRGB(lightsaberColorHex[MainColor]), colorNoiseSeed, colorNoiseSpeed);
             }
             FastLED.show();
-            vTaskDelay(10 / portTICK_PERIOD_MS);  // Delay to control the speed of the effect (adjust as needed)
+            vTaskDelay((BLADE_IGNITION_MS/NUM_LEDS) / portTICK_PERIOD_MS);  // Delay to control the speed of the effect (adjust as needed)
           }
           lightsaber_on_state = lightsaber_on_hum;
           break;
@@ -129,7 +129,7 @@ void Blade::LEDCode() {
               }
             }
             FastLED.show();
-            vTaskDelay(10 / portTICK_PERIOD_MS);
+            vTaskDelay((BLADE_RETRACTION_MS/NUM_LEDS) / portTICK_PERIOD_MS);
           }
           global_state = lightsaber_idle;
           lightsaber_on_state = lightsaber_on_idle;
