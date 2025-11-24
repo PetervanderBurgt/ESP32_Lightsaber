@@ -107,7 +107,7 @@ void Blade::LEDCode() {
               fillFlickerLEDs(leds_output_array, i, CRGB(lightsaberColorHex[MainColor]), colorNoiseSeed, colorNoiseSpeed);
             }
             FastLED.show();
-            vTaskDelay(10 / portTICK_PERIOD_MS);  // Delay to control the speed of the effect (adjust as needed)
+            vTaskDelay((BLADE_IGNITION_MS/NUM_LEDS) / portTICK_PERIOD_MS);  // Delay to control the speed of the effect (adjust as needed)
           }
           lightsaber_on_state = lightsaber_on_hum;
           break;
@@ -129,7 +129,7 @@ void Blade::LEDCode() {
               }
             }
             FastLED.show();
-            vTaskDelay(10 / portTICK_PERIOD_MS);
+            vTaskDelay((BLADE_RETRACTION_MS/NUM_LEDS) / portTICK_PERIOD_MS);
           }
           global_state = lightsaber_idle;
           lightsaber_on_state = lightsaber_on_idle;

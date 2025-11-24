@@ -36,6 +36,8 @@
 #define CLASH_THRESHOLD 33 // 1mg/LSB  milli G, 1G being earths force
 #define CLASH_DURATION 2
 
+#define BLADE_IGNITION_MS 800
+#define BLADE_RETRACTION_MS 800
 #define CLASH_FX_DURATION 750
 #define LOCKUP_FX_DURATION 4000
 #define BLASTER_FX_DURATION 500
