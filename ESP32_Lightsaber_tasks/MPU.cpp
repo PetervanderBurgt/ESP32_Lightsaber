@@ -59,6 +59,7 @@ void MovementDetection::initMPU() {
   Wire.begin();
   // TODO Check if this clock speed change helped
   Wire.setClock(100000);  // 400kHz I2C clock. Comment on this line if having compilation difficulties
+  Wire.setTimeout(3); //timeout value in mSec, retrieved from https://www.tweaking4all.com/forum/arduino/problem-using-mpu-6050-accel-gyrp-with-esp32/paged/5/#post-2666
   mpu.initialize();
   pinMode(MPU_INTERRUPT, INPUT);
 
