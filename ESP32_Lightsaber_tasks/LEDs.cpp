@@ -72,7 +72,7 @@ void Blade::runTask(void* pvParameters) {
 
 void Blade::initLEDS() {
   FastLED.addLeds<WS2811, LED_OUTPUT, GRB>(leds_output_array, NUM_LEDS).setCorrection(TypicalLEDStrip);
-  FastLED.addLeds<WS2811, CRYSTAL_LED_OUTPUT, GRB>(crystal_output_array, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.addLeds<WS2811, CRYSTAL_LED_OUTPUT, GRB>(crystal_output_array, NUM_LEDS_CRYSTAL).setCorrection(TypicalLEDStrip);
   FastLED.setBrightness(BRIGHTNESS);  // Set brightness level (0-255)
 }
 
