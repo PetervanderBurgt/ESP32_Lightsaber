@@ -57,6 +57,7 @@ void MovementDetection::runTask(void* pvParameters) {
 void MovementDetection::initMPU() {
   //Connect and start i2c
   Wire.begin();
+  // TODO Check if this clock speed change helped
   Wire.setClock(100000);  // 400kHz I2C clock. Comment on this line if having compilation difficulties
   mpu.initialize();
   pinMode(MPU_INTERRUPT, INPUT);
