@@ -202,7 +202,7 @@ void MovementDetection::handleClash() {
 
 void MovementDetection::handleSwing() {
   // This block should house something to detect motion and swings, not clashes
-  const int16_t upperThreshold = 20000;            // new upper limit
+  const uint16_t upperThreshold = SWING_SENSITIVITY_MAX_THRESHOLD;
   bool motionInt =
     ((abs(aaReal.x) > swingSensitivity) && (abs(aaReal.x) < upperThreshold)) || 
     ((abs(aaReal.y) > swingSensitivity) && (abs(aaReal.y) < upperThreshold)) || 
@@ -219,14 +219,14 @@ void MovementDetection::handleSwing() {
       lightsaber_on_state = lightsaber_on_blasterdeflect;
     } else {
       /* Display real acceleration, adjusted to remove gravity */
-      // DEBUG_PRINT("swingSensitivity\t");
-      // DEBUG_PRINTLN(swingSensitivity);
+      DEBUG_PRINT("swingSensitivity\t");
+      DEBUG_PRINTLN(swingSensitivity);
       DEBUG_PRINT("areal\t");
-      DEBUG_PRINT(abs(aaReal.x) > swingSensitivity);
+      DEBUG_PRINT(aaReal.x);
       DEBUG_PRINT("\t");
-      DEBUG_PRINT(abs(aaReal.y) > swingSensitivity);
+      DEBUG_PRINT(aaReal.y);
       DEBUG_PRINT("\t");
-      DEBUG_PRINTLN(abs(aaReal.z) > swingSensitivity);
+      DEBUG_PRINTLN(aaReal.z);
       DEBUG_PRINTLN("MOTION DETECTED");
 
       swingTriggered = true;
@@ -255,13 +255,13 @@ void MovementDetection::readMPUData() {
     // reset so we can continue cleanly
     mpu.resetFIFO();
     fifoCount = mpu.getFIFOCount();  // will be zero after reset no need to ask
-    Serial.println(fifoCount);
-    DEBUG_PRINT("areal\t");
-    DEBUG_PRINT(aaReal.x);
-    DEBUG_PRINT("\t");
-    DEBUG_PRINT(aaReal.y);
-    DEBUG_PRINT("\t");
-    DEBUG_PRINTLN(aaReal.z);
+    // Serial.println(fifoCount);
+    // DEBUG_PRINT("areal\t");
+    // DEBUG_PRINT(aaReal.x);
+    // DEBUG_PRINT("\t");
+    // DEBUG_PRINT(aaReal.y);
+    // DEBUG_PRINT("\t");
+    // DEBUG_PRINTLN(aaReal.z);
     Serial.println(F("FIFO overflow!"));
     // Move out of function so we do not process bad samples
     return;

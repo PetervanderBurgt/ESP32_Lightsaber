@@ -32,6 +32,7 @@
 #define Z_GYRO_OFFSET 54
 
 #define SWING_SENSITIVITY_INITIAL 1760
+#define SWING_SENSITIVITY_MAX_THRESHOLD 20000
 #define CLASH_THRESHOLD 33 // 1mg/LSB  milli G, 1G being earths force
 #define CLASH_DURATION 2
 
