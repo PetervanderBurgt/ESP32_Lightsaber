@@ -54,9 +54,9 @@ void Blade::startTask() {
   xTaskCreatePinnedToCore(
     runTask,   /* Task function. */
     "LEDTask", /* name of task. */
-    2048,      /* Stack size of task */
+    LED_TASK_STACK_SIZE,      /* Stack size of task */
     this,      /* parameter of the task */
-    1,         /* priority of the task */
+    LED_TASK_PRIORITY,         /* priority of the task */
     NULL,      /* Task handle to keep track of created task */
     1);        /* pin task to core 1 */
 }

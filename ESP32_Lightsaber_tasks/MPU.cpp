@@ -36,13 +36,13 @@ void MovementDetection::startTask() {
   // Create the task, passing `this` (the instance of the class) as the parameter
 
   xTaskCreatePinnedToCore(
-    runTask,   /* Task function. */
-    "MPUTask", /* name of task. */
-    2048,      /* Stack size of task */
-    this,      /* parameter of the task */
-    1,         /* priority of the task */
-    NULL,      /* Task handle to keep track of created task */
-    1);        /* pin task to core 1 */
+    runTask,             /* Task function. */
+    "MPUTask",           /* name of task. */
+    MPU_TASK_STACK_SIZE, /* Stack size of task */
+    this,                /* parameter of the task */
+    MPU_TASK_PRIORITY,   /* priority of the task */
+    NULL,                /* Task handle to keep track of created task */
+    1);                  /* pin task to core 1 */
 }
 
 // Static task function called by FreeRTOS
@@ -57,9 +57,11 @@ void MovementDetection::runTask(void* pvParameters) {
 void MovementDetection::initMPU() {
   //Connect and start i2c
   Wire.begin();
-  Wire.setClock(400000);  // 400kHz I2C clock. Comment on this line if having compilation difficulties
+  // TODO Check if this clock speed change helped
+  Wire.setClock(100000);  // 400kHz I2C clock. Comment on this line if having compilation difficulties
+  Wire.setTimeout(3);     //timeout value in mSec, retrieved from https://www.tweaking4all.com/forum/arduino/problem-using-mpu-6050-accel-gyrp-with-esp32/paged/5/#post-2666
   mpu.initialize();
-  pinMode(MPU_INTERRUPT, INPUT);
+  pinMode(MPU_INTERRUPT, INPUT_PULLUP);
 
   /*Verify connection*/
   DEBUG_PRINTLN(F("Testing MPU6050 connection..."));
@@ -85,13 +87,18 @@ void MovementDetection::initMPU() {
   // set interrupt when motion is detected
   mpu.setIntMotionEnabled(true);
 
+  // Set output rate safely
+  const uint8_t desiredRate = 20;                   // Hz
+  const uint8_t divider = (200 / desiredRate) - 1;  // 200Hz base
+  mpu.setRate(divider);
+
   /* Supply your gyro offsets here, read with MPU zero example */
   mpu.setXAccelOffset(X_ACCEL_OFFSET);
   mpu.setYAccelOffset(Y_ACCEL_OFFSET);
   mpu.setZAccelOffset(Z_ACCEL_OFFSET);
   mpu.setXGyroOffset(X_GYRO_OFFSET);
   mpu.setYGyroOffset(Y_GYRO_OFFSET);
-  mpu.setZGyroOffset(X_GYRO_OFFSET);
+  mpu.setZGyroOffset(Z_GYRO_OFFSET);
 
 
   /* Making sure it worked (returns 0 if so) */
@@ -137,17 +144,18 @@ void MovementDetection::MPUCode() {
       MPUDataReady = false;  //reset interrupt flag
       MPUIntStatus = mpu.getIntStatus();
 
+
+      readMPUData();
+
       // Only execute application code if lightsaber is on
       if (global_state == lightsaber_on) {
         handleClash();
 
         handleSwing();
       }
+      // DEBUG_PRINTLN("MPU RUNNING");
       // This block makes sure that the fifo is up to date and read correctly
     }
-
-    readMPUData();
-
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
   }
 }
@@ -167,12 +175,12 @@ void MovementDetection::handleClash() {
       lightsaber_on_state = lightsaber_on_bladelockup;
     } else {
       /* Display real acceleration, adjusted to remove gravity */
-      DEBUG_PRINT("areal\t");
-      DEBUG_PRINT(aaReal.x);
-      DEBUG_PRINT("\t");
-      DEBUG_PRINT(aaReal.y);
-      DEBUG_PRINT("\t");
-      DEBUG_PRINTLN(aaReal.z);
+      // DEBUG_PRINT("areal\t");
+      // DEBUG_PRINT(aaReal.x);
+      // DEBUG_PRINT("\t");
+      // DEBUG_PRINT(aaReal.y);
+      // DEBUG_PRINT("\t");
+      // DEBUG_PRINTLN(aaReal.z);
       DEBUG_PRINTLN("CLASH DETECTED");
 
       clashTriggered = true;
@@ -194,7 +202,11 @@ void MovementDetection::handleClash() {
 
 void MovementDetection::handleSwing() {
   // This block should house something to detect motion and swings, not clashes
-  bool motionInt = abs(aaReal.x) > swingSensitivity || abs(aaReal.y) > swingSensitivity || abs(aaReal.z) > swingSensitivity;
+  const int16_t upperThreshold = 20000;            // new upper limit
+  bool motionInt =
+    ((abs(aaReal.x) > swingSensitivity) && (abs(aaReal.x) < upperThreshold)) || 
+    ((abs(aaReal.y) > swingSensitivity) && (abs(aaReal.y) < upperThreshold)) || 
+    ((abs(aaReal.z) > swingSensitivity) && (abs(aaReal.z) < upperThreshold));
   if (motionInt && !clashTriggered && !blastTriggered && !swingTriggered && !lockupTriggered) {
 
     if (blaster_enabled) {
@@ -207,8 +219,8 @@ void MovementDetection::handleSwing() {
       lightsaber_on_state = lightsaber_on_blasterdeflect;
     } else {
       /* Display real acceleration, adjusted to remove gravity */
-      DEBUG_PRINT("swingSensitivity\t");
-      DEBUG_PRINT(swingSensitivity);
+      // DEBUG_PRINT("swingSensitivity\t");
+      // DEBUG_PRINTLN(swingSensitivity);
       DEBUG_PRINT("areal\t");
       DEBUG_PRINT(abs(aaReal.x) > swingSensitivity);
       DEBUG_PRINT("\t");
@@ -236,15 +248,25 @@ void MovementDetection::handleSwing() {
 
 void MovementDetection::readMPUData() {
   // get current FIFO count
+  uint8_t intStatus = mpu.getIntStatus();
   fifoCount = mpu.getFIFOCount();
   // check for overflow (this should never happen unless our code is too inefficient)
-  if ((MPUIntStatus & bit(MPU6050_INTERRUPT_FIFO_OFLOW_BIT)) || fifoCount >= 1024) {
+  if ((intStatus & bit(MPU6050_INTERRUPT_FIFO_OFLOW_BIT)) || fifoCount >= 1024) {
     // reset so we can continue cleanly
     mpu.resetFIFO();
-    //  fifoCount = mpu.getFIFOCount();  // will be zero after reset no need to ask
+    fifoCount = mpu.getFIFOCount();  // will be zero after reset no need to ask
+    Serial.println(fifoCount);
+    DEBUG_PRINT("areal\t");
+    DEBUG_PRINT(aaReal.x);
+    DEBUG_PRINT("\t");
+    DEBUG_PRINT(aaReal.y);
+    DEBUG_PRINT("\t");
+    DEBUG_PRINTLN(aaReal.z);
     Serial.println(F("FIFO overflow!"));
+    // Move out of function so we do not process bad samples
+    return;
     // otherwise, check for DMP data ready interrupt (this should happen frequently)
-  } else if (MPUIntStatus & bit(MPU6050_INTERRUPT_DMP_INT_BIT)) {
+  } else if (intStatus & bit(MPU6050_INTERRUPT_DMP_INT_BIT)) {
     // read all available packets from FIFO
     while (fifoCount >= packetSize)  // Lets catch up to NOW, in case someone is using the dreaded delay()!
     {
