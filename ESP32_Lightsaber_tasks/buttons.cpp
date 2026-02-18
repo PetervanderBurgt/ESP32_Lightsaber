@@ -35,9 +35,9 @@ void Buttons::startTask() {
   xTaskCreatePinnedToCore(
     runTask,       /* Task function. */
     "ButtonsTask", /* name of task. */
-    2048,          /* Stack size of task */
+    BUTTONS_TASK_STACK_SIZE,          /* Stack size of task */
     this,          /* parameter of the task */
-    1,             /* priority of the task */
+    BUTTONS_TASK_PRIORITY,             /* priority of the task */
     NULL,          /* Task handle to keep track of created task */
     1);            /* pin task to core 1 */
 }
@@ -108,17 +108,17 @@ void Buttons::ButtonsCode() {
     // DEBUG_PRINTLN("Button Tick.");
 
     if (global_state == lightsaber_on) {
-      vTaskPrioritySet(NULL, 1);
+      vTaskPrioritySet(NULL, BUTTONS_TASK_PRIORITY);
       //set button green
       setLEDColorForButton(current_button_type, LOW, LOW, HIGH);
 
     } else if (global_state == lightsaber_config) {
-      vTaskPrioritySet(NULL, 2);
+      vTaskPrioritySet(NULL, BUTTONS_TASK_PRIORITY + 1);
       //set button green
       setLEDColorForButton(current_button_type, LOW, HIGH, LOW);
 
     } else {
-      vTaskPrioritySet(NULL, 1);
+      vTaskPrioritySet(NULL, BUTTONS_TASK_PRIORITY);
       if (lightsaber_on_state == lightsaber_on_web_config) {
         //set button green
         setLEDColorForButton(current_button_type, LOW, HIGH, LOW);
