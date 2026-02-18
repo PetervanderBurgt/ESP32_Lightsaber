@@ -22,15 +22,13 @@ Before all this happened I set out a couple of things that I would like to attai
 
 \*\*Bug fixes:\*\*
 
-\- \[ ] Look at instable connection with MPU6050
+* \[x] Look at instable connection with MPU6050
 
-&nbsp;   - \[ ] Check HW faults
+  * \[x]  Check HW faults
+  * \[x]  Check SW faults
+  * \[x]  Check Weird startup bug
 
-&nbsp;   - \[ ] Check SW faults
-
-&nbsp;   - \[ ] Check Weird startup bug
-
-\- \[ ] Have a look at task priorities
+* \[x] Have a look at task priorities
 
 
 
