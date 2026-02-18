@@ -20,55 +20,55 @@ Before all this happened I set out a couple of things that I would like to attai
 
 
 
-\*\*Bug fixes:\*\*
+**Bug fixes:**
 
-* \[x] Look at instable connection with MPU6050
+* [x] Look at instable connection with MPU6050
 
-  * \[x]  Check HW faults
-  * \[x]  Check SW faults
-  * \[x]  Check Weird startup bug
+  * [x]  Check HW faults
+  * [x]  Check SW faults
+  * [x]  Check Weird startup bug
 
-* \[x] Have a look at task priorities
+* [x] Have a look at task priorities
 
 
 
 **Must haves:**
 
-* \[x] Light up all 100 LEDS
-* \[x] Two buttons to use
-* \[x]  Sound to play:
+* [x] Light up all 100 LEDS
+* [x] Two buttons to use
+* [x]  Sound to play:
 
-  * \[x]  Boot sound
-  * \[x]  Saber on
-  * \[x]  Saber off
-  * \[x]  Hum sounds
-  * \[x]  Swing sounds
-  * \[x]  Clash sounds
+  * [x]  Boot sound
+  * [x]  Saber on
+  * [x]  Saber off
+  * [x]  Hum sounds
+  * [x]  Swing sounds
+  * [x]  Clash sounds
 
-* \[x]  Config should be possible
-* \[x]  Keep settings on power on off
-* \[x]  Switch color / rainbow
+* [x]  Config should be possible
+* [x]  Keep settings on power on off
+* [x]  Switch color / rainbow
 
 **Could haves:**
 
-* \[x]  Flicker in leds
-* \[x]  Webpage for settings
-* \[x]  LED Functionality
+* [x]  Flicker in leds
+* [x]  Webpage for settings
+* [x]  LED Functionality
 
-  * \[x]  Random buzzing for startup and power down as well, aside from hum
-  * \[x]  Clash color on clash sound
-  * \[x]  Tip melt
-  * \[x]  Blaster
+  * [x]  Random buzzing for startup and power down as well, aside from hum
+  * [x]  Clash color on clash sound
+  * [x]  Tip melt
+  * [x]  Blaster
 
-    * \[x]  Random places for blaster
+    * [x]  Random places for blaster
 
-  * \[x]  Lockup
+  * [x]  Lockup
 
-* \[x]  Sounds
+* [x]  Sounds
 
-  * \[x]  Config sounds
-  * \[x]  Blaster
-  * \[x]  Lockup
+  * [x]  Config sounds
+  * [x]  Blaster
+  * [x]  Lockup
 
 ## Hardware gathering
 
