@@ -33,11 +33,12 @@ private:
   uint16_t fifoCount;      // count of all bytes currently in FIFO
   uint8_t FIFOBuffer[64];  // FIFO storage buffer
 
-  /*---Orientation/Motion Variables---*/
-  Quaternion q;         // [w, x, y, z]         Quaternion container
-  VectorInt16 aa;       // [x, y, z]            Accel sensor measurements
-  VectorInt16 aaReal;   // [x, y, z]            Gravity-free accel sensor measurements
-  VectorFloat gravity;  // [x, y, z]            Gravity vector
+  /* Raw acceleration values */
+  int16_t ax, ay, az;
+  // Gravity components
+  float gx, gy, gz;
+  const float gravityAlpha = 0.95;  
+  const float NormFactor = 5;
 
 public:
   // Code for movement objects

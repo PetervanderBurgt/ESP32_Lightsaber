@@ -60,37 +60,19 @@ void MovementDetection::initMPU() {
   // TODO Check if this clock speed change helped
   Wire.setClock(100000);  // 400kHz I2C clock. Comment on this line if having compilation difficulties
   Wire.setTimeout(3);     //timeout value in mSec, retrieved from https://www.tweaking4all.com/forum/arduino/problem-using-mpu-6050-accel-gyrp-with-esp32/paged/5/#post-2666
+
   mpu.initialize();
   pinMode(MPU_INTERRUPT, INPUT_PULLUP);
 
   /*Verify connection*/
-  DEBUG_PRINTLN(F("Testing MPU6050 connection..."));
-  if (mpu.testConnection() == false) {
+  DEBUG_PRINTLN("Testing MPU6050 connection...");
+  if (!mpu.testConnection()) {
     DEBUG_PRINTLN("MPU6050 connection failed");
     while (true)
       ;
-  } else {
-    DEBUG_PRINTLN("MPU6050 connection successful");
   }
 
-  /* Initializate and configure the DMP*/
-  DEBUG_PRINTLN(F("Initializing DMP..."));
-  devStatus = mpu.dmpInitialize();
-
-  // Set Digital Low and High pass filter
-  mpu.setDHPFMode(4);
-
-  mpu.setMotionDetectionThreshold(CLASH_THRESHOLD);
-  mpu.setMotionDetectionDuration(CLASH_DURATION);
-  mpu.setInterruptMode(false);
-  mpu.setInterruptLatch(true);
-  // set interrupt when motion is detected
-  mpu.setIntMotionEnabled(true);
-
-  // Set output rate safely
-  const uint8_t desiredRate = 20;                   // Hz
-  const uint8_t divider = (200 / desiredRate) - 1;  // 200Hz base
-  mpu.setRate(divider);
+  DEBUG_PRINTLN("MPU6050 connection successful");
 
   /* Supply your gyro offsets here, read with MPU zero example */
   mpu.setXAccelOffset(X_ACCEL_OFFSET);
@@ -100,32 +82,21 @@ void MovementDetection::initMPU() {
   mpu.setYGyroOffset(Y_GYRO_OFFSET);
   mpu.setZGyroOffset(Z_GYRO_OFFSET);
 
+  // Set Digital Low and High pass filter
+  mpu.setDHPFMode(4);
 
-  /* Making sure it worked (returns 0 if so) */
-  if (devStatus == 0) {
-    DEBUG_PRINTLN("These are the Active offsets: ");
-    mpu.PrintActiveOffsets();
-    DEBUG_PRINTLN(F("Enabling DMP..."));  //Turning ON DMP
-    mpu.setDMPEnabled(true);
+  // Motion interrupt configuration (CLASH)
+  mpu.setMotionDetectionThreshold(CLASH_THRESHOLD);
+  mpu.setMotionDetectionDuration(CLASH_DURATION);
+  mpu.setIntMotionEnabled(true);
 
-    /*Enable Arduino interrupt detection*/
-    DEBUG_PRINT(F("Enabling interrupt detection (Arduino external interrupt "));
-    DEBUG_PRINT(digitalPinToInterrupt(MPU_INTERRUPT));
-    DEBUG_PRINTLN(F(")..."));
-    attachInterrupt(digitalPinToInterrupt(MPU_INTERRUPT), DMPDataReady, RISING);
-    MPUIntStatus = mpu.getIntStatus();
+  // Latch interrupt until cleared
+  mpu.setInterruptLatch(true);
+  mpu.setInterruptMode(false);
 
-    /* Set the DMP Ready flag so the main loop() function knows it is okay to use it */
-    DEBUG_PRINTLN(F("DMP ready! Waiting for first interrupt..."));
-    DMPReady = true;
-    packetSize = mpu.dmpGetFIFOPacketSize();  //Get expected DMP packet size for later comparison
-  } else {
-    DEBUG_PRINT(F("DMP Initialization failed (code "));  //Print the error code
-    DEBUG_PRINT(devStatus);
-    DEBUG_PRINTLN(F(")"));
-    // 1 = initial memory load failed
-    // 2 = DMP configuration updates failed
-  }
+  attachInterrupt(digitalPinToInterrupt(MPU_INTERRUPT), DMPDataReady, RISING);
+
+  DEBUG_PRINTLN("MPU Ready (No DMP, No FIFO)");
 }
 
 void MovementDetection::MPUCode() {
@@ -137,24 +108,30 @@ void MovementDetection::MPUCode() {
 
   mpu_ready = true;
 
+  // Reset any accidental interrupts
+  (void)mpu.getIntStatus();
   xLastWakeTime = xTaskGetTickCount();
   for (;;) {
-    // This code makes sure to read the fifo buffer of the MPU to always have the latest data
-    if (MPUDataReady) {
-      MPUDataReady = false;  //reset interrupt flag
-      MPUIntStatus = mpu.getIntStatus();
+    if (lightsaber_on_state == lightsaber_on_ignition) {
+      // When turning on clear old interrupt statuses
+      (void)mpu.getIntStatus();
+      MPUIntStatus = 0x0;
+    }
+    readMPUData();
 
-
-      readMPUData();
-
-      // Only execute application code if lightsaber is on
-      if (global_state == lightsaber_on) {
+    // Only execute swing logic when saber ON
+    if (global_state == lightsaber_on) {
+      // Always read accel for swing detection
+      // If motion interrupt triggered (CLASH)
+      if (MPUDataReady) {
+        MPUDataReady = false;
+        MPUIntStatus = mpu.getIntStatus();  // clears interrupt
+      }
+      // Let on and off animation do its thing
+      if ((lightsaber_on_state != lightsaber_on_ignition) && (lightsaber_on_state != lightsaber_on_retraction)) {
         handleClash();
-
         handleSwing();
       }
-      // DEBUG_PRINTLN("MPU RUNNING");
-      // This block makes sure that the fifo is up to date and read correctly
     }
     vTaskDelayUntil(&xLastWakeTime, xFrequency);
   }
@@ -162,6 +139,7 @@ void MovementDetection::MPUCode() {
 
 void MovementDetection::handleClash() {
   bool clashInt = ((MPUIntStatus >> 6) & 0x1) != 0;  // Only check the motion bit
+  MPUIntStatus = 0x0;
 
   // This is only done when the motion interrupt pin of the interrupt status is set, which can be configured by
   // setMotionDetectionThreshold and setMotionDetectionDuration
@@ -174,13 +152,6 @@ void MovementDetection::handleClash() {
       startLockupMillis = millis();
       lightsaber_on_state = lightsaber_on_bladelockup;
     } else {
-      /* Display real acceleration, adjusted to remove gravity */
-      // DEBUG_PRINT("areal\t");
-      // DEBUG_PRINT(aaReal.x);
-      // DEBUG_PRINT("\t");
-      // DEBUG_PRINT(aaReal.y);
-      // DEBUG_PRINT("\t");
-      // DEBUG_PRINTLN(aaReal.z);
       DEBUG_PRINTLN("CLASH DETECTED");
 
       clashTriggered = true;
@@ -202,11 +173,11 @@ void MovementDetection::handleClash() {
 
 void MovementDetection::handleSwing() {
   // This block should house something to detect motion and swings, not clashes
+  float magnitude = sqrt(ax * ax + ay * ay + az * az) / NormFactor;
+  // float motion = abs(magnitude - 16384);  // remove 1g
+
   const uint16_t upperThreshold = SWING_SENSITIVITY_MAX_THRESHOLD;
-  bool motionInt =
-    ((abs(aaReal.x) > swingSensitivity) && (abs(aaReal.x) < upperThreshold)) || 
-    ((abs(aaReal.y) > swingSensitivity) && (abs(aaReal.y) < upperThreshold)) || 
-    ((abs(aaReal.z) > swingSensitivity) && (abs(aaReal.z) < upperThreshold));
+  bool motionInt = (magnitude > swingSensitivity) && (magnitude < upperThreshold);
   if (motionInt && !clashTriggered && !blastTriggered && !swingTriggered && !lockupTriggered) {
 
     if (blaster_enabled) {
@@ -219,14 +190,7 @@ void MovementDetection::handleSwing() {
       lightsaber_on_state = lightsaber_on_blasterdeflect;
     } else {
       /* Display real acceleration, adjusted to remove gravity */
-      DEBUG_PRINT("swingSensitivity\t");
-      DEBUG_PRINTLN(swingSensitivity);
-      DEBUG_PRINT("areal\t");
-      DEBUG_PRINT(aaReal.x);
-      DEBUG_PRINT("\t");
-      DEBUG_PRINT(aaReal.y);
-      DEBUG_PRINT("\t");
-      DEBUG_PRINTLN(aaReal.z);
+
       DEBUG_PRINTLN("MOTION DETECTED");
 
       swingTriggered = true;
@@ -247,37 +211,15 @@ void MovementDetection::handleSwing() {
 }
 
 void MovementDetection::readMPUData() {
-  // get current FIFO count
-  uint8_t intStatus = mpu.getIntStatus();
-  fifoCount = mpu.getFIFOCount();
-  // check for overflow (this should never happen unless our code is too inefficient)
-  if ((intStatus & bit(MPU6050_INTERRUPT_FIFO_OFLOW_BIT)) || fifoCount >= 1024) {
-    // reset so we can continue cleanly
-    mpu.resetFIFO();
-    fifoCount = mpu.getFIFOCount();  // will be zero after reset no need to ask
-    // Serial.println(fifoCount);
-    // DEBUG_PRINT("areal\t");
-    // DEBUG_PRINT(aaReal.x);
-    // DEBUG_PRINT("\t");
-    // DEBUG_PRINT(aaReal.y);
-    // DEBUG_PRINT("\t");
-    // DEBUG_PRINTLN(aaReal.z);
-    Serial.println(F("FIFO overflow!"));
-    // Move out of function so we do not process bad samples
-    return;
-    // otherwise, check for DMP data ready interrupt (this should happen frequently)
-  } else if (intStatus & bit(MPU6050_INTERRUPT_DMP_INT_BIT)) {
-    // read all available packets from FIFO
-    while (fifoCount >= packetSize)  // Lets catch up to NOW, in case someone is using the dreaded delay()!
-    {
-      mpu.getFIFOBytes(FIFOBuffer, packetSize);
-      // track FIFO count here in case there is > 1 packet available
-      // (this lets us immediately read more without waiting for an interrupt)
-      fifoCount -= packetSize;
-    }
-  }
-  mpu.dmpGetQuaternion(&q, FIFOBuffer);
-  mpu.dmpGetAccel(&aa, FIFOBuffer);
-  mpu.dmpGetGravity(&gravity, &q);
-  mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
+  mpu.getAcceleration(&ax, &ay, &az);
+
+  gx = gravityAlpha * gx + (1.0 - gravityAlpha) * ax;
+  gy = gravityAlpha * gy + (1.0 - gravityAlpha) * ay;
+  gz = gravityAlpha * gz + (1.0 - gravityAlpha) * az;
+
+  // Subtract gravity → real acceleration
+  ax -= gx;
+  ay -= gy;
+  az -= gz;
+  float magnitude = sqrt(ax * ax + ay * ay + az * az) / NormFactor;
 }
