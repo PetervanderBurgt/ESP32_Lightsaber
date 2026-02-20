@@ -15,6 +15,7 @@ extern uint8_t effectLedsLength;
 
 bool mpu_ready = false;
 
+// This is set by the configmenu
 uint16_t swingSensitivity = 960;  // range should be between 0 and 16000 with increments of 160
 
 MPU6050 mpu;
@@ -107,6 +108,7 @@ void MovementDetection::MPUCode() {
   initMPU();
 
   mpu_ready = true;
+  
 
   // Reset any accidental interrupts
   (void)mpu.getIntStatus();
