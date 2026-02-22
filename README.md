@@ -70,14 +70,14 @@ Before all this happened I set out a couple of things that I would like to attai
 
 All links given are based on availability in the Netherlands
 
-|**Lightsaber Core**|**Amount**|**Minimum order**|**Price Per Piece**|
+|**Lightsaber Hilt**|**Amount**|**Minimum order**|**Price Per Piece**|
 |-|-|-|-|
 |[Wemos D1 Mini ESP32 (Dual Core)](https://nl.aliexpress.com/item/1005006026692511.html) (Tested with ESP32-WROOM-32)|1|€4,40|€4,40|
 |[Buttons (19mm)](https://nl.aliexpress.com/item/1005004920346156.html), nice ones|2|€3,99|€1,99|
 |[DFPlayer Mini](https://www.tinytronics.nl/nl/audio/audio-bronnen/dfrobot-dfplayer-mini-mp3-module) (An Original one, clones do not work!)|1|€8,00|€8,00|
 |[Micro SD Card](https://nl.aliexpress.com/item/1005005857273248.html)|1|€4,79|€4,79|
 |[MPU6050](https://nl.aliexpress.com/item/1005006579363624.html?spm=a2g0o.order_list.order_list_main.161.306179d2NNYWTh&gatewayAdapt=glo2nld)|1|€2,53|€2,53|
-|[2W Speaker 28mm](https://www.aliexpress.com/p/order/index.html?spm=a2g0o.home.headerAcount.2.682e44f5dH63Bg)|1|€1,89|
+|[2W Speaker 28mm](https://www.aliexpress.com/p/order/index.html?spm=a2g0o.home.headerAcount.2.682e44f5dH63Bg)|1|€1,89|€0,95|
 |[GX12 P3 Connector Male](https://nl.aliexpress.com/item/1005004207045147.html)|1|€6,59|€1,32|
 |[5V Boost Converter 3A](https://nl.aliexpress.com/item/1005008051438437.html)|1|€1,61|€1,61|
 |[TS-13 Slide Switch](https://nl.aliexpress.com/item/1005006060448283.html?)|1|€1,86|€0,93|
@@ -85,7 +85,7 @@ All links given are based on availability in the Netherlands
 |Random wires for Speaker|1|€0,00|€0,00|
 |[18650 Battery](https://nl.aliexpress.com/item/1005008243319532.html) (This one is a bit overkill)|1|€10,79|€5,40|
 |[Custom PCB](https://jlcpcb.com)|1|€10,01|€2,00|
-|**Total**|-|€0,00|€0,00|
+|**Total**|-|€58,87|€34,40|
 
 
 |**Lightsaber Blade**|**Amount**|**Minimum order**|**Price Per Piece**|
@@ -95,19 +95,25 @@ All links given are based on availability in the Netherlands
 |[GX12 P3 Connector Female](https://nl.aliexpress.com/item/1005004207045147.html) (See above)|0|€0,00|€0,00|
 |Random wires for LED connections|3|€0,00|€0,00|€0,00|
 |[Soft diffusion tube (8 x 18 mm)](https://nl.aliexpress.com/item/1005005913288707.html?spm=a2g0o.order_list.order_list_main.166.306179d2NNYWTh&gatewayAdapt=glo2nld)|1|€3,75|€3,75|
-|**Total**|-|€0,00|€0,00|
+|**Total**|-|€24,43|€24,43|
 
-|**3D Prints**|**Amount**|**Minimum order**|**Price Per Piece**|
-|-|-|-|-|
-|Lightsaber Carriage Top|1|€0,00|€0,00|
-|Lightsaber Carriage Bottom|1|€0,00|€0,00|
-|Bottom Sleeve|1|€0,00|€0,00|
-|Top Sleeve Bottom|1|€0,00|€0,00|
-|Top Sleeve Top|1|€0,00|€0,00|
-|Blade Stopper Top|1|€0,00|€0,00|
-|Blade Stopper Bottom|1|€0,00|€0,00|
-|**Total**|-|€0,00|€0,00|
+|**Lightsaber 3D Prints**|**Amount**|**Price Per Piece**|
+|-|-|-|
+|Lightsaber Carriage Top|1|€1,99|
+|Lightsaber Carriage Bottom|1|€1,95|
+|Bottom Sleeve|1|€1,37|
+|Top Sleeve Bottom|1|€0,44|
+|Top Sleeve Top|1|€0,66|
+|Blade Stopper Top|1|€0,99|
+|Blade Stopper Bottom|1|€0,03|
+|**Total**|-|€7,43|
 
+|**All**|**Price**|
+|-|-|
+|Lightsaber Hilt|€34,40|
+|Lightsaber Blade|€24,43|
+|Lightsaber 3D Print|€7,43|
+|**Total**|€66,26|
 
 ## Software BOM
 
