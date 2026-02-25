@@ -93,7 +93,8 @@ All links given are based on availability in the Netherlands
 |[Acrylate Transparent tube 1000x25x2](https://kunststofshop.nl/acrylaat-plexiglas/acrylaat-buizen/transparant/acrylaat-buis-transparant-1000x25x2mm-1000x25x2mm/a-3493-20000034)|1|€7,50|€7,50|
 |[COB Led Strips 100 LEDs/m 5mm 1m wide](https://nl.aliexpress.com/item/1005005922172231.html?spm=a2g0o.order_list.order_list_main.136.306179d2NNYWTh&gatewayAdapt=glo2nld) (tried 160 but too much power draw)|2|€13.18|€6,59|
 |[GX12 P3 Connector Female](https://nl.aliexpress.com/item/1005004207045147.html) (See above)|0|€0,00|€0,00|
-|Random wires for LED connections|3|€0,00|€0,00|€0,00|
+|Random wires for LED connections|3|€0,00|€0,00|
+|[Clear Present Foil](https://www.jumbo.com/producten/hema-cadeaupapier-folie-70-x-500-cm-667439STK) (1m)|31|€0,99|€0,99|
 |[Soft diffusion tube (8 x 18 mm)](https://nl.aliexpress.com/item/1005005913288707.html?spm=a2g0o.order_list.order_list_main.166.306179d2NNYWTh&gatewayAdapt=glo2nld)|1|€3,75|€3,75|
 |**Total**|-|€24,43|€24,43|
 
