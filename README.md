@@ -85,8 +85,9 @@ All links given are based on availability in the Netherlands
 |[TP4056 Battery Charger](https://nl.aliexpress.com/item/1005004427739715.html?)|1|€2,41|€0,48|
 |Random wires for Speaker|1|€0,00|€0,00|
 |[18650 Battery](https://nl.aliexpress.com/item/1005008243319532.html) (This one is a bit overkill)|1|€10,79|€5,40|
+|[18650 Battery Holder](https://nl.aliexpress.com/item/1005008815075521.html) |1|5,59|€0,56|
 |[Custom PCB](https://jlcpcb.com)|1|€10,01|€2,00|
-|**Total**|-|€58,87|€34,40|
+|**Total**|-|64,46|€34,99|
 
 
 |**Lightsaber Blade**|**Amount**|**Minimum order**|**Price Per Piece**|
@@ -112,10 +113,10 @@ All links given are based on availability in the Netherlands
 
 |**All**|**Price**|
 |-|-|
-|Lightsaber Hilt|€34,40|
+|Lightsaber Hilt|€34,99|
 |Lightsaber Blade|€24,43|
 |Lightsaber 3D Print|€7,43|
-|**Total**|€66,26|
+|**Total**|€66,85|
 
 ## Software BOM
 
